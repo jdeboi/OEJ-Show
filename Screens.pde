@@ -14,7 +14,7 @@ class Screen {
 
   Screen() {
     s = createGraphics(screenW, screenH, P3D);
-    //snakeLoc = int(random(0, screenW*2 + screenH*2));
+    snakeLoc = int(random(0, screenW*2 + screenH*2));
   }
 
   void blackOut() {
@@ -28,7 +28,7 @@ class Screen {
     s.background(c);
     s.endDraw();
   }
-  
+
   void drawCN() {
     s.beginDraw();
     s.strokeWeight(1);
@@ -36,8 +36,39 @@ class Screen {
     drawCurvyNetwork(s);
     s.endDraw();
   }
-  
+
+  void drawGif(Gif g, int x, int y, int w, int h) {
+    s.beginDraw();
+    s.image(g, x, y, w, h);
+    s.endDraw();
+  }
+
   void drawImage(PImage img, int x, int y) {
+    s.beginDraw();
+    s.image(img, x, y);
+    s.endDraw();
+  }
+
+  void drawFFTBars() {
+    s.beginDraw();
+    float rectW = screenW / beat.detectSize();
+    for (int i = 0; i < beat.detectSize(); ++i) {    
+      if ( beat.isOnset(i) ) {  // test one frequency band for an onset
+        s.fill(200);
+        s.rect( i*rectW, 0, rectW, screenH);
+      }
+    }
+    int lowBand = 5;
+    int highBand = 15;
+    int numberOfOnsetsThreshold = 4; // at least this many bands must have an onset for isRange to return true 
+    if ( beat.isRange(lowBand, highBand, numberOfOnsetsThreshold) ) {
+      s.fill(232, 0, 2, 200);
+      s.rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, screenH);
+    }
+    s.endDraw();
+  }
+
+  void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
     s.image(img, x, y);
     s.endDraw();
@@ -60,7 +91,7 @@ class Screen {
     int maxSnake = screenW*2 + screenH*2;
     snakeLoc += speed;
     if (snakeLoc > maxSnake) snakeLoc = 0;
-    
+
     // going clockwise starting from top left corner
     if (snakeLoc < screenW) {
       int sLoc = snakeLoc;
@@ -69,24 +100,21 @@ class Screen {
         s.line(0, 0, sLoc, 0);
         s.line(0, sLen - sLoc, 0, 0);
       }
-    }
-    else if (snakeLoc < screenW + screenH) {
+    } else if (snakeLoc < screenW + screenH) {
       int sLoc = snakeLoc - screenW;
       if (sLoc > sLen) s.line(screenW, sLoc - sLen, screenW, sLoc);
       else {
         s.line(screenW - (sLen-sLoc), 0, screenW, 0);
         s.line(screenW, 0, screenW, sLoc);
       }
-    }
-    else if (snakeLoc < screenW*2 + screenH) {
+    } else if (snakeLoc < screenW*2 + screenH) {
       int sLoc = snakeLoc - screenW - screenH;
       if (sLoc > sLen) s.line(screenW - sLoc, screenH, screenW - sLoc + sLen, screenH);
       else {
         s.line(screenW, screenH, screenW - sLoc, screenH);
         s.line(screenW, screenH - sLen + sLoc, screenW, screenH);
       }
-    }
-    else  {
+    } else {
       int sLoc = snakeLoc - 2*screenW - screenH;
       if (sLoc > sLen) s.line(0, screenH - sLoc, 0, screenH - sLoc + sLen);
       else {
@@ -117,7 +145,7 @@ void drawCNAll() {
 }
 
 void snakeOutlineAll(color c, int sw, int sLen, int speed) {
-   for (int i = 0; i < numScreens; i++) {
+  for (int i = 0; i < numScreens; i++) {
     screens[i].snakeOutline(c, sw, sLen, speed);
   }
 }
@@ -133,6 +161,37 @@ void drawImageAll(PImage img, int x, int y) {
     screens[i].drawImage(img, x, y);
   }
 }
+
+void drawImageAll(PImage img, int x, int y, int w, int h) {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawImage(img, x, y, w, h);
+  }
+}
+
+void drawGifAll(Gif g, int x, int y, int w, int h) {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawGif(g, x, y, w, h);
+  }
+}
+
+void drawImageAcross(PImage img, int y) {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawImage(img, -i*screenW, y, screenW*4, img.height*screenW*4/img.width);
+  }
+}
+
+void drawGifAcross(Gif g, int y) {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawGif(g, -i*screenW, y, screenW*4, g.height*screenW*4/g.width);
+  }
+}
+
+void drawFFTBarsAll() {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawFFTBars();
+  }
+}
+
 
 void initScreens() {
   ks = new Keystone(this);
