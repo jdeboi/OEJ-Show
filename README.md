@@ -13,20 +13,20 @@ Press the space bar
 
 To change to a different song hold ']' and a number / key specified below. Current set list (in order):
 
-1 - "When the Moon Comes"
-2 - "Dirty"
-3 - "Fifty Fifty"
-4 - "Crush Proof"
-5 - "Cycles"
-6 - "WizRock"
-7 - "Violate Expectations"
-8 - "Mood \#2"
-9 - "Delta Waves"
-0 - "Song for M"
-'-' - "Ellon"
-'=' - "Rite of Spring"
-'q' - "Lollies"
-'w' - "Egrets"
+1 - "When the Moon Comes"  
+2 - "Dirty"  
+3 - "Fifty Fifty"  
+4 - "Crush Proof"  
+5 - "Cycles"  
+6 - "WizRock"  
+7 - "Violate Expectations"  
+8 - "Mood \#2"  
+9 - "Delta Waves"  
+0 - "Song for M"  
+'-' - "Ellon"  
+'=' - "Rite of Spring"  
+'q' - "Lollies"  
+'w' - "Egrets"  
 
 ### projection surfaces
 
