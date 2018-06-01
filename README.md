@@ -1,6 +1,6 @@
 # Kirasu 1st Show
 
-One Eyed Jacks
+One Eyed Jacks  
 July 21st, 2018
 
 ## controls
@@ -30,5 +30,5 @@ To change to a different song hold ']' and a number / key specified below. Curre
 
 ### projection surfaces
 
-'c' to toggle the draggable edges
+'c' to toggle the draggable edges  
 's' to save the current surfaces
