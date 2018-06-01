@@ -42,7 +42,7 @@ void nextSong() {
 void drawSongLabel() {
   textSize(30);
   fill(255);
-  text(currentScene.song, 50, 50);
+  text(currentScene.order + ". " + currentScene.song, 50, 50);
 }
 
 class Scene {

@@ -23,10 +23,12 @@ void setup() {
 
 void draw() {
   background(0);
-  drawSongLabel();
+  
   playShow();
   //testShow();
   renderScreens();
+  
+  drawControls();
 }
 
 void testShow() {
@@ -98,7 +100,12 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  mousePlayer();
+  mousePlayer(50, 60, 300, 50);
+}
+
+void drawControls() {
+  drawSongLabel();
+  drawPlayer(50, 60, 300, 50);
 }
 
 void initTesting() {
