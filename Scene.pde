@@ -49,12 +49,10 @@ class Scene {
 
   String song;
   int order;
-  long timeStarted, duration, timeRemaining;
 
   Scene(String s, int o) {
     song = s;
     order = o;
-    timeRemaining = duration;
   }
 
   void playScene() {
@@ -66,8 +64,6 @@ class Scene {
 
   void pauseScene() {
     isPlaying = false;
-    //timeRemaining = timeRemaining - (millis() - timeStarted);
-    //timeRemaining = songFile.length() - songFile.position();
     songFile.pause();
     println(song + " paused");
   }
@@ -128,4 +124,49 @@ class Scene {
     songFile.cue(0);
     println(song + " has ended");
   }
+}
+
+void initDelta() {
+  songFile = minim.loadFile("music/delta.mp3", 1024);
+}
+void initRite() {
+  songFile = minim.loadFile("music/rite.mp3", 1024);
+}
+void initMoon() {
+  songFile = minim.loadFile("music/moon.mp3", 1024);
+}
+void initLollies() {
+  songFile = minim.loadFile("music/lollies.mp3", 1024);
+}
+void initCrush() {
+  songFile = minim.loadFile("music/crush.mp3", 1024);
+}
+void initCycles() {
+  songFile = minim.loadFile("music/cycles.mp3", 1024);
+}
+void initDirty() {
+  // TODO
+  songFile = minim.loadFile("music/fifty.mp3", 1024);
+}
+void initFifty() {
+  songFile = minim.loadFile("music/fifty.mp3", 1024);
+}
+void initWiz() {
+  songFile = minim.loadFile("music/wizrock.mp3", 1024);
+}
+void initViolate() {
+  songFile = minim.loadFile("music/violate.mp3", 1024);
+}
+void initMood() {
+  songFile = minim.loadFile("music/mood.mp3", 1024);
+}
+void initSong() {
+  songFile = minim.loadFile("music/song.mp3", 1024);
+}
+void initEllon() {
+  // TODO
+  songFile = minim.loadFile("music/egrets.mp3", 1024);
+}
+void initEgrets() {
+  songFile = minim.loadFile("music/egrets.mp3", 1024);
 }

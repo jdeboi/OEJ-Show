@@ -16,18 +16,17 @@ void setup() {
   size(1200, 800, P3D);
   initScenes();
   initScreens();
-  
+
   initTesting();
   currentScene.init();
 }
 
 void draw() {
   background(0);
-  
-  playShow();
-  //testShow();
+
+  //playShow();
+  testShow();
   renderScreens();
-  
   drawControls();
 }
 
@@ -93,8 +92,7 @@ void keyPressed() {
 void keyReleased() {
   if (key == ']') {
     bracketDown = false;
-  }
-  else if (key == '/') {
+  } else if (key == '/') {
     slashDown = false;
   }
 }
@@ -110,16 +108,16 @@ void drawControls() {
 
 void initTesting() {
   stage = loadImage("stage.png");
-  
+
   initCurvyNetwork();
-  
+
   initFFT();
-  
+
   gifAcross = new Gif(this, "patterns/spiral.gif");
   gifAcross.loop();
-  
+
   gifPanel = new Gif(this, "patterns/star_tunnel.gif");
   gifPanel.loop();
-  
+
   pattern = loadImage("dave.jpg");
 }
