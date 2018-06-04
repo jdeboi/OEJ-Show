@@ -28,6 +28,7 @@ void changeScene(int n) {
     currentScene = scenes[n];
     currentScene.init();
     isPlaying = false;
+    initBreaks();
     println("Current scene: " + currentScene.song);
   }
 }

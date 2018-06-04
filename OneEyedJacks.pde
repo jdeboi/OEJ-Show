@@ -18,20 +18,22 @@ void setup() {
   initScreens();
 
   initTesting();
-  currentScene.init();
+  initControls();
+  changeScene(0);
 }
 
 void draw() {
   background(0);
 
-  //playShow();
-  testShow();
+  playShow();
+  //testShow();
   renderScreens();
-  drawControls();
+  if (mouseY < 300) drawControls();
+  else hideControls();
 }
 
 void testShow() {
-  //image(stage, 0, 0, width, stage.height * width/stage.width);
+ image(stage, 0, 0, width, stage.height * width/stage.width);
   drawSolidAll(color(0));
   //snakeOutlineAll(color(255), 30, 150, 5);
   //drawCNAll();
@@ -43,6 +45,7 @@ void testShow() {
   //drawImageAcross(pattern, y);
   //drawOutlineAll(color(255), 30);; 
   //drawFFT();
+  //drawLines();
 }
 
 void playShow() {
@@ -55,36 +58,41 @@ void playShow() {
 }
 
 void keyPressed() {
-  if (bracketDown) { 
-    if (key == '0') changeScene(9);
-    else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);
-    else if (key == '-') changeScene(10);
-    else if (key == '=') changeScene(11);
-    else if (key == 'q') changeScene(12);
-    else if (key == 'w') changeScene(13);
-  } else if (slashDown) {
-    if (isPlaying) {
-      if (keyCode == RIGHT) songFile.skip(15000);
-      else if (keyCode == LEFT) songFile.skip(-1000);
-    }
-  } else if (key == ' ') {
-    isPlaying = !isPlaying;
-    if (isPlaying == true) currentScene.playScene();
-    else currentScene.pauseScene();
-  } else if (key == ']') {
-    bracketDown = true;
-  } else if (key == '/') {
-    slashDown = true;
+  if (cp5.get(Textfield.class, "input").isFocus() && selected > -1 && editingBreaks) {
+    println(cp5.get(Textfield.class, "input").getText());
+    breaks.get(selected).text = cp5.get(Textfield.class, "input").getText();
   } else {
-    switch(key) {
-    case 'c':
-      // toggle moveable edges
-      ks.toggleCalibration();
-      break;
-    case 's':
-      // saves the layout
-      ks.save();
-      break;
+    if (bracketDown) { 
+      if (key == '0') changeScene(9);
+      else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);
+      else if (key == '-') changeScene(10);
+      else if (key == '=') changeScene(11);
+      else if (key == 'q') changeScene(12);
+      else if (key == 'w') changeScene(13);
+    } else if (slashDown) {
+      if (isPlaying) {
+        if (keyCode == RIGHT) songFile.skip(15000);
+        else if (keyCode == LEFT) songFile.skip(-1000);
+      }
+    } else if (key == ' ' && !cp5.get(Textfield.class, "input").isFocus()) {
+      isPlaying = !isPlaying;
+      if (isPlaying == true) currentScene.playScene();
+      else currentScene.pauseScene();
+    } else if (key == ']') {
+      bracketDown = true;
+    } else if (key == '/') {
+      slashDown = true;
+    } else if (editingBreaks) {
+      if (selected > -1) {
+        if (keyCode == LEFT) breaks.get(selected).move(50);
+        else if (keyCode == RIGHT) breaks.get(selected).move(-50);
+        else if (key == 'd') {
+          breaks.remove(selected);
+          resetHighlights();
+          selected = -1;
+        } else breaks.get(selected).breakType = key;
+      } 
+      breaks.add(new Break(songFile.position(), key));
     }
   }
 }
@@ -98,12 +106,29 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  mousePlayer(50, 60, 300, 50);
+  if (editingBreaks) {
+    selected = -1;
+    for (int i = 0; i < breaks.size(); i++) {
+      if (breaks.get(i).mouseOver()) {
+        resetHighlights();
+        selected = i;
+        breaks.get(i).highlight = true;
+        return;
+      }
+    }
+  } 
+  mousePlayer();
 }
 
 void drawControls() {
   drawSongLabel();
-  drawPlayer(50, 60, 300, 50);
+  drawPlayer();
+  cp5.show();
+  drawBreakInfo();
+}
+
+void hideControls() {
+  cp5.hide();
 }
 
 void initTesting() {

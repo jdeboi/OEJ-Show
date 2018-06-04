@@ -1,3 +1,5 @@
+
+
 void displayDelta() {
   drawSolidAll(color(255));
 }
@@ -18,7 +20,10 @@ void displayLollies() {
 
 void displayCrush() {
   drawSolidAll(color(0));
-  drawFFTBarsAll();
+  
+  if (songFile.position() < 2000) drawFFTBarsAll();
+  
+  else drawGifAcross(gifAcross, 0);
 }
 void displayCycles() {
   drawSolidAll(color(0));

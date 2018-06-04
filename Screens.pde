@@ -70,7 +70,7 @@ class Screen {
 
   void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
-    s.image(img, x, y);
+    s.image(img, x, y, w, h);
     s.endDraw();
   }
 
