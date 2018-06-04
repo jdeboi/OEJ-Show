@@ -9,10 +9,10 @@ import java.util.List;
 ArrayList<Break> breaks;
 int currentBreak = 0;
 
-int xSpace = 50;
+int xSpace = 270;
 int vW = 800;
-int vH = 50;
-int ySpace = 75;
+int vH = 40;
+int ySpace = 60;
 int infoX = 400;
 int infoY = 150;
 
@@ -175,6 +175,12 @@ void drawPlayer() {
   textSize(12);
   timeText.setText((nf(songFile.position()/1000.0, 3, 2)));
   //text(nf(songFile.position()/1000.0, 3,2), xSpace, ySpace + vH);
+}
+
+void drawSongLabel() {
+  textSize(20);
+  fill(255);
+  text(currentScene.order + ". " + currentScene.song, xSpace, 50);
 }
 
 void mousePlayer() {

@@ -4,20 +4,20 @@ int currentSceneIndex = 0;
 boolean isPlaying = false;
 
 void initScenes() {
-  scenes[0] = new Scene("When the Moon Comes", 1);
-  scenes[1] = new Scene("Dirty", 2);
-  scenes[2] = new Scene("Fifty Fifty", 3);
-  scenes[3] = new Scene("Crush Proof", 4);
-  scenes[4] = new Scene("Cycles", 5);
-  scenes[5] = new Scene("WizRock", 6);
-  scenes[6] = new Scene("Violate Expectations", 7);
-  scenes[7] = new Scene("Mood #2", 8);
-  scenes[8] = new Scene("Delta Waves", 9);
-  scenes[9] = new Scene("Song for M", 10);
-  scenes[10] = new Scene("Ellon", 11);
-  scenes[11] = new Scene("Rite of Spring", 12);
-  scenes[12] = new Scene("Lollies", 13);
-  scenes[13] = new Scene("Egrets", 14);
+  scenes[0] = new Scene("When the Moon Comes", "moon", 1);
+  scenes[1] = new Scene("Dirty", "dirty", 2);
+  scenes[2] = new Scene("Fifty Fifty", "fifty", 3);
+  scenes[3] = new Scene("Crush Proof", "crush", 4);
+  scenes[4] = new Scene("Cycles", "cycles", 5);
+  scenes[5] = new Scene("WizRock", "wizrock", 6);
+  scenes[6] = new Scene("Violate Expectations", "violate", 7);
+  scenes[7] = new Scene("Mood #2", "mood", 8);
+  scenes[8] = new Scene("Delta Waves", "delta", 9);
+  scenes[9] = new Scene("Song for M", "song", 10);
+  scenes[10] = new Scene("Ellon", "ellon", 11);
+  scenes[11] = new Scene("Rite of Spring", "rite", 12);
+  scenes[12] = new Scene("Lollies", "lollies", 13);
+  scenes[13] = new Scene("Egrets", "egrets", 14);
   currentScene = scenes[0];
 }
 
@@ -40,19 +40,15 @@ void nextSong() {
 }
 
 
-void drawSongLabel() {
-  textSize(30);
-  fill(255);
-  text(currentScene.order + ". " + currentScene.song, 50, 50);
-}
-
 class Scene {
 
   String song;
+  String shortName;
   int order;
 
-  Scene(String s, int o) {
+  Scene(String s, String sn, int o) {
     song = s;
+    shortName = sn;
     order = o;
   }
 
@@ -70,12 +66,12 @@ class Scene {
   }
 
   void update() {
-    if (isPlaying) {
-      if (songFile.position() >= songFile.length()-100) {
-        resetScene();
-        nextSong();
-      }
-    }
+    //if (isPlaying) {
+    //  if (songFile.position() >= songFile.length()-100) {
+    //    resetScene();
+    //    nextSong();
+    //  }
+    //}
   }
 
   void init() {
@@ -143,7 +139,10 @@ void initCrush() {
   songFile = minim.loadFile("music/crush.mp3", 1024);
 }
 void initCycles() {
+
   songFile = minim.loadFile("music/cycles.mp3", 1024);
+  initVid("scenes/cycles/movies/vid1.mp4"); 
+  loadImages("cycles");
 }
 void initDirty() {
   // TODO
@@ -170,4 +169,15 @@ void initEllon() {
 }
 void initEgrets() {
   songFile = minim.loadFile("music/egrets.mp3", 1024);
+}
+
+void loadImages(String dir) {
+  images = new ArrayList<PImage>();
+  java.io.File folder = new java.io.File(dataPath("scenes/" + dir + "/images")); 
+  String[] filenames = folder.list(); 
+  PImage p;
+  for (int i = 0; i < filenames.length; i++) {
+    p = loadImage("scenes/" + dir + "/images/" + filenames[i]);
+    images.add(p);
+  }
 }

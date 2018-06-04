@@ -20,15 +20,24 @@ void displayLollies() {
 
 void displayCrush() {
   drawSolidAll(color(0));
-  
+
   if (songFile.position() < 2000) drawFFTBarsAll();
-  
+
   else drawGifAcross(gifAcross, 0);
 }
+
 void displayCycles() {
-  drawSolidAll(color(0));
-  drawFFTBarsAll();
+  if (songFile.position() < 5000) mirrorVidCenter(vid1, -100, 0);
+  else if (songFile.position() < 15000) {
+    drawSolidAll(color(0));
+    drawImageAll(images.get(0), 0, 0);
+  }
+  else {
+    drawSolidAll(color(0));
+    drawFFTBarsAll();
+  }
 }
+
 void displayDirty() {
   drawSolidAll(color(0));
   drawFFTBarsAll();

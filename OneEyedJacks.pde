@@ -3,6 +3,9 @@ boolean bracketDown = false;
 boolean slashDown = false;
 PImage pattern;
 PImage stage;
+boolean isTesting = false;
+
+ArrayList<PImage> images;
 
 import gifAnimation.*;
 Gif gifAcross;
@@ -25,27 +28,34 @@ void setup() {
 void draw() {
   background(0);
 
-  playShow();
-  //testShow();
+  // are we testing imagery or playing the show?
+  if (isTesting) testShow();
+  else playShow();
   renderScreens();
+  
+  // control bar
   if (mouseY < 300) drawControls();
   else hideControls();
 }
 
 void testShow() {
- image(stage, 0, 0, width, stage.height * width/stage.width);
-  drawSolidAll(color(0));
+  //image(stage, 0, 0, width, stage.height * width/stage.width);
+  //drawSolidAll(color(0));
   //snakeOutlineAll(color(255), 30, 150, 5);
   //drawCNAll();
   //drawGifAll(gifPanel, 0, 0, screenW, screenH);
   //drawGifAcross(gifAcross, 0);
-  drawFFTBarsAll();
+  //drawFFTBarsAll();
   //drawImageAll(pattern, 0, 0, screenW, screenH);
   //int y = int(map(mouseY, 0, height, -550, 0));
   //drawImageAcross(pattern, y);
-  //drawOutlineAll(color(255), 30);; 
+  
   //drawFFT();
   //drawLines();
+  //tileVid(vid2, 0, 0);
+  //movieAcrossAll(vid2, -100);
+  //mirrorVidCenter(vid1, 0, 0);
+  //drawOutlineAll(color(255), 10);
 }
 
 void playShow() {
@@ -132,17 +142,19 @@ void hideControls() {
 }
 
 void initTesting() {
-  stage = loadImage("stage.png");
+  stage = loadImage("_testing/images/stage.png");
 
   initCurvyNetwork();
 
   initFFT();
 
-  gifAcross = new Gif(this, "patterns/spiral.gif");
+  gifAcross = new Gif(this, "_testing/gifs/spiral.gif");
   gifAcross.loop();
 
-  gifPanel = new Gif(this, "patterns/star_tunnel.gif");
+  gifPanel = new Gif(this, "_testing/gifs/star_tunnel.gif");
   gifPanel.loop();
 
-  pattern = loadImage("dave.jpg");
+  pattern = loadImage("_testing/images/dave.jpg");
+  
+  initVid("_testing/movies/vid1.mp4", "_testing/movies/explosion.mp4");
 }

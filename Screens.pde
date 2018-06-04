@@ -48,6 +48,22 @@ class Screen {
     s.image(img, x, y);
     s.endDraw();
   }
+  
+  void drawBlend(PImage img1, PImage img2, int x, int y, int mode) {
+    s.beginDraw();
+    s.image(img1, x, y);
+    s.blend(img2, x, y, screenW, screenH, x, y, screenW, screenH, mode);
+    s.endDraw();
+  }
+
+  void drawImageMirror(PImage img, int x, int y) {
+    s.beginDraw();
+    s.pushMatrix();
+    s.scale(-1.0, 1.0);
+    s.image(img, -screenW+x, y);
+    s.popMatrix();
+    s.endDraw();
+  }
 
   void drawFFTBars() {
     s.beginDraw();
