@@ -23,7 +23,7 @@ void displayCrush() {
 
   if (songFile.position() < 2000) drawFFTBarsAll();
 
-  else drawGifAcross(gifAcross, 0);
+  //else drawGifAcross(gifAcross, 0);
 }
 
 void displayCycles() {

@@ -142,7 +142,7 @@ void initCycles() {
 
   songFile = minim.loadFile("music/cycles.mp3", 1024);
   initVid("scenes/cycles/movies/vid1.mp4"); 
-  loadImages("cycles");
+  images = loadImages("scenes/cycles/images/");
 }
 void initDirty() {
   // TODO
@@ -171,13 +171,43 @@ void initEgrets() {
   songFile = minim.loadFile("music/egrets.mp3", 1024);
 }
 
-void loadImages(String dir) {
-  images = new ArrayList<PImage>();
-  java.io.File folder = new java.io.File(dataPath("scenes/" + dir + "/images")); 
+ArrayList<PImage> loadImages(String dir) {
+  ArrayList<PImage> imgs = new ArrayList<PImage>();
+  java.io.File folder = new java.io.File(dataPath(dir)); 
   String[] filenames = folder.list(); 
   PImage p;
-  for (int i = 0; i < filenames.length; i++) {
-    p = loadImage("scenes/" + dir + "/images/" + filenames[i]);
-    images.add(p);
+  for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
+    p = loadImage(dir + filenames[i]);
+    imgs.add(p);
   }
+  return imgs;
+}
+
+String[] getFileNames(String dir) {
+  java.io.File folder = new java.io.File(dataPath(dir)); 
+  return folder.list(); 
+}
+
+ArrayList<Gif> loadGifs(String dir) {
+  ArrayList<Gif> gifs = new ArrayList<Gif>();
+  java.io.File folder = new java.io.File(dataPath(dir)); 
+  String[] filenames = folder.list(); 
+  Gif g;
+  for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
+    g = new Gif(this, dir + filenames[i]);
+    gifs.add(g);
+  }
+  return gifs;
+}
+
+ArrayList<Movie> loadMovies(String dir) {
+  ArrayList<Movie> movies = new ArrayList<Movie>();
+  java.io.File folder = new java.io.File(dataPath(dir)); 
+  String[] filenames = folder.list(); 
+  Movie m;
+  for (int i = 0; i < filenames.length && i < MAX_MOV; i++) {
+    m = new Movie(this, dir + filenames[i]);
+    movies.add(m);
+  }
+  return movies;
 }

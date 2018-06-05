@@ -9,10 +9,10 @@ import java.util.List;
 ArrayList<Break> breaks;
 int currentBreak = 0;
 
-int xSpace = 270;
-int vW = 800;
+int xSpace = 50;
+int vW = 600;
 int vH = 40;
-int ySpace = 60;
+int ySpace = 150;
 int infoX = 400;
 int infoY = 150;
 
@@ -180,7 +180,7 @@ void drawPlayer() {
 void drawSongLabel() {
   textSize(20);
   fill(255);
-  text(currentScene.order + ". " + currentScene.song, xSpace, 50);
+  text(currentScene.order + ". " + currentScene.song, xSpace, ySpace - 10);
 }
 
 void mousePlayer() {
@@ -192,10 +192,10 @@ void mousePlayer() {
     int position = int( map( mouseX, x, x+w, 0, songFile.length() ) );
     songFile.cue( position );
   } else {
-    if (!cp5.get(Textfield.class, "input").isMouseOver()) {
+    //if (!cp5.get(Textfield.class, "input").isMouseOver()) {
       resetHighlights();
       selected = -1;
-    }
+    //}
   }
 }
 
