@@ -48,7 +48,7 @@ class Screen {
     s.image(img, x, y);
     s.endDraw();
   }
-  
+
   void drawBlend(PImage img1, PImage img2, int x, int y, int mode) {
     s.beginDraw();
     s.image(img1, x, y);
@@ -87,6 +87,17 @@ class Screen {
   void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
     s.image(img, x, y, w, h);
+    s.endDraw();
+  }
+
+  void drawTriangle(color c, int sw, int x, int y, int sz) {
+    s.beginDraw();
+    s.strokeWeight(sw);
+    s.stroke(c);
+    s.noFill();
+    println((x-sz/2) + " " + (y + sz*sqrt(3)/4.0));
+    float alt = sz*sqrt(3)/2.0;
+    s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2); //50, 50, 100, 10, 150, 50);
     s.endDraw();
   }
 

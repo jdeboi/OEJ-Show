@@ -20,8 +20,11 @@ void displayLollies() {
 
 void displayCrush() {
   drawSolidAll(color(0));
+  triangleCenter(color(20, 255, 255), 5, screenW/2);
+  drawOutlineAll(color(255), 5);
+  
 
-  if (songFile.position() < 2000) drawFFTBarsAll();
+  //if (songFile.position() < 2000) drawFFTBarsAll();
 
   //else drawGifAcross(gifAcross, 0);
 }
@@ -69,4 +72,15 @@ void displayEllon() {
 void displayEgrets() {
   drawSolidAll(color(0));
   drawFFTBarsAll();
+}
+
+
+
+void triangleCenter2(color c, int sw, int sz) {
+  
+}
+
+void triangleCenter(color c, int sw, int sz) {
+  screens[1].drawTriangle(c, sw, screenW, screenH/2, sz);
+  screens[2].drawTriangle(c, sw, 0, screenH/2, sz);
 }

@@ -11,7 +11,7 @@ int MAX_GIF = 50;
 int MAX_IMG = 50;
 int MAX_MOV = 20;
 
-boolean isTesting = true;
+boolean isTesting = false;
 PImage currentTestImg;
 Gif currentTestGif;
 String[] testingImages;
@@ -35,17 +35,21 @@ void setup() {
   initScreens();
 
   initControls();
-  changeScene(0);
+  changeScene(3);
+  initMask();
 }
 
 void draw() {
   background(0);
+
 
   // are we testing imagery or playing the show?
   if (isTesting) testShow();
   else playShow();
 
   renderScreens();
+
+  maskScreens();
 
   // control bar
   if (mouseY < 300) drawControls();
@@ -92,7 +96,7 @@ void testShow() {
   else if (mode == VID_MIRROR) mirrorVidCenter(vid1, 0, 0);
 
   //snakeOutlineAll(color(255), 30, 150, 5);
-  drawOutlineAll(color(255), 10);
+  //drawOutlineAll(color(255), 10);
 }
 
 void playShow() {
@@ -101,6 +105,10 @@ void playShow() {
     currentScene.display();
   } else {
     blackoutScreens();
+  }
+  if (editingMask) {
+    drawMaskPoints();
+    moveSelectedMask();
   }
 }
 
@@ -163,9 +171,11 @@ void mousePressed() {
         return;
       }
     }
-  } 
+  } else if (editingMask) checkMaskClick();
   mousePlayer();
 }
+
+
 
 void drawControls() {
   drawSongLabel();
@@ -185,7 +195,7 @@ void initTesting() {
   currentTestGif = new Gif(this, "_testing/gifs/" + testingGifs[0]);
 
   testingMovies = getFileNames("_testing/movies/");
-  
+
   initVid("_testing/movies/" + testingMovies[0]);
 
   if (MAX_GIF > testingGifs.length) MAX_GIF=testingGifs.length;

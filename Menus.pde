@@ -4,7 +4,7 @@ ControlP5 cp5;
 
 // start / stop music
 
-Toggle togMap, togEdit, togShow, togP;
+Toggle togMap, togEdit, togShow, togP, togEditMask;
 Textlabel timeText;
 Textarea myTextarea;
 
@@ -50,7 +50,20 @@ void initControls() {
     .setMode(ControlP5.SWITCH)
     ;
 
-
+  togEditMask = cp5.addToggle("toggleEditMask")
+    .setPosition(950, 150)
+    .setSize(50, 20)
+    .setValue(false)
+    .setLabel("Edit Mask Off")
+    .setMode(ControlP5.SWITCH)
+    ;
+    
+  cp5.addButton("saveMask")
+    .setValue(0)
+    .setPosition(950, 200)
+    .setSize(80, 19)
+    .setLabel("Save Mask")
+    ;
 
   cp5.addButton("saveBreaks")
     .setValue(0)
@@ -99,13 +112,13 @@ void initControls() {
   l = Arrays.asList("GIF_ALL", "GIF_ACROSS", "IMG_ALL", "IMG_ACROSS", "FFT", "TILE_VID", "VID_ACROSS", "VID_MIRROR");
   cp5.addScrollableList("modeList")
     .setPosition(150, 0)
-    .setColorBackground(color(10, 105, 0))
+    .setColorBackground(color(105, 10, 0))
     .setSize(150, 100)
     .setBarHeight(20)
     .setItemHeight(20)
     .addItems(l)
     ;
-    
+
   l = Arrays.asList(subset(getFileNames("_testing/gifs/"), 0, MAX_GIF));
   cp5.addScrollableList("gifs")
     .setPosition(300, 0)
@@ -161,6 +174,11 @@ public void saveMap(int theValue) {
   ks.save();
 }
 
+public void saveMask(int theValue) {
+  println("mask saved");
+  saveMaskPoints();
+}
+
 public void saveBreaks(int theValue) {
   println("breaks saved");
   bubbleSort();
@@ -183,6 +201,12 @@ void toggleP(boolean theFlag) {
   }
 }
 
+void toggleEditMask(boolean theFlag) {
+  editingMask = theFlag;
+  String o = editingMask?"ON":"OFF";
+  togEditMask.setLabel("Edit Mask " + o);
+  println("toggling edit mask");
+}
 
 void toggleEditBreak(boolean theFlag) {
   editingBreaks = theFlag;
