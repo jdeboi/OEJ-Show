@@ -6,6 +6,8 @@ MPoint selectedP = null;
 void initMask() {
   maskPoints = new MPoint[10];
   loadMask();
+  centerX = (maskPoints[2].x+maskPoints[7].x)/2; 
+  centerY = (maskPoints[2].y+maskPoints[7].y)/2;
 }
 
 
@@ -66,7 +68,7 @@ void checkMaskClick() {
 
 
 void maskScreens() {
-  fill(0);
+  fill(50);
   noStroke();
   beginShape();
   vertex(0, maskPoints[0].y);

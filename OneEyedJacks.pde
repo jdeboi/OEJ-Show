@@ -30,17 +30,17 @@ int VID_MIRROR = 8;
 
 void setup() {
   size(1200, 800, P3D);
-  initTesting();
   initScenes();
-  initScreens();
-
-  initControls();
+  initTesting();
   changeScene(3);
+
+  initScreens();
+  initControls();
   initMask();
 }
 
 void draw() {
-  background(0);
+  background(50);
 
 
   // are we testing imagery or playing the show?
@@ -50,6 +50,7 @@ void draw() {
   renderScreens();
 
   maskScreens();
+
 
   // control bar
   if (mouseY < 300) drawControls();
@@ -211,6 +212,7 @@ void initTesting() {
 
 void togglePlay() {
   isPlaying = !isPlaying;
-  if (isPlaying == true) currentScene.playScene();
-  else currentScene.pauseScene();
+  if (isPlaying == true) {
+    currentScene.playScene();
+  } else currentScene.pauseScene();
 }

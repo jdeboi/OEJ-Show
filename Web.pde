@@ -69,3 +69,31 @@ class Star {
     loc = loc.add(speed);
   } // End of update()
 } // End of class
+
+
+// Nervous Waves 2
+// Levente Sandor, 2014
+// https://www.openprocessing.org/sketch/153224
+void disaplyNervous() {
+  noiseDetail(2, 0.9);
+  rectMode(CENTER);
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    s.s.fill(255);
+    s.s.noStroke();
+    
+    for (int x = 10; x < screenW; x += 10) {
+      for (int y = 10; y < screenH; y += 10) {
+        float n = noise(x * 0.005, y * 0.005, frameCount * 0.05);
+        s.s.pushMatrix();
+        s.s.translate(x, y);
+        s.s.rotate(TWO_PI * n);
+        s.s.scale(10 * n);
+        s.s.rect(0, 0, 1, 1);
+        s.s.popMatrix();
+      }
+    }
+    s.s.endDraw();
+  }
+  rectMode(CORNER);
+}

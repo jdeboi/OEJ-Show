@@ -6,6 +6,7 @@ CornerPinSurface [] surfaces;
 Screen [] screens;
 int screenW = 400;
 int screenH = 400;
+int centerX, centerY;
 
 class Screen {
 
@@ -83,6 +84,26 @@ class Screen {
     }
     s.endDraw();
   }
+  
+  //void drawFFTHoriz(color c, int sw) {
+  //  s.beginDraw();
+    
+  //  for (int i = 0; i < beat.detectSize(); ++i) {    
+  //    if ( beat.isOnset(i) ) {  // test one frequency band for an onset
+  //      s.stroke(c);
+  //      s.noFill();
+  //      s.rect( i*rectW, 0, rectW, screenH);
+  //    }
+  //  }
+  //  int lowBand = 5;
+  //  int highBand = 15;
+  //  int numberOfOnsetsThreshold = 4; // at least this many bands must have an onset for isRange to return true 
+  //  if ( beat.isRange(lowBand, highBand, numberOfOnsetsThreshold) ) {
+  //    s.fill(232, 0, 2, 200);
+  //    s.rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, screenH);
+  //  }
+  //  s.endDraw();
+  //}
 
   void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
@@ -95,7 +116,6 @@ class Screen {
     s.strokeWeight(sw);
     s.stroke(c);
     s.noFill();
-    println((x-sz/2) + " " + (y + sz*sqrt(3)/4.0));
     float alt = sz*sqrt(3)/2.0;
     s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2); //50, 50, 100, 10, 150, 50);
     s.endDraw();
@@ -232,7 +252,10 @@ void initScreens() {
 }
 
 void renderScreens() {
+  pushMatrix();
+  translate(0, 0, -1);
   for (int i = 0; i < numScreens; i++) {
     surfaces[i].render(screens[i].s);
   }
+  popMatrix();
 }

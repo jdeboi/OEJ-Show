@@ -1,26 +1,43 @@
 import processing.video.*;
 Movie vid1;
 Movie vid2;
+boolean vidIsPlaying = false;
+boolean vid1IsPlaying = false;
 
 void initVid(String path1) {
   vid1 = new Movie(this, path1);
   vid2 = null;
-  vid1.play();
-  vid1.volume(0);
+  vid1IsPlaying = true;
+  vidIsPlaying = true;
+  pauseVids();
 }
 
 void initVid(String path1, String path2) {
   vid1 = new Movie(this, path1);
   vid2 = new Movie(this, path2);
-  vid1.play();
-  vid2.play();
-  vid1.volume(0);
-  vid2.volume(0);
+  vid1IsPlaying = true;
+  vidIsPlaying = true;
+  pauseVids();
+}
+
+void playVids() {
+  if (vid1IsPlaying && vid1 != null) {
+    vid1.play();
+    vid1.volume(0);
+  } else if (vid2 != null) {
+    vid2.play();
+    vid2.volume(0);
+  }
 }
 
 void stopVids() {
-  vid1.stop();
-  vid2.stop();
+  pauseVids();
+  vidIsPlaying = false;
+}
+
+void pauseVids() {
+  if (vid1 != null) vid1.stop();
+  if (vid2 != null) vid2.stop();
 }
 
 void mirrorVidCenter(Movie m, int x, int y) {

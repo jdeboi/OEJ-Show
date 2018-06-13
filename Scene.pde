@@ -57,21 +57,19 @@ class Scene {
     //timeStarted = millis();
     songFile.play();
     println(song + " is playing");
+
+    if (currentCue != -1) cues[currentCue].initCue();
   }
 
   void pauseScene() {
     isPlaying = false;
     songFile.pause();
-    println(song + " paused");
+    println(song + " paused"); 
+
+    if (currentCue != -1) cues[currentCue].pauseCue();
   }
 
   void update() {
-    //if (isPlaying) {
-    //  if (songFile.position() >= songFile.length()-100) {
-    //    resetScene();
-    //    nextSong();
-    //  }
-    //}
   }
 
   void init() {
@@ -123,53 +121,7 @@ class Scene {
   }
 }
 
-void initDelta() {
-  songFile = minim.loadFile("music/delta.mp3", 1024);
-}
-void initRite() {
-  songFile = minim.loadFile("music/rite.mp3", 1024);
-}
-void initMoon() {
-  songFile = minim.loadFile("music/moon.mp3", 1024);
-}
-void initLollies() {
-  songFile = minim.loadFile("music/lollies.mp3", 1024);
-}
-void initCrush() {
-  songFile = minim.loadFile("music/crush.mp3", 1024);
-}
-void initCycles() {
 
-  songFile = minim.loadFile("music/cycles.mp3", 1024);
-  initVid("scenes/cycles/movies/vid1.mp4"); 
-  images = loadImages("scenes/cycles/images/");
-}
-void initDirty() {
-  // TODO
-  songFile = minim.loadFile("music/fifty.mp3", 1024);
-}
-void initFifty() {
-  songFile = minim.loadFile("music/fifty.mp3", 1024);
-}
-void initWiz() {
-  songFile = minim.loadFile("music/wizrock.mp3", 1024);
-}
-void initViolate() {
-  songFile = minim.loadFile("music/violate.mp3", 1024);
-}
-void initMood() {
-  songFile = minim.loadFile("music/mood.mp3", 1024);
-}
-void initSong() {
-  songFile = minim.loadFile("music/song.mp3", 1024);
-}
-void initEllon() {
-  // TODO
-  songFile = minim.loadFile("music/egrets.mp3", 1024);
-}
-void initEgrets() {
-  songFile = minim.loadFile("music/egrets.mp3", 1024);
-}
 
 ArrayList<PImage> loadImages(String dir) {
   ArrayList<PImage> imgs = new ArrayList<PImage>();
@@ -185,7 +137,7 @@ ArrayList<PImage> loadImages(String dir) {
 
 String[] getFileNames(String dir) {
   java.io.File folder = new java.io.File(dataPath(dir)); 
-  return folder.list(); 
+  return folder.list();
 }
 
 ArrayList<Gif> loadGifs(String dir) {
@@ -194,8 +146,10 @@ ArrayList<Gif> loadGifs(String dir) {
   String[] filenames = folder.list(); 
   Gif g;
   for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
-    g = new Gif(this, dir + filenames[i]);
-    gifs.add(g);
+    if (!filenames[i].equals(".DS_Store")) {
+      g = new Gif(this, dir + filenames[i]);
+      gifs.add(g);
+    }
   }
   return gifs;
 }

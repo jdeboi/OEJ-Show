@@ -56,6 +56,7 @@ class Break {
     //}
   }
 
+
   void displayInfo() {
     if (mouseOver() || highlight) {
     strokeWeight(1);
@@ -191,6 +192,9 @@ void mousePlayer() {
   if (mouseY > y && mouseY < y + h && mouseX > x && mouseX < x + w) {
     int position = int( map( mouseX, x, x+w, 0, songFile.length() ) );
     songFile.cue( position );
+    setCurrentCue();
+    println("current cue: " + currentCue);
+    if (currentCue != -1) cues[currentCue].initCue();
   } else {
     //if (!cp5.get(Textfield.class, "input").isMouseOver()) {
       resetHighlights();
