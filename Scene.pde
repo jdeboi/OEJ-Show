@@ -87,7 +87,12 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
+ 
+    currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
+    currentImages = loadImages("scenes/" + shortName + "/images/");
+    currentCue = 0;
 
+    songFile = minim.loadFile("music/" + shortName + ".mp3", 1024);
     songFile.cue(0);
     songFile.pause();
     initBeat();
@@ -96,6 +101,7 @@ class Scene {
 
   void display() {
     if (isPlaying) {
+      setCurrentCue();
       if (song.equals("Delta Waves")) displayDelta();
       else if (song.equals("Rite of Spring")) displayRite();
       else if (song.equals("When the Moon Comes")) displayMoon();

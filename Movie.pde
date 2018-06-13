@@ -55,7 +55,6 @@ void movieAcrossAll(Movie m, int y) {
   }
 }
 
-
 void tileVid(Movie m, int x, int y) {
   for (int i = 0; i < 4; i++) {
     screens[i].drawImage(m, x, y);
