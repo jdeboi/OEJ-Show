@@ -117,7 +117,7 @@ void triangleCenterScreen(color c, int sw, int sz) {
 // Koï Koï
 ArrayList<Star> constellation;
 int n;
-float d;
+float dd;
 
 void initCurvyNetwork() {
   n = 50;
@@ -135,8 +135,8 @@ void drawCurvyNetwork(PGraphics s) {
     constellation.get(i).update();
     for (int j = 0; j < constellation.size(); j++) {
       if (i > j) { // "if (i > j)" => to check one time distance between two stars
-        d = constellation.get(i).loc.dist(constellation.get(j).loc); // Distance between two stars
-        if (d <= width / 10) { // if d is less than width/10 px, we draw a line between the two stars
+        dd = constellation.get(i).loc.dist(constellation.get(j).loc); // Distance between two stars
+        if (dd <= width / 10) { // if d is less than width/10 px, we draw a line between the two stars
           s.line(constellation.get(i).loc.x, constellation.get(i).loc.y, constellation.get(j).loc.x, constellation.get(j).loc.y);
         }
       }
@@ -157,6 +157,7 @@ class Star {
     this.bam = new PVector();
     this.m = 0;
   }
+  
 
   void update() {
     bam =  PVector.random2D();// movement of star will be a bit erractic
@@ -198,7 +199,7 @@ void displayNervous() {
     s.s.beginDraw();
     s.s.fill(255);
     s.s.noStroke();
-    
+
     for (int x = 10; x < screenW; x += 10) {
       for (int y = 10; y < screenH; y += 10) {
         float n = noise(x * 0.005, y * 0.005, frameCount * 0.05);
@@ -213,4 +214,80 @@ void displayNervous() {
     s.s.endDraw();
   }
   rectMode(CORNER);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// CIRCLE PULSE
+//////////////////////////////////////////////////////////////////////////////////
+/**
+ * @author aa_debdeb
+ * https://www.openprocessing.org/sketch/385808
+ */
+
+void initLACircle() {
+  size(640, 640);
+  noFill();
+  strokeWeight(2);
+}
+
+void displayLACircle() {
+  background(238, 243, 239);
+  translate(width / 2, height / 2);
+  float radius = 200;
+  float step = 5;
+  for (float y = -radius + step / 2; y <= radius - step / 2; y += step) {
+    float X = sqrt(sq(radius) - sq(y)); 
+    float cRate = map(y, -radius + step / 2, radius + step / 2, 0, 1);
+    stroke(lerpColor(color(69, 189, 207), color(234, 84, 93), cRate));
+    beginShape();
+    for (float x = -X; x <= X; x += 1) {
+      vertex(x, y);
+    }
+    endShape();
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// WAVY CIRCLE
+//////////////////////////////////////////////////////////////////////////////////
+//https://www.openprocessing.org/sketch/399221
+color c1 = #191970;
+color c2 = #ECF0F1;
+int count = 19;
+float r = 120;
+float d = 8.25;
+int MAX = 330;
+
+void initWavyCircle() {
+}
+
+void displayWavyCircle() {
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    s.s.smooth();
+    //s.s.background(c1);
+    s.s.ellipseMode(RADIUS);
+    s.s.noStroke();
+
+    s.s.fill(c1, 100);
+    s.s.rect(0, 0, screenW, screenH);
+    s.s.fill(c2, 100);
+
+    s.s.pushMatrix();
+    s.s.translate(screenW/ 2, screenH / 2);
+    for (int n = 1; n < count; n++) {
+      for (float a = 0; a <= 360; a += 1) {
+        float progress = constrain(map(frameCount%MAX, 0+n*d, MAX+(n-count)*d, 0, 1), 0, 1);
+        float ease = -0.5*(cos(progress * PI) - 1);
+        float phase = 0 + 2*PI*ease + PI + radians(map(frameCount%MAX, 0, MAX, 0, 360));
+        float x = map(a, 0, 360, -r, r);
+        float y = r * sqrt(1 - pow(x/r, 2)) * sin(radians(a) + phase);
+        s.s.ellipse(x, y, 1.5, 1.5);
+      }
+    }
+    s.s.popMatrix();
+  }
 }

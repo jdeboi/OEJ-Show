@@ -1,24 +1,28 @@
+boolean isTesting = true;
+//////////
+
 import gifAnimation.*;
 import processing.video.*;
+boolean startShow = false;
 Movie myMovie;
 
 boolean bracketDown = false;
 boolean slashDown = false;
 PImage stage;
-ArrayList<PImage> images;
+//ArrayList<PImage> images;
 
 int MAX_GIF = 50;
 int MAX_IMG = 50;
 int MAX_MOV = 20;
 
-boolean isTesting = false;
+
 PImage currentTestImg;
 Gif currentTestGif;
 String[] testingImages;
 String[] testingGifs;
 String[] testingMovies;
 
-int mode = 0;
+int mode = 5;
 int GIF_ALL = 1;
 int GIF_ACROSS = 2;
 int IMG_ALL = 3;
@@ -37,6 +41,8 @@ void setup() {
   initScreens();
   initControls();
   initMask();
+  initConst();
+  initHands();
 }
 
 void draw() {
@@ -87,7 +93,16 @@ void testShow() {
   else if (mode == FFT) {
     //drawFFT();
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    //drawFFTBarsAll();
+    
+    
+    //drawSpectrum(30);
+    //cycleShapeFFT();
+    //cycleConstFFT();
+    cycleHandsFFT();
+    //drawSpectrumAcross();
+    //drawSpectrumMirror();
+    //drawTriangleSpectrum();
   }
 
   ///////////////////////////// 
@@ -133,6 +148,7 @@ void keyPressed() {
       }
     } // && !cp5.get(Textfield.class, "input").isFocus() 
     else if (key == ' ') {
+      if (!startShow) startShow = true;
       togglePlay();
     } else if (key == ']') {
       bracketDown = true;

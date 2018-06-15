@@ -6,7 +6,23 @@ AudioPlayer songFile;
 BeatDetect beat;
 BeatListener bl;
 
-float kickSize, snareSize, hatSize;
+FFT         myAudioFFT;
+
+int         myAudioRange     = 256;
+int         myNumBands       = 11;
+int         myAudioMax       = 100;
+int[]       bandBreaks       = {20, 50, 60, 80, 100, 150, 175, 200, 225, 255};
+int[]       bands            = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float       myAudioAmp       = 170.0;
+float       myAudioIndex     = 0.2;
+float       myAudioIndexAmp  = myAudioIndex;
+float       myAudioIndexStep = 0.55;
+
+float       myAudioAmp2       = 250.0;
+float       myAudioIndex2     = 2.0;
+float       myAudioIndexAmp2  = 0.8;
+float       myAudioIndexStep2 = 2;
+
 
 class BeatListener implements AudioListener
 {
@@ -31,13 +47,277 @@ class BeatListener implements AudioListener
 void initFFT() {
   minim = new Minim(this);
   songFile = minim.loadFile("music/moon.mp3", 1024);
-  kickSize = snareSize = hatSize = 16;
+
+
+  myAudioFFT = new FFT(songFile.bufferSize(), songFile.sampleRate());
+  myAudioFFT.linAverages(myAudioRange);
+  //myAudioFFT.window(FFT.GAUSS);
 }
 
 void initBeat() {
   beat = new BeatDetect(songFile.bufferSize(), songFile.sampleRate());
   beat.setSensitivity(200);  
   bl = new BeatListener(beat, songFile);
+}
+
+void drawSpectrum(int w) {
+  updateSpectrum();
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    s.s.colorMode(HSB, bands.length);
+    for (int i = 0; i < bands.length; i++) {
+      s.s.fill(i, bands.length, bands.length);
+      s.s.noStroke();
+      s.s.rect(i*w, 40, w, bands[i]);
+    }
+    s.s.colorMode(RGB, 255);
+    s.s.endDraw();
+  }
+}
+
+int currentShape = 0;
+int lastCheckedShape = 0;
+void cycleShapeFFT() {
+  updateSpectrum();
+  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
+    lastCheckedShape = millis();
+    currentShape++;
+    if (currentShape > 3) currentShape = 0;
+  }
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.stroke(255);
+    sc.s.noFill();
+    sc.s.strokeWeight(3);
+    sc.s.rectMode(CENTER);
+    if (currentShape == 0) sc.s.ellipse(screenW/2, screenH/2, screenW/4, screenW/4);
+    else if (currentShape == 1) sc.s.rect(screenW/2, screenH/2, screenW/4, screenW/4);
+    else if (currentShape == 2) {
+      int sz = screenW/4;
+      int x = screenW/2;
+      int y = screenH/2;
+      float alt = sz*sqrt(3)/2.0;
+      sc.s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2);
+    }
+    else sc.s.line(screenW/2, screenH/2 - screenW/8, screenW/2, screenH/2 + screenW/8);
+    sc.s.rectMode(CORNERS);
+    sc.s.endDraw();
+  }
+}
+
+PImage[] constellations;
+PImage[] hands;
+void initConst() {
+  constellations = new PImage[5];
+  constellations[0] = loadImage("images/constellations/0.png");
+  constellations[1] = loadImage("images/constellations/1.png");
+  constellations[2] = loadImage("images/constellations/2.png");
+  constellations[3] = loadImage("images/constellations/3.png");
+  constellations[4] = loadImage("images/constellations/4.png");
+}
+void cycleConstFFT() {
+  updateSpectrum();
+  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
+    lastCheckedShape = millis();
+    currentShape++;
+    if (currentShape >= constellations.length) currentShape = 0;
+  }
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.stroke(255);
+    sc.s.noFill();
+    sc.s.strokeWeight(3);
+    sc.s.rectMode(CENTER);
+    int imgSize = 100;
+    sc.drawImage(constellations[currentShape], screenW/2 -imgSize/2 , screenH/2 - imgSize/2, imgSize, imgSize);
+    sc.s.rectMode(CORNERS);
+    sc.s.endDraw();
+  }
+}
+void initHands() {
+  hands = new PImage[5];
+  hands[0] = loadImage("images/hand/hand0.jpg");
+  hands[1] = loadImage("images/hand/hand1.jpg");
+  hands[2] = loadImage("images/hand/hand2.jpg");
+  hands[3] = loadImage("images/hand/hand3.jpg");
+  hands[4] = loadImage("images/hand/hand4.jpg");
+}
+void cycleHandsFFT() {
+  updateSpectrum();
+  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
+    lastCheckedShape = millis();
+    currentShape++;
+    if (currentShape >= hands.length) currentShape = 0;
+  }
+
+  int j = 0;
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.stroke(255);
+    sc.s.noFill();
+    sc.s.strokeWeight(3);
+    sc.s.rectMode(CENTER);
+    
+    int imgW = 400;
+    int imgH = int(hands[(currentShape+j)%hands.length].height *  imgW*1.0/hands[(currentShape+j)%hands.length].width);
+    //sc.drawImage(hands[(currentShape+j)%hands.length], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    if (currentShape == j) sc.drawImage(hands[0], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    else  sc.drawImage(hands[4], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    sc.s.rectMode(CORNERS);
+    sc.s.endDraw();
+    j++;
+  }
+}
+
+void drawTriangleSpectrum() {
+  int numBands = 10;
+  float rectW = screenW / numBands/2;
+  float rectH = screenH / numBands/2;
+
+  int j = 0;
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    for (int i = 0; i < numBands; ++i) {
+      if ( beat.isOnset(i) ) {
+        s.stroke(255);
+        s.strokeWeight(3);
+        if (j==0 ) {
+          s.line( i*rectW, screenH, screenW*2, screenH-i*rectH);
+          s.line( i*rectW, 0, screenW*2, i*rectH);
+        } else if (j==1) {
+          s.line( i*rectW - screenW, screenH, screenW, screenH-i*rectH);
+          s.line( i*rectW - screenW, 0, screenW, i*rectH);
+        } else if (j==2) {
+          s.line( 0, screenH-i*rectH, i*rectW + screenW, screenH);
+          s.line( 0, i*rectH, i*rectW + screenW, 0);
+        } else {
+          s.line( -screenW, screenH-i*rectH, i*rectW, screenH);
+          s.line( -screenW, i*rectH, i*rectW, 0);
+        }
+      }
+    }
+    s.endDraw();
+    j++;
+  }
+}
+
+void drawSpectrumMirror() {
+  int numBands = 20;
+  int w = int(screenW * 2.0 / numBands);
+  int j = 0;
+
+  float temp = 0;
+  Screen s1 = screens[1];
+  Screen s2 = screens[2];
+
+  float t = myAudioIndexAmp2;
+  s1.s.beginDraw();
+  for (int i = 0; i <= numBands/2; i++) {
+    myAudioIndexAmp2 += myAudioIndexStep2;
+    temp = myAudioFFT.getAvg(i + numBands/2 * j);
+    temp *= myAudioIndexAmp2;
+
+    s1.s.fill(255);
+    s1.s.noStroke();
+    s1.s.rect(screenW-i*w, screenH, w, -temp );
+  }
+  s1.s.endDraw();
+
+  s2.s.beginDraw();
+  myAudioIndexAmp2 = t;
+  for (int i = 0; i <= numBands/2; i++) {
+    myAudioIndexAmp2 += myAudioIndexStep2;
+    temp = myAudioFFT.getAvg(i + numBands/2 * j);
+    temp *= myAudioIndexAmp2;
+
+    s2.s.fill(255);
+    s2.s.noStroke();
+    s2.s.rect(i*w, screenH, w, -temp );
+  }
+  s2.s.endDraw();
+
+
+  j++;
+
+  s1 = screens[0];
+  s2 = screens[3];
+
+  s1.s.beginDraw();
+  t = myAudioIndexAmp2;
+  for (int i = 0; i < numBands/2; i++) {
+    myAudioIndexAmp2 += myAudioIndexStep2;
+    temp = myAudioFFT.getAvg(i + numBands/2 * j);
+    temp *= myAudioIndexAmp2;
+
+    s1.s.fill(255);
+    s1.s.noStroke();
+    s1.s.rect(screenW-i*w, screenH, w, -temp );
+  }
+  myAudioIndexAmp2 = t;
+  s1.s.endDraw();
+  s2.s.beginDraw();
+  for (int i = 0; i < numBands/2; i++) {
+    myAudioIndexAmp2 += myAudioIndexStep2;
+    temp = myAudioFFT.getAvg(i + numBands/2 * j);
+    temp *= myAudioIndexAmp2;
+    s2.s.fill(255);
+    s2.s.noStroke();
+    s2.s.rect(i*w, screenH, w, -temp );
+  }
+  s2.s.endDraw();
+  myAudioIndexAmp = myAudioIndex;
+  myAudioIndexAmp2 = myAudioIndex2;
+}
+void drawSpectrumAcross() {
+  int numBands = 80;
+  int w = int(screenW * 4.0 / numBands);
+  int j = 0;
+  for (Screen s : screens) {
+    float temp = 0;
+    s.s.beginDraw();
+    for (int i = 0; i < numBands/4; i++) {
+      myAudioIndexAmp2 += myAudioIndexStep2;
+      temp = myAudioFFT.getAvg(i + numBands/4 * j);
+      temp *= myAudioIndexAmp2;
+      s.s.fill(255);
+      s.s.noStroke();
+      s.s.rect(i*w, screenH, w, -temp );
+    }
+    s.s.endDraw();
+    j++;
+  }
+  myAudioIndexAmp = myAudioIndex;
+  myAudioIndexAmp2 = myAudioIndex2;
+}
+
+void updateSpectrum() {
+  myAudioFFT.forward(songFile.mix);
+
+  int bandIndex = 0;
+  while (bandIndex < bandBreaks.length) {
+    float temp = 0;
+    int startB = 0; 
+    int endB = 0;
+    if (bandIndex == 0) {
+      startB = -1;
+      endB = bandBreaks[bandIndex];
+    } else if (bandIndex < bandBreaks.length) {
+      startB = bandBreaks[bandIndex-1];
+      endB = bandBreaks[bandIndex];
+    }
+    for (int j = startB+1; j <= endB; j++) {
+      myAudioIndexAmp2 += myAudioIndexStep2;
+      temp += myAudioFFT.getAvg(j);
+    }
+    temp /= endB - startB;
+    temp *= myAudioAmp*myAudioIndexAmp;
+    myAudioIndexAmp+=myAudioIndexStep;
+    bands[bandIndex] = int(temp);
+    bandIndex++;
+  }
+  myAudioIndexAmp = myAudioIndex;
+  myAudioIndexAmp2 = myAudioIndex2;
 }
 
 void drawFFT() {
@@ -67,22 +347,7 @@ void drawFFT() {
     rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, height);
   }
 
-  if ( beat.isKick() ) kickSize = 32;
-  if ( beat.isSnare() ) snareSize = 32;
-  if ( beat.isHat() ) hatSize = 32;
-
-  fill(255);
-
-  textSize(kickSize);
-  text("KICK", width/4, height/2);
-
-  textSize(snareSize);
-  text("SNARE", width/2, height/2);
-
-  textSize(hatSize);
-  text("HAT", 3*width/4, height/2);
-
-  kickSize = constrain(kickSize * 0.95, 16, 32);
-  snareSize = constrain(snareSize * 0.95, 16, 32);
-  hatSize = constrain(hatSize * 0.95, 16, 32);
+  //if ( beat.isKick() ) kickSize = 32;
+  //if ( beat.isSnare() ) snareSize = 32;
+  //if ( beat.isHat() ) hatSize = 32;
 }

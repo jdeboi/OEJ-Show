@@ -193,11 +193,13 @@ public void input(String theText) {
 }
 
 void toggleP(boolean theFlag) {
-  togglePlay();
-  if (isPlaying) {
-    togP.setLabel("PAUSE");
-  } else {
-    togP.setLabel("PLAY");
+  if (startShow) {
+    togglePlay();
+    if (isPlaying) {
+      togP.setLabel("PAUSE");
+    } else {
+      togP.setLabel("PLAY");
+    }
   }
 }
 

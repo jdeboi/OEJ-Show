@@ -12,10 +12,14 @@ class Screen {
 
   PGraphics s;
   int snakeLoc;
+  Star[] stars;
 
   Screen() {
     s = createGraphics(screenW, screenH, P3D);
     snakeLoc = int(random(0, screenW*2 + screenH*2));
+    //stars = new Star[30];
+    //for (int i = 0; i < stars.length; i++) {
+    //  stars[i] = new Star();
   }
 
   void blackOut() {

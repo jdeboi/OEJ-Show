@@ -82,10 +82,18 @@ void initCycles() {
 }
 
 void initDirty() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0); 
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
+  cues = new Cue[11];
+  cues[0] = new Cue(0, 'v', 0, 0); 
+  cues[1] = new Cue(6, 'v', 0.0, 0);
+  cues[2] = new Cue(12, 'v', 0.0, 0); // tic toc begins
+  cues[3] = new Cue(55, 'v', 0.0, 0); // down chords
+  cues[4] = new Cue(77, 'v', 0.0, 0);  // tic toc
+  cues[5] = new Cue(99, 'v', 0.0, 0);  // down chords
+  cues[6] = new Cue(121, 'v', 0.0, 0);  // down chords
+  cues[7] = new Cue(143, 'v', 0.0, 0);  // down chords
+  cues[8] = new Cue(99, 'v', 0.0, 0);  // down chords
+  cues[9] = new Cue(175, 'v', 0.0, 0);  // down chords
+  cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
 void initFifty() {
   cues = new Cue[3];
@@ -138,6 +146,8 @@ void displayCrush() {
   case 0:
     movieAcrossAll(vid1, -350); 
     haromCenter(color(255), 3, 180);
+    //displayNervous();
+     //displayWavyCircle();
     break;
   case 1: 
     drawSolidAll(color(0));
