@@ -1,9 +1,14 @@
 
 import deadpixel.keystone.*;
 Keystone ks;
-int numScreens = 4;
+Keystone ksC;
+int keystoneNum = 0;
 CornerPinSurface [] surfaces;
+CornerPinSurface centerSurface;
 Screen [] screens;
+Screen centerScreen;
+boolean useCenterScreen = true;
+int numScreens = 4;
 int screenW = 400;
 int screenH = 400;
 int centerX, centerY;
@@ -13,6 +18,7 @@ class Screen {
   PGraphics s;
   int snakeLoc;
   Star[] stars;
+  //Tesseract tesseract;
 
   Screen() {
     s = createGraphics(screenW, screenH, P3D);
@@ -246,13 +252,23 @@ void drawFFTBarsAll() {
 
 void initScreens() {
   ks = new Keystone(this);
+  if (useCenterScreen) ksC = new Keystone(this);
   surfaces = new CornerPinSurface[numScreens];
   screens = new Screen[numScreens];
   for (int i = 0; i < numScreens; i++) {
     surfaces[i] = ks.createCornerPinSurface(screenW, screenH, 20);
     screens[i] = new Screen();
   }
-  ks.load();
+  if (useCenterScreen) {
+    centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
+    centerScreen = new Screen();
+  }
+  loadKeystone(0);
+}
+
+void loadKeystone(int i) {
+  if (useCenterScreen) ks.load("data/keystone/keystoneCenter" +  i + ".xml");
+  else ks.load("data/keystone/keystone" +  i + ".xml");
 }
 
 void renderScreens() {
@@ -261,5 +277,6 @@ void renderScreens() {
   for (int i = 0; i < numScreens; i++) {
     surfaces[i].render(screens[i].s);
   }
+  if (useCenterScreen) centerSurface.render(centerScreen.s);
   popMatrix();
 }

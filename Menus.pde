@@ -35,6 +35,13 @@ void initControls() {
     .setLabel("Save Mapping")
     ;
 
+  //cp5.addButton("saveMapAs")
+  //  .setValue(0)
+  //  .setPosition(750, 250)
+  //  .setSize(80, 19)
+  //  .setLabel("Save New Map")
+  //  ;
+
   togP = cp5.addToggle("toggleP")
     .setPosition(xSpace, ySpace + vH + 30)
     .setSize(50, 20)
@@ -57,7 +64,7 @@ void initControls() {
     .setLabel("Edit Mask Off")
     .setMode(ControlP5.SWITCH)
     ;
-    
+
   cp5.addButton("saveMask")
     .setValue(0)
     .setPosition(950, 200)
@@ -145,6 +152,16 @@ void initControls() {
     .setItemHeight(20)
     .addItems(l)
     ;
+
+  l = Arrays.asList("0", "1");
+  cp5.addScrollableList("keystoneList")
+    .setPosition(750, 0)
+    .setColorBackground(color(105, 110, 0))
+    .setSize(100, 100)
+    .setBarHeight(20)
+    .setItemHeight(20)
+    .addItems(l)
+    ;
 }
 
 
@@ -160,6 +177,11 @@ void imageList(int n) {
   currentTestImg = loadImage("_testing/images/" + testingImages[n]);
 }
 
+void keystoneList(int n) {
+  keystoneNum = n;
+  loadKeystone(n);
+}
+
 void gifs(int n) {
   currentTestGif = new Gif(this, "_testing/gifs/" + testingGifs[n]);
   currentTestGif.loop();
@@ -170,9 +192,17 @@ void songs(int n) {
 }
 
 public void saveMap(int theValue) {
-  println("map saved");
-  ks.save();
+  println("map saved " + keystoneNum);
+  if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
+  else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
 }
+
+//public void saveMapAs(int theValue) {
+//  if (millis() > 10000) keystoneNum++;
+//  println("map saved as " + keystoneNum);
+//  if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
+//  else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
+//}
 
 public void saveMask(int theValue) {
   println("mask saved");

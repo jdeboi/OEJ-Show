@@ -33,7 +33,8 @@ int VID_ACROSS = 7;
 int VID_MIRROR = 8;
 
 void setup() {
-  size(1200, 800, P3D);
+  //size(1200, 800, P3D);
+  fullScreen(P3D);
   initScenes();
   initTesting();
   changeScene(3);
@@ -43,10 +44,12 @@ void setup() {
   initMask();
   initConst();
   initHands();
+  initTesseract();
+  initParticles(); 
 }
 
 void draw() {
-  background(50);
+  background(0);
 
 
   // are we testing imagery or playing the show?
@@ -55,7 +58,7 @@ void draw() {
 
   renderScreens();
 
-  maskScreens();
+  //maskScreens();
 
 
   // control bar
@@ -71,6 +74,11 @@ void testShow() {
   ///////////////////////////// 
   // CUSTOM SCRIPTS
   //drawCNAll();
+  //drawSolidAll(color(255, 0, 0));
+  //displayRainbow();
+  drawSolidAll(color(0));
+  displayShadowLines(30, 5);
+  haromAll(color(255), 3);
 
   ///////////////////////////// 
   // GIF
@@ -92,17 +100,21 @@ void testShow() {
   // FFT
   else if (mode == FFT) {
     //drawFFT();
-    drawSolidAll(color(0));
+    //drawSolidAll(color(0));
     //drawFFTBarsAll();
     
     
     //drawSpectrum(30);
     //cycleShapeFFT();
     //cycleConstFFT();
-    cycleHandsFFT();
+    //cycleHandsFFT();
     //drawSpectrumAcross();
     //drawSpectrumMirror();
     //drawTriangleSpectrum();
+    //displayTesseract();
+    //beatTile();
+    //displayParticles();
+    //drawWaveForm();
   }
 
   ///////////////////////////// 
@@ -111,6 +123,11 @@ void testShow() {
   else if (mode == VID_ACROSS) movieAcrossAll(vid1, -100);
   else if (mode == VID_MIRROR) mirrorVidCenter(vid1, 0, 0);
 
+  
+  
+  if (useCenterScreen) {
+    centerScreen.drawSolid(color(0));
+  }
   //snakeOutlineAll(color(255), 30, 150, 5);
   //drawOutlineAll(color(255), 10);
 }

@@ -157,7 +157,7 @@ class Star {
     this.bam = new PVector();
     this.m = 0;
   }
-  
+
 
   void update() {
     bam =  PVector.random2D();// movement of star will be a bit erractic
@@ -289,5 +289,281 @@ void displayWavyCircle() {
       }
     }
     s.s.popMatrix();
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// TESSERACT
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/205544
+Tesseract tesseract;
+
+void initTesseract() {
+  tesseract = new Tesseract();
+}
+
+void displayTesseract() {
+  updateSpectrum();
+  beatCycle(300);
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    s.s.stroke(255);
+    s.s.strokeWeight(2);
+    s.s.pushMatrix();
+    s.s.translate(screenW/2, screenH/2);
+
+    tesseract.display(s);
+    s.s.popMatrix();
+
+    if (currentCycle%6 == 0) tesseract.turn(0, 1, .01);
+    else if (currentCycle%6 == 1) tesseract.turn(0, 2, .01);
+    else if (currentCycle%6 == 2) tesseract.turn(1, 2, .01);
+    else if (currentCycle%6 == 3) tesseract.turn(0, 3, .01);
+    else if (currentCycle%6 == 4) tesseract.turn(1, 3, .01);
+    else if (currentCycle%6 == 5) tesseract.turn(2, 3, .01);
+    s.s.endDraw();
+  }
+}
+class Tesseract {
+  float[][][] lines;
+  float x, y, z, w, perspZ, perspW, size;
+
+  Tesseract() {
+    size=screenW/14;
+    z=5;
+    w=1;
+    perspZ=4;
+    perspW=1;
+
+    float[][][] temp={
+      {{1, 1, 1, 1}, {-1, 1, 1, 1}}, 
+      {{1, 1, 1, 1}, { 1, -1, 1, 1}}, 
+      {{1, 1, 1, 1}, { 1, 1, -1, 1}}, 
+      {{1, 1, 1, 1}, { 1, 1, 1, -1}}, 
+
+      {{-1, -1, 1, 1}, { 1, -1, 1, 1}}, 
+      {{-1, -1, 1, 1}, {-1, 1, 1, 1}}, 
+      {{-1, -1, 1, 1}, {-1, -1, -1, 1}}, 
+      {{-1, -1, 1, 1}, {-1, -1, 1, -1}}, 
+
+      {{-1, 1, -1, 1}, { 1, 1, -1, 1}}, 
+      {{-1, 1, -1, 1}, {-1, -1, -1, 1}}, 
+      {{-1, 1, -1, 1}, {-1, 1, 1, 1}}, 
+      {{-1, 1, -1, 1}, {-1, 1, -1, -1}}, 
+
+      {{-1, 1, 1, -1}, { 1, 1, 1, -1}}, 
+      {{-1, 1, 1, -1}, {-1, -1, 1, -1}}, 
+      {{-1, 1, 1, -1}, {-1, 1, -1, -1}}, 
+      {{-1, 1, 1, -1}, {-1, 1, 1, 1}}, 
+
+      {{1, -1, -1, 1}, {-1, -1, -1, 1}}, 
+      {{1, -1, -1, 1}, { 1, 1, -1, 1}}, 
+      {{1, -1, -1, 1}, { 1, -1, 1, 1}}, 
+      {{1, -1, -1, 1}, { 1, -1, -1, -1}}, 
+
+      {{1, -1, 1, -1}, {-1, -1, 1, -1}}, 
+      {{1, -1, 1, -1}, { 1, 1, 1, -1}}, 
+      {{1, -1, 1, -1}, { 1, -1, -1, -1}}, 
+      {{1, -1, 1, -1}, { 1, -1, 1, 1}}, 
+
+      {{1, 1, -1, -1}, {-1, 1, -1, -1}}, 
+      {{1, 1, -1, -1}, { 1, -1, -1, -1}}, 
+      {{1, 1, -1, -1}, { 1, 1, 1, -1}}, 
+      {{1, 1, -1, -1}, { 1, 1, -1, 1}}, 
+
+      {{-1, -1, -1, -1}, { 1, -1, -1, -1}}, 
+      {{-1, -1, -1, -1}, {-1, 1, -1, -1}}, 
+      {{-1, -1, -1, -1}, {-1, -1, 1, -1}}, 
+      {{-1, -1, -1, -1}, {-1, -1, -1, 1}}};
+
+    lines=temp;
+  }
+
+  void turn(int a, int b, float deg) {
+    float[] temp;
+    for (int j=0; j<2; j++)
+      for (int i=0; i<32; i++) {
+        temp=lines[i][j];
+        lines[i][j][a]=temp[a]*cos(deg)+temp[b]*sin(deg);
+        lines[i][j][b]=temp[b]*cos(deg)-temp[a]*sin(deg);
+      }
+  }
+
+  void persp(float[][][] arr) {
+    for (int j=0; j<2; j++)
+      for (int i=0; i<32; i++) {
+        arr[i][j][0]=arr[i][j][0]+(arr[i][j][0]+x)*((arr[i][j][2]+z)/perspZ+(arr[i][j][3]+w)/perspW);
+        arr[i][j][1]=arr[i][j][1]+(arr[i][j][1]+y)*((arr[i][j][2]+z)/perspZ+(arr[i][j][3]+w)/perspW);
+      }
+  }
+
+  void resize(float[][][] arr) {
+    for (int i=0; i<32; i++)
+      for (int j=0; j<2; j++)
+        for (int k=0; k<4; k++)
+          arr[i][j][k]*=size;
+  }
+
+  void display(Screen s) {
+    float[][][] temp = new float[32][2][4];
+    for (int i=0; i<32; i++)
+      for (int j=0; j<2; j++)
+        for (int k=0; k<4; k++)
+          temp[i][j][k]=lines[i][j][k];
+    persp(temp);
+    resize(temp);
+    for (int i=0; i<32; i++)
+      s.s.line(temp[i][0][0], temp[i][0][1], temp[i][1][0], temp[i][1][1]);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// PARTICLES
+//////////////////////////////////////////////////////////////////////////////////
+/* OpenProcessing Tweak of *@*http://www.openprocessing.org/sketch/17163*@* */
+/* !do not delete the line above, required for linking your tweak if you upload again */
+class particle {
+  PVector x;
+  PVector v;
+  PVector f;
+  particle() {
+    x = new PVector(random(0, screenW*4), random(0, screenH));
+    v = new PVector();
+    f = new PVector();
+  }
+  void update() {
+    v.add(f);
+    f = new PVector(0, 0.02);
+    x.add(v);
+  }
+}
+ArrayList particles;
+float diam = 10;
+float suck = 1.2;
+float k = 0.1;
+float c = 0.01;
+void initParticles() {
+  particles = new ArrayList();
+  for (int i=0; i<300; i++) {
+    particles.add(new particle());
+  }
+}
+void updateParticles() {
+  for (int i=1; i<particles.size(); i++) {
+    particle A = (particle) particles.get(i);
+    for (int j=0; j<i; j++) {
+      particle B = (particle) particles.get(j);
+      PVector dx = PVector.sub(B.x, A.x);
+      if (abs(dx.x)<diam*suck) {
+        if (abs(dx.y)<diam*suck) {
+          if (dx.mag()<diam*suck) {
+            float restore = (diam - dx.mag())*k;
+            dx.normalize();
+            float dampen = dx.dot(PVector.sub(B.v, A.v))*c;
+            dx.mult(restore - dampen);
+            A.f.sub(dx);
+            B.f.add(dx);
+          }
+        }
+      }
+    }
+  }
+  for (int i=0; i<particles.size(); i++) {
+    particle A = (particle) particles.get(i);
+    PVector mouseV = new PVector(mouseX, mouseY);
+    PVector pmouseV = new PVector(pmouseX, pmouseY);
+    if (mousePressed) {
+      PVector dx = PVector.sub(A.x, mouseV);
+      float pushrad = 8;
+      if (abs(dx.x)<pushrad) {
+        if (abs(dx.y)<pushrad) {
+          if (dx.mag()<pushrad) {
+            //            dx.normalize();
+            //            A.f.add(PVector.mult(dx,0.8));
+            A.v.add(PVector.mult(PVector.sub(
+              PVector.sub(mouseV, pmouseV), A.v), 0.2));
+          }
+        }
+      }
+    }
+    boolean dampen = false;
+    if (A.x.x<0) {
+      A.f.x -= A.x.x*k;
+      dampen = true;
+    };
+    if (A.x.x>width) {
+      A.f.x -= (A.x.x-width)*k;
+      dampen = true;
+    };
+    if (A.x.y<0) {
+      A.f.y -= A.x.y*k;
+      dampen = true;
+    };
+    if (A.x.y>height) {
+      A.f.y -= (A.x.y-height)*k;
+      dampen = true;
+    };
+    if (dampen) {
+      A.v.mult(0.9);
+    }
+    A.update();
+  }
+}
+void displayParticles() {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    for (int i=0; i<particles.size(); i++) {
+      particle A = (particle) particles.get(i);
+      if (A.x.x > j * screenW && A.x.x <= (j+1) * screenW) {
+        screens[j].s.fill(255);
+        screens[j].s.ellipse(A.x.x, A.x.y, diam, diam);
+      }
+    }
+    screens[j].s.endDraw();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// RAINBOW
+//////////////////////////////////////////////////////////////////////////////////
+void displayRainbow() {
+  int j = 0;
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    s.s.colorMode(HSB, 255);
+    s.s.background((frameCount+50*j)%255, 255, 255);
+    s.s.endDraw();
+    j++;
+  }
+}
+void displayShadowRainbow() {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.colorMode(HSB, 255);
+    if (j%2 == 0) screens[j].s.background(frameCount%255,200, 255, 255);
+    else screens[j].s.background(frameCount%255,200, 255, 100);
+    screens[j].s.endDraw();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// SHADOW LINES
+//////////////////////////////////////////////////////////////////////////////////
+void displayShadowLines(int hue, int sz, int sp) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.colorMode(HSB, 255);
+    if (j%2 == 0) screens[j].s.fill(hue, 255, 255);
+    else screens[j].s.fill(hue, 255, 155);
+    screens[j].s.noStroke();
+    int ynum = screenH/(sz+sp);
+    int ysp = (screenH - ynum * (sz+sp))/2;
+    for (int i = 0; i < screenH/(sz+sp); i++) {
+      screens[j].s.rect(ysp, ysp+i * (sz+sp), screenW-ysp*2, sz);
+    }
+    screens[j].s.endDraw();
   }
 }

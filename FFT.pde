@@ -75,31 +75,32 @@ void drawSpectrum(int w) {
   }
 }
 
-int currentShape = 0;
+int currentCycle = 0;
 int lastCheckedShape = 0;
+void beatCycle(int delayT) {
+  if (bands[3] > 225 && millis() - lastCheckedShape > delayT) {
+    lastCheckedShape = millis();
+    currentCycle++;
+  }
+}
 void cycleShapeFFT() {
   updateSpectrum();
-  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
-    lastCheckedShape = millis();
-    currentShape++;
-    if (currentShape > 3) currentShape = 0;
-  }
+  beatCycle(300);
   for (Screen sc : screens) {
     sc.s.beginDraw();
     sc.s.stroke(255);
     sc.s.noFill();
     sc.s.strokeWeight(3);
     sc.s.rectMode(CENTER);
-    if (currentShape == 0) sc.s.ellipse(screenW/2, screenH/2, screenW/4, screenW/4);
-    else if (currentShape == 1) sc.s.rect(screenW/2, screenH/2, screenW/4, screenW/4);
-    else if (currentShape == 2) {
+    if (currentCycle%4 == 0) sc.s.ellipse(screenW/2, screenH/2, screenW/4, screenW/4);
+    else if (currentCycle%4 == 1) sc.s.rect(screenW/2, screenH/2, screenW/4, screenW/4);
+    else if (currentCycle%4 == 2) {
       int sz = screenW/4;
       int x = screenW/2;
       int y = screenH/2;
       float alt = sz*sqrt(3)/2.0;
       sc.s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2);
-    }
-    else sc.s.line(screenW/2, screenH/2 - screenW/8, screenW/2, screenH/2 + screenW/8);
+    } else sc.s.line(screenW/2, screenH/2 - screenW/8, screenW/2, screenH/2 + screenW/8);
     sc.s.rectMode(CORNERS);
     sc.s.endDraw();
   }
@@ -117,11 +118,7 @@ void initConst() {
 }
 void cycleConstFFT() {
   updateSpectrum();
-  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
-    lastCheckedShape = millis();
-    currentShape++;
-    if (currentShape >= constellations.length) currentShape = 0;
-  }
+  beatCycle(300);
   for (Screen sc : screens) {
     sc.s.beginDraw();
     sc.s.stroke(255);
@@ -129,7 +126,7 @@ void cycleConstFFT() {
     sc.s.strokeWeight(3);
     sc.s.rectMode(CENTER);
     int imgSize = 100;
-    sc.drawImage(constellations[currentShape], screenW/2 -imgSize/2 , screenH/2 - imgSize/2, imgSize, imgSize);
+    sc.drawImage(constellations[currentCycle%constellations.length], screenW/2 -imgSize/2, screenH/2 - imgSize/2, imgSize, imgSize);
     sc.s.rectMode(CORNERS);
     sc.s.endDraw();
   }
@@ -144,12 +141,7 @@ void initHands() {
 }
 void cycleHandsFFT() {
   updateSpectrum();
-  if (bands[3] > 225 && millis() - lastCheckedShape > 300) {
-    lastCheckedShape = millis();
-    currentShape++;
-    if (currentShape >= hands.length) currentShape = 0;
-  }
-
+  beatCycle(300);
   int j = 0;
   for (Screen sc : screens) {
     sc.s.beginDraw();
@@ -157,15 +149,36 @@ void cycleHandsFFT() {
     sc.s.noFill();
     sc.s.strokeWeight(3);
     sc.s.rectMode(CENTER);
-    
+
     int imgW = 400;
-    int imgH = int(hands[(currentShape+j)%hands.length].height *  imgW*1.0/hands[(currentShape+j)%hands.length].width);
-    //sc.drawImage(hands[(currentShape+j)%hands.length], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
-    if (currentShape == j) sc.drawImage(hands[0], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
-    else  sc.drawImage(hands[4], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    int imgH = int(hands[(currentCycle+j)%hands.length].height *  imgW*1.0/hands[(currentCycle+j)%hands.length].width);
+    sc.drawImage(hands[(currentCycle+j)%hands.length], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    //if (currentCycle%hands.length == j) sc.drawImage(hands[0], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
+    //else  sc.drawImage(hands[4], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     sc.s.rectMode(CORNERS);
     sc.s.endDraw();
     j++;
+  }
+}
+
+
+void beatTile() {
+  updateSpectrum();
+  beatCycle(300);
+  int k = 0;
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    int numW = (currentCycle%4)+1;
+    int w = screenW/numW;
+    int h = hands[(currentCycle+k)%hands.length].height * w/hands[(currentCycle+k)%hands.length].width;
+    int numH = screenH/h;
+    for (int i = 0; i < numW; i++) {
+      for (int j = 0; j < numH+1; j++) {
+        sc.s.image(hands[(currentCycle+k)%hands.length], i * w, j * h, w, h);
+      }
+    }
+    k++;
+    sc.s.endDraw();
   }
 }
 
@@ -199,6 +212,21 @@ void drawTriangleSpectrum() {
     }
     s.endDraw();
     j++;
+  }
+}
+
+void drawWaveForm() {
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.stroke(255);
+    sc.s.strokeWeight(5);
+    int j = 0;
+    for (int i = 0; i < screenW; i++) {
+      sc.s.line(i, screenH/2-50  + songFile.left.get(i + j * screenW)*50, (i+1), screenH/2-50  + songFile.left.get(i+1 + j * screenW)*50);
+      sc.s.line(i, screenH/2+50 + songFile.right.get(i + j * screenW)*50, (i+1), screenH/2+50 + songFile.right.get(i+1 + j * screenW)*50);
+    }
+    j++;
+    sc.s.endDraw();
   }
 }
 
