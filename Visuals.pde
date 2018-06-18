@@ -543,8 +543,8 @@ void displayShadowRainbow() {
   for (int j = 0; j < screens.length; j++) {
     screens[j].s.beginDraw();
     screens[j].s.colorMode(HSB, 255);
-    if (j%2 == 0) screens[j].s.background(frameCount%255,200, 255, 255);
-    else screens[j].s.background(frameCount%255,200, 255, 100);
+    if (j%2 == 0) screens[j].s.background(frameCount%255, 200, 255, 255);
+    else screens[j].s.background(frameCount%255, 200, 255, 100);
     screens[j].s.endDraw();
   }
 }
@@ -556,13 +556,17 @@ void displayShadowLines(int hue, int sz, int sp) {
   for (int j = 0; j < screens.length; j++) {
     screens[j].s.beginDraw();
     screens[j].s.colorMode(HSB, 255);
-    if (j%2 == 0) screens[j].s.fill(hue, 255, 255);
-    else screens[j].s.fill(hue, 255, 155);
+
     screens[j].s.noStroke();
     int ynum = screenH/(sz+sp);
     int ysp = (screenH - ynum * (sz+sp))/2;
-    for (int i = 0; i < screenH/(sz+sp); i++) {
-      screens[j].s.rect(ysp, ysp+i * (sz+sp), screenW-ysp*2, sz);
+    for (int k = 0; k < 5; k++) {
+      for (int i = 0; i < screenH/(sz+sp); i++) {
+        if (j%2 == 0) screens[j].s.fill(hue, 255, 255, 150 + k * 20);
+        else screens[j].s.fill((hue-10)%255, 255, 105, 150 + k * 20);
+        if (j%2==0) screens[j].s.rect(ysp, ysp+i * (sz+sp), screenW-ysp*2-5*k, sz-5*k);
+        else screens[j].s.rect(ysp+i * (sz+sp), ysp, sz-5*k, screenW-ysp*2-5*k);
+      }
     }
     screens[j].s.endDraw();
   }

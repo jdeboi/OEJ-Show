@@ -1,4 +1,4 @@
-
+// to modify keystone lib and then make a jar file: jar cvf keystone.jar .
 import deadpixel.keystone.*;
 Keystone ks;
 Keystone ksC;

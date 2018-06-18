@@ -46,24 +46,30 @@ void setup() {
   initHands();
   initTesseract();
   initParticles(); 
+  
+  initCubes();
 }
 
 void draw() {
   background(0);
 
-
+  
   // are we testing imagery or playing the show?
-  if (isTesting) testShow();
-  else playShow();
+  //if (isTesting) testShow();
+  //else playShow();
 
-  renderScreens();
+  //renderScreens();
 
-  //maskScreens();
+  ////maskScreens();
 
 
-  // control bar
-  if (mouseY < 300) drawControls();
-  else hideControls();
+  //// control bar
+  //if (mouseY < 300) drawControls();
+  //else hideControls();
+  
+  display3D();
+  updateCubes();
+  
 }
 
 void testShow() {
@@ -74,11 +80,12 @@ void testShow() {
   ///////////////////////////// 
   // CUSTOM SCRIPTS
   //drawCNAll();
-  //drawSolidAll(color(255, 0, 0));
-  //displayRainbow();
-  drawSolidAll(color(0));
-  displayShadowLines(30, 5);
-  haromAll(color(255), 3);
+  //drawSolidAll(color(0));
+  //displayShadowLines(50, 30, 5);
+  
+  //mirrorVidCenter(vid1, 0, 0);
+  //displayShadowRainbow();
+  //haromAll(color(255), 3);
 
   ///////////////////////////// 
   // GIF
@@ -127,6 +134,7 @@ void testShow() {
   
   if (useCenterScreen) {
     centerScreen.drawSolid(color(0));
+    //centerScreen.drawImage(currentTestImg,0, 0);
   }
   //snakeOutlineAll(color(255), 30, 150, 5);
   //drawOutlineAll(color(255), 10);
@@ -206,10 +214,13 @@ void mousePressed() {
       }
     }
   } else if (editingMask) checkMaskClick();
+  else if (editing3D) check3DClick();
   mousePlayer();
 }
 
-
+void mouseReleased() {
+  cubesReleaseMouse();
+}
 
 void drawControls() {
   drawSongLabel();
