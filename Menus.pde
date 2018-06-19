@@ -4,7 +4,7 @@ ControlP5 cp5;
 
 // start / stop music
 
-Toggle togMap, togEdit, togShow, togP, togEditMask, togEdit3D;
+Toggle togMap, togEdit, togShow, togP, togEditMask, togMask, togEdit3D;
 Textlabel timeText;
 Textarea myTextarea;
 
@@ -62,6 +62,14 @@ void initControls() {
     .setSize(50, 20)
     .setValue(false)
     .setLabel("Edit Mask Off")
+    .setMode(ControlP5.SWITCH)
+    ;
+    
+  togMask = cp5.addToggle("toggleMask")
+    .setPosition(950, 100)
+    .setSize(50, 20)
+    .setValue(false)
+    .setLabel("Mask Off")
     .setMode(ControlP5.SWITCH)
     ;
 
@@ -188,15 +196,6 @@ void initControls() {
     .addItems(l)
     ;
 
-  //    l = Arrays.asList("0", "1", "2");
-  //cp5.addScrollableList("selectedCube")
-  //  .setPosition(850, 0)
-  //  .setColorBackground(color(105, 170, 0))
-  //  .setSize(100, 100)
-  //  .setBarHeight(20)
-  //  .setItemHeight(20)
-  //  .addItems(l)
-  //  ;
 }
 
 
@@ -285,6 +284,13 @@ void toggleEditMask(boolean theFlag) {
   println("toggling edit mask");
 }
 
+void toggleMask(boolean theFlag) {
+  showMask = theFlag;
+  String o = showMask?"ON":"OFF";
+  togMask.setLabel("Mask " + o);
+  println("toggling show mask");
+}
+
 void toggleEdit3D(boolean theFlag) {
   editing3D = theFlag;
   String o = editing3D?"ON":"OFF";
@@ -313,6 +319,7 @@ void toggleEditBreak(boolean theFlag) {
 
 
 void toggleMap(boolean theFlag) {
+  editingMapping = theFlag;
   if (theFlag) ks.startCalibration();
   else ks.stopCalibration();
   String o = theFlag?"ON":"OFF";

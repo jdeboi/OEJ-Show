@@ -31,6 +31,7 @@ int FFT = 5;
 int TILE_VID = 6;
 int VID_ACROSS = 7;
 int VID_MIRROR = 8;
+int CUBE_MODE = 9;
 
 void setup() {
   //size(1200, 800, P3D);
@@ -42,33 +43,28 @@ void setup() {
   initScreens();
   initControls();
   initMask();
-  initConst();
-  initHands();
-  initTesseract();
-  initParticles(); 
-  
-  initCubes();
 }
 
 void draw() {
-  background(0);
+  background(30);
 
-  
   // are we testing imagery or playing the show?
-  //if (isTesting) testShow();
-  //else playShow();
+  if (isTesting) testShow();
+  else playShow();
 
-  //renderScreens();
+  renderScreens();
 
-  ////maskScreens();
+  if (showMask) maskScreens();
 
 
   //// control bar
-  //if (mouseY < 300) drawControls();
-  //else hideControls();
+  if (mouseY < 300) drawControls();
+  else hideControls();
   
-  display3D();
-  updateCubes();
+  if (editingMask) {
+    drawMaskPoints();
+    moveSelectedMask();
+  }
   
 }
 
@@ -82,10 +78,19 @@ void testShow() {
   //drawCNAll();
   //drawSolidAll(color(0));
   //displayShadowLines(50, 30, 5);
-  
+
   //mirrorVidCenter(vid1, 0, 0);
   //displayShadowRainbow();
   //haromAll(color(255), 3);
+
+  
+  
+  //displayShadowRainbow();
+  //centerScreen.drawSolid(color(0));
+  //displayTerrainCenter();
+  //displayTerrainCenter();
+  displayTerrainSplit();
+  
 
   ///////////////////////////// 
   // GIF
@@ -93,6 +98,13 @@ void testShow() {
   else if (mode == GIF_ACROSS) {
     int y = int(map(mouseY, 0, height, -550, 0));
     drawGifAcross(currentTestGif, y);
+  }
+
+  ///////////////////////////// 
+  // CUBES
+  else if (mode == CUBE_MODE) {
+    display3D();
+    updateCubes();
   }
 
   ///////////////////////////// 
@@ -109,8 +121,8 @@ void testShow() {
     //drawFFT();
     //drawSolidAll(color(0));
     //drawFFTBarsAll();
-    
-    
+
+
     //drawSpectrum(30);
     //cycleShapeFFT();
     //cycleConstFFT();
@@ -130,14 +142,16 @@ void testShow() {
   else if (mode == VID_ACROSS) movieAcrossAll(vid1, -100);
   else if (mode == VID_MIRROR) mirrorVidCenter(vid1, 0, 0);
 
-  
-  
-  if (useCenterScreen) {
-    centerScreen.drawSolid(color(0));
+
+
+  //if (useCenterScreen) {
+    //centerScreen.drawSolid(color(0));
     //centerScreen.drawImage(currentTestImg,0, 0);
-  }
+  //}
   //snakeOutlineAll(color(255), 30, 150, 5);
   //drawOutlineAll(color(255), 10);
+  
+  if (editingMapping) numberScreens();
 }
 
 void playShow() {
@@ -146,10 +160,6 @@ void playShow() {
     currentScene.display();
   } else {
     blackoutScreens();
-  }
-  if (editingMask) {
-    drawMaskPoints();
-    moveSelectedMask();
   }
 }
 
@@ -247,9 +257,15 @@ void initTesting() {
   if (MAX_IMG > testingImages.length) MAX_IMG=testingImages.length;
   if (MAX_MOV > testingMovies.length) MAX_MOV=testingMovies.length;
 
-  stage = loadImage("_testing/images/stage.png");
+  //stage = loadImage("_testing/images/stage.png");
 
-  initCurvyNetwork();
+  //initCurvyNetwork();
+  //initConst();
+  //initHands();
+  //initTesseract();
+  //initParticles(); 
+  initTerrainCenter();
+  //initCubes();
 
   initFFT();
 }

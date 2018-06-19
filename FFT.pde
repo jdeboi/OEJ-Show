@@ -5,6 +5,7 @@ Minim minim;
 AudioPlayer songFile;
 BeatDetect beat;
 BeatListener bl;
+int previousCycle = 0;
 
 FFT         myAudioFFT;
 

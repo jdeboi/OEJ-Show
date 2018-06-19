@@ -12,6 +12,8 @@ int numScreens = 4;
 int screenW = 400;
 int screenH = 400;
 int centerX, centerY;
+boolean editingMapping = false;
+int numMappings = 2;
 
 class Screen {
 
@@ -20,9 +22,9 @@ class Screen {
   Star[] stars;
   //Tesseract tesseract;
 
-  Screen() {
-    s = createGraphics(screenW, screenH, P3D);
-    snakeLoc = int(random(0, screenW*2 + screenH*2));
+  Screen(int w, int h) {
+    s = createGraphics(w, h, P3D);
+    snakeLoc = int(random(0, w*2 + h*2));
     //stars = new Star[30];
     //for (int i = 0; i < stars.length; i++) {
     //  stars[i] = new Star();
@@ -257,11 +259,11 @@ void initScreens() {
   screens = new Screen[numScreens];
   for (int i = 0; i < numScreens; i++) {
     surfaces[i] = ks.createCornerPinSurface(screenW, screenH, 20);
-    screens[i] = new Screen();
+    screens[i] = new Screen(screenW, screenH);
   }
   if (useCenterScreen) {
     centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
-    centerScreen = new Screen();
+    centerScreen = new Screen(screenW*4, screenH);
   }
   loadKeystone(0);
 }
@@ -279,4 +281,15 @@ void renderScreens() {
   }
   if (useCenterScreen) centerSurface.render(centerScreen.s);
   popMatrix();
+}
+
+void numberScreens() {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].s.beginDraw();
+    screens[i].s.fill(255);
+    screens[i].s.noStroke();
+    screens[i].s.textSize(50);
+    screens[i].s.text(i, 50, 50);
+    screens[i].s.endDraw();
+  }
 }

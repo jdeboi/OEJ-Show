@@ -14,7 +14,7 @@ void initStripedSquares(int num) {
 void displayStriped(int lineW) {
   for (int j = 0; j < stripedAngles.length; j++) { 
     pushMatrix();
-    translate(centerX, centerY);
+    translate(width/2, height/2);
     rotateZ(stripedAngles[j]);
     stripedAngles[j] += .01;
 
@@ -38,8 +38,8 @@ void triangleCenter(color c, int sw, int sz) {
   strokeWeight(sw);
   stroke(c);
   noFill();
-  int x = (maskPoints[2].x+maskPoints[7].x)/2; 
-  int y = (maskPoints[2].y+maskPoints[7].y)/2;
+  int x = (maskPoints[keystoneNum][2].x+maskPoints[keystoneNum][7].x)/2; 
+  int y = (maskPoints[keystoneNum][2].y+maskPoints[keystoneNum][7].y)/2;
   float alt = sz*sqrt(3)/2.0;
   triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2);
 }
@@ -570,4 +570,174 @@ void displayShadowLines(int hue, int sz, int sp) {
     }
     screens[j].s.endDraw();
   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// FROZEN BRUSH
+//////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// PERLIN NOISE
+//////////////////////////////////////////////////////////////////////////////////
+int spacingTerr, colsTerr, rowsTerr;
+float[][] terrain;
+float flyingTerr = 0;
+float flyingTerrInc = 0.01;
+boolean flyingTerrOn = true;
+float xoffInc = 0.2;
+boolean acceleratingTerr = true;
+int lastCheckedTerr = 0;
+boolean beginningTerrain = false;
+boolean addAudioAmp = true;
+
+void initTerrainCenter() {
+  int w = screenW*4; 
+  int h = 800; 
+  int spacing = 20;
+  this.colsTerr = w/spacing;
+  this.rowsTerr = h/spacing;
+  this.spacingTerr = spacing;
+  terrain = new float[colsTerr][rowsTerr];
+}
+void setAudioGrid() {
+  updateSpectrum();
+
+  beatCycle(300);
+  if (currentCycle > previousCycle) {
+    acceleratingTerr = true;
+    previousCycle = currentCycle;
+  }
+  updateFlying(800);
+
+  float yoff = flyingTerr;
+
+  for (int y = 0; y < rowsTerr; y++) {
+    float xoff = 0;
+    float amp = 0.5;
+    for (int x = 0; x < colsTerr; x++) {
+      float f = getFreq(map(x, 0, colsTerr, 0, 100));
+
+
+      terrain[x][y] = map(noise(xoff, yoff), 0, 1, -100, 100);
+      //terrain[x][y] += f*amp;
+      //terrain[x][y] += map(y,0,rowsTerr,-f*amp,f*amp);
+      xoff += xoffInc;
+    }
+    yoff += xoffInc;
+  }
+}
+
+void updateFlying(int delayT) {
+  if (flyingTerrOn) {
+    if (acceleratingTerr) {
+      flyingTerr -= 0.3;
+      if (millis() - lastCheckedTerr > delayT) {
+        acceleratingTerr = false;
+      }
+    } else {
+      flyingTerr -= flyingTerrInc;
+    }
+  }
+}
+
+void displayTerrainSplit() {
+  setAudioGrid();
+  int j = 0;
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.pushMatrix();
+    
+    // 0  +screenW*2
+    // 1  +screenW
+    // 2 -screenW
+    // 3 -2*screenW
+
+    s.translate((2-j) * screenW, screenH/2, 0);
+    s.rotateX(radians(60));
+
+
+    s.noFill();
+    s.stroke(255);
+    s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
+    s.colorMode(HSB, 255);
+    for (int y = 0; y < rowsTerr-1; y++) {
+      s.beginShape(TRIANGLE_STRIP);
+      for (int x = 0; x < colsTerr; x++) {
+        //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
+        s.vertex(x * spacingTerr, y * spacingTerr, addAudioAmp?terrain[x][y]:0);
+        s.vertex(x * spacingTerr, (y+1) * spacingTerr, addAudioAmp?terrain[x][y+1]:0);
+      }
+      s.endShape();
+    }
+    s.popMatrix();
+    s.endDraw();
+    j++;
+  }
+}
+
+
+void displayTerrainCenter() {
+  PGraphics s = centerScreen.s;
+  //setGrid();
+  setAudioGrid();
+  s.beginDraw();
+  s.background(0);
+  s.pushMatrix();
+  if (beginningTerrain) {
+    s.translate(screenW*2, screenH/2, 0);
+    s.rotateX(radians(millis()/100.0));
+  } else {
+    s.translate(screenW*2, screenH/2, 0);
+    s.rotateX(radians(60));
+  }
+
+  s.noFill();
+  s.stroke(255);
+  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
+  s.colorMode(HSB, 255);
+  for (int y = 0; y < rowsTerr-1; y++) {
+    s.beginShape(TRIANGLE_STRIP);
+    for (int x = 0; x < colsTerr; x++) {
+      //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
+      s.vertex(x * spacingTerr, y * spacingTerr, addAudioAmp?terrain[x][y]:0);
+      s.vertex(x * spacingTerr, (y+1) * spacingTerr, addAudioAmp?terrain[x][y+1]:0);
+    }
+    s.endShape();
+  }
+  s.popMatrix();
+  s.endDraw();
+}
+
+
+
+//void displayTerrainCenter() {
+//  PGraphics s = centerScreen.s;
+//  setAudioGrid();
+//  s.beginDraw();
+//  s.pushMatrix();
+//  s.translate(screenW*4/2,screenH/2,-500);
+//  s.rotateX(radians(80));
+//  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
+//  for(int y = 0; y < rowsTerr-1; y++) {
+//    s.beginShape(TRIANGLE_STRIP);
+//    for(int x = 0; x < colsTerr; x++) {
+//      //fill(getVertexColor(x,y),gridOpacity);
+//      s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]);
+//      s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]);
+//    }
+//    s.endShape();
+//  }
+//  s.popMatrix();
+//  s.endDraw();
+//}
+
+// return frequency from 0 to 100 at x (band) between 0 and 100
+float getFreq(float col) {
+  int x = constrain((int)col, 0, 100);
+  x = (int)(x * (bands.length/100.0));
+  return constrain(bands[x], 0, 100);
 }
