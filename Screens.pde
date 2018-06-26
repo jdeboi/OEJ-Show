@@ -1,16 +1,27 @@
-// to modify keystone lib and then make a jar file: jar cvf keystone.jar .
-import deadpixel.keystone.*;
+
+import deadpixel.keystone.*;  // to modify keystone lib and then make a jar file: jar cvf keystone.jar .
+
+//////
+int screenW = 400;
+int screenH = 400;
+
+int sphereW = 400;
+int topScreenW = 350;
+int topScreenH = 200;
+//////
 Keystone ks;
 Keystone ksC;
 int keystoneNum = 0;
 CornerPinSurface [] surfaces;
+CornerPinSurface [] topSurfaces;
 CornerPinSurface centerSurface;
+CornerPinSurface sphereSurface;
 Screen [] screens;
+Screen [] topScreens;
 Screen centerScreen;
+Screen sphereScreen;
 boolean useCenterScreen = true;
 int numScreens = 4;
-int screenW = 400;
-int screenH = 400;
 int centerX, centerY;
 boolean editingMapping = false;
 int numMappings = 2;
@@ -96,26 +107,6 @@ class Screen {
     }
     s.endDraw();
   }
-  
-  //void drawFFTHoriz(color c, int sw) {
-  //  s.beginDraw();
-    
-  //  for (int i = 0; i < beat.detectSize(); ++i) {    
-  //    if ( beat.isOnset(i) ) {  // test one frequency band for an onset
-  //      s.stroke(c);
-  //      s.noFill();
-  //      s.rect( i*rectW, 0, rectW, screenH);
-  //    }
-  //  }
-  //  int lowBand = 5;
-  //  int highBand = 15;
-  //  int numberOfOnsetsThreshold = 4; // at least this many bands must have an onset for isRange to return true 
-  //  if ( beat.isRange(lowBand, highBand, numberOfOnsetsThreshold) ) {
-  //    s.fill(232, 0, 2, 200);
-  //    s.rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, screenH);
-  //  }
-  //  s.endDraw();
-  //}
 
   void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
@@ -191,10 +182,22 @@ void blackoutScreens() {
   }
 }
 
+void drawSolidAllCubes(color c) {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawSolid(c);
+  }
+  
+}
+
 void drawSolidAll(color c) {
   for (int i = 0; i < numScreens; i++) {
     screens[i].drawSolid(c);
   }
+  for (int i = 0; i < numScreens; i++) {
+    topScreens[i].drawSolid(c);
+  }
+  centerScreen.drawSolid(c);
+  sphereScreen.drawSolid(c);
 }
 
 void drawCNAll() {
@@ -254,17 +257,30 @@ void drawFFTBarsAll() {
 
 void initScreens() {
   ks = new Keystone(this);
-  if (useCenterScreen) ksC = new Keystone(this);
+
   surfaces = new CornerPinSurface[numScreens];
   screens = new Screen[numScreens];
   for (int i = 0; i < numScreens; i++) {
     surfaces[i] = ks.createCornerPinSurface(screenW, screenH, 20);
     screens[i] = new Screen(screenW, screenH);
   }
+
+  topSurfaces = new CornerPinSurface[2];
+  topScreens = new Screen[2];
+  for (int i = 0; i < 2; i++) {
+    topSurfaces[i] = ks.createCornerPinSurface(topScreenW, topScreenH, 20);
+    topScreens[i] = new Screen(topScreenW, topScreenH);
+  } 
+
   if (useCenterScreen) {
     centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
     centerScreen = new Screen(screenW*4, screenH);
   }
+
+  sphereSurface = ks.createCornerPinSurface(sphereW, sphereW, 20);
+  sphereScreen = new Screen(sphereW, sphereW);
+
+
   loadKeystone(0);
 }
 
@@ -279,6 +295,13 @@ void renderScreens() {
   for (int i = 0; i < numScreens; i++) {
     surfaces[i].render(screens[i].s);
   }
+  
+  for (int i = 0; i < 2; i++) {
+    topSurfaces[i].render(topScreens[i].s);
+  }
+  
+  sphereSurface.render(sphereScreen.s);
+  
   if (useCenterScreen) centerSurface.render(centerScreen.s);
   popMatrix();
 }

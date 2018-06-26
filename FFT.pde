@@ -153,7 +153,7 @@ void cycleHandsFFT() {
 
     int imgW = 400;
     int imgH = int(hands[(currentCycle+j)%hands.length].height *  imgW*1.0/hands[(currentCycle+j)%hands.length].width);
-    sc.drawImage(hands[(currentCycle+j)%hands.length], screenW/2 -imgW/2 , screenH/2 - imgH/2, imgW, imgH);
+    sc.drawImage(hands[(currentCycle+j)%hands.length], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     //if (currentCycle%hands.length == j) sc.drawImage(hands[0], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     //else  sc.drawImage(hands[4], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     sc.s.rectMode(CORNERS);
@@ -347,6 +347,22 @@ void updateSpectrum() {
   }
   myAudioIndexAmp = myAudioIndex;
   myAudioIndexAmp2 = myAudioIndex2;
+}
+
+void displayAmplitudeHoriz() {
+  int lev = int(map((songFile.left.level() + songFile.right.level())/2, 0, 0.5, 0, screenW*4));
+
+  for (int i = 0; i < screens.length; i++) {
+    screens[i].s.beginDraw();
+    //screens[i].s.background(color(0));
+    screens[i].s.noStroke();
+    screens[i].s.fill(0, 80);
+    screens[i].s.rect(0, 0, screenW, screenH);
+    
+    screens[i].s.fill(255);
+    screens[i].s.rect(0, 0, constrain(lev - screenW * i, 0, screenW*4), screenH);
+    screens[i].s.endDraw();
+  }
 }
 
 void drawFFT() {

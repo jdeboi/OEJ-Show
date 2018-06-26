@@ -1,4 +1,5 @@
 boolean isTesting = true;
+boolean useMusic = true;
 //////////
 
 import gifAnimation.*;
@@ -37,16 +38,22 @@ void setup() {
   //size(1200, 800, P3D);
   fullScreen(P3D);
   initScenes();
-  initTesting();
+  initScreens();
+  
+  initFFT();
+  initMidi();
+
+  //initTesting();
   changeScene(3);
 
-  initScreens();
+
   initControls();
   initMask();
+   centerScreen.drawSolid(color(0));
 }
 
 void draw() {
-  background(30);
+  background(0);
 
   // are we testing imagery or playing the show?
   if (isTesting) testShow();
@@ -60,12 +67,11 @@ void draw() {
   //// control bar
   if (mouseY < 300) drawControls();
   else hideControls();
-  
+
   if (editingMask) {
     drawMaskPoints();
     moveSelectedMask();
   }
-  
 }
 
 void testShow() {
@@ -73,7 +79,7 @@ void testShow() {
   // do we want to see the stage?
   //image(stage, 0, 0, width, stage.height * width/stage.width);
 
-  ///////////////////////////// 
+  /////////////////////////////
   // CUSTOM SCRIPTS
   //drawCNAll();
   //drawSolidAll(color(0));
@@ -81,18 +87,31 @@ void testShow() {
 
   //mirrorVidCenter(vid1, 0, 0);
   //displayShadowRainbow();
+  //drawSolidAll(color(0));
   //haromAll(color(255), 3);
+  //displayMoonsAcross();
+  //displayFlowyWaves(centerScreen.s);
 
-  
-  
+
+  //displayTreeBranchesAll();
+  //displayFractalTreeAll(1);
+
   //displayShadowRainbow();
   //centerScreen.drawSolid(color(0));
-  //displayTerrainCenter();
-  //displayTerrainCenter();
-  displayTerrainSplit();
-  
+  //displayTerrainCenter();  // no mesh
+  //displayTerrainSplit();
+  //drawStream();
+  //drawSolidAll(color(0));
+  //displayWavesCenter();
+  //centerScreen.drawSolid(color(0));
+  //displayLineBounceAll();
 
-  ///////////////////////////// 
+  //displayMoveSpaceCenter();
+  //displayMoveSpaceAll();
+  //displayRedPlanetAll();
+  //displayRedPlanet(centerScreen.s);
+
+  /////////////////////////////
   // GIF
   if (mode == GIF_ALL) drawGifAll(currentTestGif, 0, 0, screenW, screenH);
   else if (mode == GIF_ACROSS) {
@@ -100,14 +119,14 @@ void testShow() {
     drawGifAcross(currentTestGif, y);
   }
 
-  ///////////////////////////// 
+  /////////////////////////////
   // CUBES
   else if (mode == CUBE_MODE) {
     display3D();
     updateCubes();
   }
 
-  ///////////////////////////// 
+  /////////////////////////////
   // IMAGE
   else if (mode == IMG_ALL) drawImageAll(currentTestImg, 0, 0, screenW, screenH);
   else if (mode == IMG_ACROSS) {
@@ -115,12 +134,13 @@ void testShow() {
     drawImageAcross(currentTestImg, y);
   }
 
-  ///////////////////////////// 
+  /////////////////////////////
   // FFT
   else if (mode == FFT) {
     //drawFFT();
     //drawSolidAll(color(0));
     //drawFFTBarsAll();
+    //displayAmplitudeHoriz();
 
 
     //drawSpectrum(30);
@@ -136,7 +156,7 @@ void testShow() {
     //drawWaveForm();
   }
 
-  ///////////////////////////// 
+  /////////////////////////////
   // VIDEO
   else if (mode == TILE_VID) tileVid(vid1, 0, 0);
   else if (mode == VID_ACROSS) movieAcrossAll(vid1, -100);
@@ -145,12 +165,12 @@ void testShow() {
 
 
   //if (useCenterScreen) {
-    //centerScreen.drawSolid(color(0));
-    //centerScreen.drawImage(currentTestImg,0, 0);
+  //centerScreen.drawSolid(color(0));
+  //centerScreen.drawImage(currentTestImg,0, 0);
   //}
-  //snakeOutlineAll(color(255), 30, 150, 5);
-  //drawOutlineAll(color(255), 10);
-  
+  //snakeOutlineAll(color(0, 255, 255), 30, 150, 5);
+  drawOutlineAll(color(255, 0, 0), 10);
+
   if (editingMapping) numberScreens();
 }
 
@@ -160,6 +180,7 @@ void playShow() {
     currentScene.display();
   } else {
     blackoutScreens();
+    if (betweenSongs) checkMidiStart();
   }
 }
 
@@ -169,7 +190,7 @@ void keyPressed() {
     //println(cp5.get(Textfield.class, "input").getText());
     //breaks.get(selected).text = cp5.get(Textfield.class, "input").getText();
   } else {
-    if (bracketDown) { 
+    if (bracketDown) {
       if (key == '0') changeScene(9);
       else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);
       else if (key == '-') changeScene(10);
@@ -181,7 +202,7 @@ void keyPressed() {
         if (keyCode == RIGHT) songFile.skip(15000);
         else if (keyCode == LEFT) songFile.skip(-1000);
       }
-    } // && !cp5.get(Textfield.class, "input").isFocus() 
+    } // && !cp5.get(Textfield.class, "input").isFocus()
     else if (key == ' ') {
       if (!startShow) startShow = true;
       togglePlay();
@@ -198,7 +219,7 @@ void keyPressed() {
           resetHighlights();
           selected = -1;
         } else breaks.get(selected).breakType = key;
-      } 
+      }
       breaks.add(new Break(songFile.position(), key));
     }
   }
@@ -233,10 +254,12 @@ void mouseReleased() {
 }
 
 void drawControls() {
+  pushMatrix();
   drawSongLabel();
   drawPlayer();
   cp5.show();
   drawBreakInfo();
+  popMatrix();
 }
 
 void hideControls() {
@@ -259,15 +282,28 @@ void initTesting() {
 
   //stage = loadImage("_testing/images/stage.png");
 
-  //initCurvyNetwork();
+  initCurvyNetwork();
   //initConst();
   //initHands();
-  //initTesseract();
-  //initParticles(); 
+  initTesseract();
+  //initParticles();
   initTerrainCenter();
   //initCubes();
 
-  initFFT();
+  initTreeBranchesAll();
+  initWaves();
+  initDisplayFlowyWaves(centerScreen.s);
+  
+}
+
+void playScene() {
+  isPlaying = true;
+  currentScene.playScene();
+}
+
+void pauseScene() {
+  isPlaying = false;
+  currentScene.pauseScene();
 }
 
 void togglePlay() {

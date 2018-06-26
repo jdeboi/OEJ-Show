@@ -650,7 +650,7 @@ void displayTerrainSplit() {
     s.beginDraw();
     s.background(0);
     s.pushMatrix();
-    
+
     // 0  +screenW*2
     // 1  +screenW
     // 2 -screenW
@@ -712,32 +712,616 @@ void displayTerrainCenter() {
   s.endDraw();
 }
 
-
-
-//void displayTerrainCenter() {
-//  PGraphics s = centerScreen.s;
-//  setAudioGrid();
-//  s.beginDraw();
-//  s.pushMatrix();
-//  s.translate(screenW*4/2,screenH/2,-500);
-//  s.rotateX(radians(80));
-//  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
-//  for(int y = 0; y < rowsTerr-1; y++) {
-//    s.beginShape(TRIANGLE_STRIP);
-//    for(int x = 0; x < colsTerr; x++) {
-//      //fill(getVertexColor(x,y),gridOpacity);
-//      s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]);
-//      s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]);
-//    }
-//    s.endShape();
-//  }
-//  s.popMatrix();
-//  s.endDraw();
-//}
-
 // return frequency from 0 to 100 at x (band) between 0 and 100
 float getFreq(float col) {
   int x = constrain((int)col, 0, 100);
   x = (int)(x * (bands.length/100.0));
   return constrain(bands[x], 0, 100);
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// NOISE STRIP
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/203961
+/*
+author:  lisper <leyapin@gmail.com> 2015
+ desc:    noise led strip
+ This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+ */
+float nx = 0;
+float ny = 0;
+float nz = 0;
+float nxcolor;
+float nycolor;
+float nzcolor;
+
+void drawStream () {
+
+  int ind = 0;
+  for (Screen sc : screens) {
+    //nx = 0;
+    //nxcolor = 0;
+    nx = 0.02 * screenW/20 * ind;
+    nxcolor= 0.1 * screenW/20 * ind;
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.colorMode(HSB);
+    s.stroke (255);
+    s.strokeWeight(3);
+    for (int i=0; i<= screenW; i += 20) {
+      ny = 0;
+      nycolor=0;
+      for (int j=50; j<= screenW; j += 100) {
+        float n = noise (nx, ny, nz);
+        float angle = map (n, 0, 1.0, 0, 6*PI);
+        float x = 50 * cos (angle);
+        float y = 40 * sin (angle);
+        //int c = constrain( int (map( noise (nxcolor, nycolor, nzcolor), 0, 1.0, -200, 400)), 0, 255);
+        int c = int (map( noise (nxcolor, nycolor, nzcolor), 0, 1.0, 0, 255));
+        //println (c);
+        //s.stroke (c*2);
+        s.stroke (c);
+        s.line (i-x, j-y, i+x, j+y);
+        ny += 0.5;
+        nycolor += 0.3;
+      }
+      nxcolor += 0.1;
+      nx += 0.02;
+    }
+    s.endDraw();
+    ind++;
+    nz +=0.001;
+    nzcolor += 0.001;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// TREE BRANCHES
+//////////////////////////////////////////////////////////////////////////////////
+//https://www.openprocessing.org/sketch/144159
+class pathfinder {
+  PVector location;
+  PVector velocity;
+  float diameter;
+  pathfinder(PGraphics s) {
+    location = new PVector(s.width/2, s.height);
+    velocity = new PVector(0, -1);
+    diameter = 32;
+  }
+  pathfinder(pathfinder parent) {
+    location = parent.location.copy();
+    velocity = parent.velocity.copy();
+    float area = PI*sq(parent.diameter/2);
+    float newDiam = sqrt(area/2/PI)*2;
+    diameter = newDiam;
+    parent.diameter = newDiam;
+  }
+  void update() {
+    if (diameter>0.5) {
+      location.add(velocity);
+      PVector bump = new PVector(random(-1, 1), random(-1, 1));
+      bump.mult(0.1);
+      velocity.add(bump);
+      velocity.normalize();
+      if (random(0, 1)<0.02) {
+        paths = (pathfinder[]) append(paths, new pathfinder(this));
+      }
+    } else if (location.x < -400) resetTreeBranchesAll();
+  }
+}
+pathfinder[] paths;
+void initTreeBranchesAll() {
+  smooth();
+  paths = new pathfinder[1];
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    paths[0] = new pathfinder(s);
+    s.beginDraw();
+    s.background(0);
+    s.endDraw();
+  }
+}
+void displayTreeBranchesAll() {
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.ellipseMode(CENTER);
+    s.fill(255);
+    s.noStroke();
+    for (int i=0; i<paths.length; i++) {
+      PVector loc = paths[i].location;
+      float diam = paths[i].diameter;
+      s.ellipse(loc.x, loc.y, diam, diam);
+      paths[i].update();
+    }
+    s.endDraw();
+  }
+}
+void resetTreeBranchesAll() {
+  PGraphics s = screens[0].s;
+  paths = new pathfinder[1];
+  paths[0] = new pathfinder(s);
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.background(0);
+    sc.s.endDraw();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// TREE BRANCHES
+//////////////////////////////////////////////////////////////////////////////////
+float thetaFTree; 
+void displayFractalTreeAll(int mode) {
+  int j = 0;
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.stroke(255);
+    s.strokeWeight(2);
+    s.pushMatrix();
+    // Let's pick an angle 0 to 90 degrees based on the mouse position
+    float a = (mouseX / (float) s.width) * 90f;
+    if (mode == 1) a = 40*sin(frameCount/100.0 + j * 0.35); // (mouseX / (float) s.width) * 90f 
+    // Convert it to radians
+    thetaFTree = radians(a);
+    // Start the tree from the bottom of the screen
+    s.translate(s.width/2, s.height);
+    // Draw a line 120 pixels
+    s.line(0, 0, 0, -120);
+    // Move to the end of that line
+    s.translate(0, -120);
+    // Start the recursive branching!
+    //s.scale(3);
+    branch(s, 120);
+    s.popMatrix();
+    s.endDraw();
+    j++;
+  }
+}
+
+void branch(PGraphics s, float h) {
+  // Each branch will be 2/3rds the size of the previous one
+  h *= 0.66;
+
+  // All recursive functions must have an exit condition!!!!
+  // Here, ours is when the length of the branch is 2 pixels or less
+  if (h > 2) {
+    s.pushMatrix();    // Save the current state of transformation (i.e. where are we now)
+    s.rotate(thetaFTree);   // Rotate by theta
+    s.line(0, 0, 0, -h);  // Draw the branch
+    s.translate(0, -h); // Move to the end of the branch
+    branch(s, h);       // Ok, now call myself to draw two new branches!!
+    s.popMatrix();     // Whenever we get back here, we "pop" in order to restore the previous matrix state
+
+    // Repeat the same thing, only branch off to the "left" this time!
+    s.pushMatrix();
+    s.rotate(-thetaFTree);
+    s.line(0, 0, 0, -h);
+    s.translate(0, -h);
+    branch(s, h);
+    s.popMatrix();
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// WAVES
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/546665
+void displayWavesCenter() {
+  cycleWaves();
+  PGraphics s = centerScreen.s;
+  s.beginDraw();
+  s.background(0);  
+  for (int i = 0; i < waves.size(); i++) {
+    Wave w = waves.get(i);
+    if (w != null) {
+      w.tick();
+      w.display(s);
+    }
+  }
+  s.endDraw();
+}
+ArrayList<Wave> waves;
+void initWaves() {
+  waves = new ArrayList();
+}
+
+class Wave {
+  PVector pos, dim;
+
+  Wave(int x, int y) {
+    pos = new PVector(x, y);
+    dim = new PVector(0, 0);
+  }
+
+  void display(PGraphics s) {
+    s.stroke(255);
+    s.strokeWeight(5);
+    s.noFill();
+    s.ellipse(pos.x, pos.y, dim.x, dim.y);
+  }
+
+  void tick() {
+    dim.add(new PVector(3, 3));
+    if (dim.x > width*2) {
+      waves.remove(this);
+    }
+  }
+}
+
+void cycleWaves() {
+  updateSpectrum();
+  beatCycle(500);
+  if (currentCycle > previousCycle) {
+    waves.add(new Wave(centerScreen.s.width/2, centerScreen.s.height/2));
+    previousCycle = currentCycle;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// LINES BOUNCE
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/449873
+// modified by jdeboi
+float angleBottom = 0;
+
+void displayLineBounceAll() {
+  for (Screen s : screens) {
+    displayLineBounce(s.s, 30);
+  }
+  angleBottom += 0.01;
+}
+void displayLineBounce(PGraphics s, int spacing) {
+  s.beginDraw();
+  s.background(0);
+  s.stroke(255);
+  int w = s.width;
+  int h = s.height ;
+  int centerX = w/2;
+  //int bottomY = h-50;
+  int bottomY = h;
+  int centerY = bottomY/2;
+  for (int i = 0; i<w; i+=spacing) {
+    // 0 -> 1, not 0 -> 2h
+    float yMove = bottomY/2-sin(angleBottom)*bottomY/2;
+    s.line(centerX, bottomY, i, yMove); // bottom lines
+    yMove = bottomY/2+sin(angleBottom)*bottomY/2;
+    s.line(centerX, 0, i, yMove);         // top lines
+  }
+  for (int i = 0; i<=bottomY; i+=spacing) {
+
+    float xMove = centerX/2 + sin(angleBottom)*centerX/2;
+    s.line(0, i, xMove, centerY);        // left to right lines
+
+    xMove = w-sin(angleBottom)*w/4 - w/4;
+    // between w and w/2
+    s.line(xMove, centerY, w, i);
+  }
+  s.endDraw();
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// MOVING THROUGH SPACE
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/96938
+ArrayList<PVector> starsSpace = new ArrayList<PVector>();
+int convergeX = 1;
+int convergeY = 1;
+
+void displayMoveSpaceAll() {
+  cycleStarsSpaceModes();
+  for (Screen s : screens) {
+    displayMoveSpace(s.s, 0.8);
+  }
+}
+
+void displayMoveSpaceCenter() {
+  cycleStarsSpaceModes();
+  displayMoveSpace(centerScreen.s, 1.0);
+}
+
+void displayMoveSpace(PGraphics s, float speed) {
+  //int controlX = mouseX;
+  //int controlY = mouseY;
+  speed = constrain(speed, 0.6, 1.0);
+  int controlX = int(map(convergeX, 0, 2, s.width*(1-speed), s.width*speed));
+  int controlY = int(map(convergeY, 0, 2, s.height*(1-speed), s.height*speed));
+  float w2=s.width/2;
+  float h2= s.height/2;
+  float d2 = dist(0, 0, w2, h2);
+  s.beginDraw();
+  s.noStroke();
+  s.fill(0, map(dist(controlX, controlY, w2, h2), 0, d2, 255, 5));
+  s.rect(0, 0, s.width, s.height);
+  s.fill(255);
+
+  for (int i = 0; i<20; i++) {   // star init
+    starsSpace.add(new PVector(random(s.width), random(s.height), random(1, 3)));
+  }
+
+  for (int i = 0; i<starsSpace.size(); i++) {
+    float x =starsSpace.get(i).x;//local vars
+    float y =starsSpace.get(i).y;
+    float d =starsSpace.get(i).z;
+
+    /* movement+"glitter"*/
+    starsSpace.set(i, new PVector(x-map(controlX, 0, s.width, -0.05, 0.05)*(w2-x), y-map(controlY, 0, s.height, -0.05, 0.05)*(h2-y), d+0.2-0.6*noise(x, y, frameCount)));
+
+    if (d>3||d<-3) starsSpace.set(i, new PVector(x, y, 3));
+    if (x<0||x>s.width||y<0||y>s.height) starsSpace.remove(i);
+    if (starsSpace.size()>999) starsSpace.remove(1);
+    s.ellipse(x, y, d, d);//draw stars
+  }
+  s.endDraw();
+}
+
+void cycleStarsSpaceModes() {
+  updateSpectrum();
+  beatCycle(500);
+  if (currentCycle > previousCycle) {
+    convergeX = (currentCycle/3)%3;
+    convergeY = currentCycle%3;
+
+    previousCycle = currentCycle;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// RED PLANET
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/422775
+ArrayList<PVector> pathPoints = new ArrayList<PVector> ();
+void displayRedPlanetAll() {
+  for (Screen s : screens) {
+    displayRedPlanet(s.s);
+  }
+}
+void displayRedPlanet(PGraphics s) {
+  s.beginDraw();
+  //create the path
+  pathPoints = circlePoints(s);
+
+  for (int j=0; j<8; j++) {
+    pathPoints = complexifyPath(pathPoints);
+  }
+
+  //draw the path
+  s.stroke(random(100, 255), 20, 15, random(10, 55));
+  //filter(BLUR,0.571) ;
+  for (int i=0; i<pathPoints.size() -1; i++) {
+    PVector v1 = pathPoints.get(i);
+    PVector v2 = pathPoints.get(i+1);
+    s.line(v1.x, v1.y, v2.x, v2.y);
+  }
+  s.endDraw();
+}
+
+ArrayList<PVector>   complexifyPath(ArrayList<PVector> pathPoints) {
+  //create a new path array from the old one by adding new points inbetween the old points
+  ArrayList<PVector> newPath = new ArrayList<PVector>();
+
+  for (int i=0; i<pathPoints.size() -1; i++) {
+    PVector v1 = pathPoints.get(i);
+    PVector v2 = pathPoints.get(i+1);
+    PVector midPoint = PVector.add(v1, v2).mult(0.5);
+    float distance =  v1.dist(v2);
+
+    //the new point is halfway between the old points, with some gaussian variation
+    float standardDeviation = 0.125*distance;
+    PVector v = new PVector((randomGaussian()-0.5)*standardDeviation+midPoint.x, (randomGaussian()-0.5)*standardDeviation+midPoint.y);
+    newPath.add(v1);
+    newPath.add(v);
+  }
+
+  //don't forget the last point!
+  newPath.add(pathPoints.get(pathPoints.size()-1));
+  return newPath;
+}
+
+ArrayList<PVector> circlePoints(PGraphics s) {
+  //two points somewhere on a circle
+  float r = s.height/2;
+  int x = s.width/2;
+  int y = s.height/2;
+  //float theta1 = random(TWO_PI);
+  float theta1 = (randomGaussian()-0.5)*PI/4;
+  float theta2 = theta1 + (randomGaussian()-0.5)*PI/3;
+  PVector v1 = new PVector(x + r*cos(theta1), y+ r*sin(theta1)*.7 );
+  PVector v2 = new PVector(x + r*cos(theta2), y + r*sin(theta2)*.7);
+  ArrayList<PVector> vecs = new ArrayList<PVector>();
+  vecs.add(v1);
+  vecs.add(v2);
+  return vecs;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// MOONS
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/219297
+color moonColor = #ffe699;
+float moonRadius = 40;
+int moonFrames = 250;
+int moonCell = 108;
+float moonDelay = 0;
+int moonColumns = 12;
+int moonRows = 1;
+
+//Draws the rows and columns of moons.
+//Adds a delay for each moon.
+void displayMoonsAcross() {
+  for (int k = 0; k < screens.length; k++) {
+    PGraphics s = screens[k].s;
+    s.beginDraw();
+    s.background(0);
+    s.noStroke(); 
+
+    for (int j = 0; j < moonRows; j++) {
+      for (int i = 0; i < moonColumns/4; i++) {
+        float x = i*moonCell;
+        //float y = j*moonCell;
+        float y = 100;
+        s.pushMatrix();
+        s.translate(x, y);
+        drawMoon(s, moonDelay);
+        moonDelay = moonDelay+0.025;
+        s.popMatrix();
+      }
+    }
+
+    s.endDraw();
+  }
+  moonDelay = 0;
+}
+
+//Draws a moon. 
+//This function is a modifiend version of "the moon" by Jerome Herr.
+void drawMoon(PGraphics s, float delay) {
+  float t = (((frameCount)%moonFrames*1.5)/(float)moonFrames)+delay;
+  if (t > 1.5) t -= 1.5;
+  s.translate(moonCell, moonCell);
+  //Moon growing to full moon
+  if (t < 0.5) { 
+    float tt = map(t, 0, 0.5, 0, 1); 
+    if (tt < 0.5) { 
+      float r = map(tt, 0, 0.5, moonRadius, 0);
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left moon
+      s.fill(0);
+      s.arc(0, 0, r, moonRadius, PI/2, PI*1.5); //left background shrinking
+    } else {
+      float r = map(tt, 0.5, 1, 0, moonRadius);
+      s.fill(moonColor);
+      s.arc(0, 0, r, moonRadius, -PI/2, PI/2); //right moon growing
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left moon
+    }
+    //Moon shrinking to new moon
+  } else if (t < 1.0) {
+    float tt = map(t, 0.5, 1, 0, 1);
+    if (tt < 0.5) {
+      float r = map(tt, 0, 0.5, moonRadius, 0); 
+      s.fill(0);
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left background
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
+      s.arc(0, 0, r, moonRadius, PI/2, PI*1.5); //left moon shrinking
+    } else {
+      float r = map(tt, 0.5, 1, 0, moonRadius); 
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
+      s.fill(0);
+      s.arc(0, 0, r, moonRadius, -PI/2, PI/2); //right background growing
+    }
+  } else if (t < 1.5) {
+    s.fill(0);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// FLOWY WAVES
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/133048
+float myPerlin;
+float cFW=0;
+float dFW=0;
+float eFW=0;
+//float x=0;
+float yFW=0;
+float randPerl;
+float countFW=150;
+float  mapHeightFW;
+int modeFW = 0;
+color startCFW;
+color midCFW;
+color endCFW;
+
+void initDisplayFlowyWaves(PGraphics s) {
+  mapHeightFW = screenH;
+  s.beginDraw();
+  s.background(255);
+
+  colorMode(HSB);
+  startCFW = color(random(255), 255, 255);
+  midCFW = color((hue(startCFW)+60)%255, 255, 255);
+  endCFW = color((hue(startCFW)+120)%255, 255, 255);
+  colorMode(RGB);
+  s.endDraw();
+}
+
+void displayFlowyWaves(PGraphics s) {
+  s.beginDraw();
+  int fadeStart = 1150;
+  int fadeEnd = 1200;
+  if (countFW > fadeStart) {
+    s.noStroke();
+    color c = getColorFW(0, modeFW);
+    s.fill(hue(c), saturation(c), brightness(c), map(countFW, fadeStart, fadeEnd, 2, 50));
+    s.rect(0, 0, s.width, s.height);
+  }
+  s.noFill();
+  changeColor(s, countFW);
+  changePerlin();
+  paintFW(s);
+  countFW++;
+
+  if (countFW > fadeEnd) {
+    //s.background(255);
+    countFW = 100;
+    mapHeightFW = screenH;
+  }
+  mapHeightFW=mapHeightFW-1;
+  s.endDraw();
+}
+
+void changeColor(PGraphics s, float cnt) {
+  s.colorMode(HSB);
+  s.stroke(getColorFW(cnt, modeFW));
+}
+
+color getColorFW(float cnt, int mode) {
+  if (mode == 0) {
+    cFW = sin(radians(cnt))+1;
+    dFW = sin(radians(cnt+30))+1;
+    eFW = sin(radians(cnt+60))+1;
+    cFW = map(cFW, 0, 1, 0, 255);
+    dFW = map(dFW, 0, 1, 0, 255);
+    eFW = map(eFW, 0, 1, 0, 255);
+    return color(cFW, dFW, 220);
+  } else if (mode == 1) {
+    cFW = sin(radians(cnt))+1;
+    return color(cFW);
+  } else {
+    cFW = sin(radians(cnt))+1;
+    dFW = sin(radians(cnt+30))+1;
+    eFW = sin(radians(cnt+60))+1;
+    cFW = map(cFW, 0, 1, 0, 255);
+    dFW = map(dFW, 0, 1, 0, 255);
+    eFW = map(eFW, 0, 1, 0, 255);
+
+    float s = sin(radians(cnt));
+    color c;
+    if (s < -0.5) c = lerpColor(startCFW, midCFW, map(s, -1, -0.5, 0, 1));
+    else if (s < 0.5) c = lerpColor(midCFW, endCFW, map(s, -0.5, 0.5, 0, 1));
+    else  c = lerpColor(endCFW, startCFW, map(s, 0.5, 1, 0, 1));
+    return c;
+  }
+}
+
+void paintFW(PGraphics s) {
+  for (int x=0; x<s.width; x=x+1) {
+    myPerlin = noise(float(x)/200, countFW/200);
+    float myY = map(myPerlin, 0, 1, 0, s.height-mapHeightFW);
+    s.line(x, myY, x, s.height );
+  }
+}
+
+void changePerlin() {
+  myPerlin = noise(countFW);
 }

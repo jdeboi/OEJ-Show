@@ -28,6 +28,7 @@ void changeScene(int n) {
     currentScene = scenes[n];
     currentScene.init();
     isPlaying = false;
+    betweenSongs = true;
     initBreaks();
     println("Current scene: " + currentScene.song);
   }
@@ -53,6 +54,7 @@ class Scene {
   }
 
   void playScene() {
+    betweenSongs = false;
     isPlaying = true;
     //timeStarted = millis();
     songFile.play();
@@ -64,7 +66,7 @@ class Scene {
   void pauseScene() {
     isPlaying = false;
     songFile.pause();
-    println(song + " paused"); 
+    println(song + " paused");
 
     if (currentCue != -1) cues[currentCue].pauseCue();
   }
@@ -87,7 +89,7 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
- 
+
     currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
     currentImages = loadImages("scenes/" + shortName + "/images/");
     currentCue = 0;
@@ -131,8 +133,8 @@ class Scene {
 
 ArrayList<PImage> loadImages(String dir) {
   ArrayList<PImage> imgs = new ArrayList<PImage>();
-  java.io.File folder = new java.io.File(dataPath(dir)); 
-  String[] filenames = folder.list(); 
+  java.io.File folder = new java.io.File(dataPath(dir));
+  String[] filenames = folder.list();
   PImage p;
   for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
     p = loadImage(dir + filenames[i]);
@@ -142,14 +144,14 @@ ArrayList<PImage> loadImages(String dir) {
 }
 
 String[] getFileNames(String dir) {
-  java.io.File folder = new java.io.File(dataPath(dir)); 
+  java.io.File folder = new java.io.File(dataPath(dir));
   return folder.list();
 }
 
 ArrayList<Gif> loadGifs(String dir) {
   ArrayList<Gif> gifs = new ArrayList<Gif>();
-  java.io.File folder = new java.io.File(dataPath(dir)); 
-  String[] filenames = folder.list(); 
+  java.io.File folder = new java.io.File(dataPath(dir));
+  String[] filenames = folder.list();
   Gif g;
   for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
     if (!filenames[i].equals(".DS_Store")) {
@@ -162,8 +164,8 @@ ArrayList<Gif> loadGifs(String dir) {
 
 ArrayList<Movie> loadMovies(String dir) {
   ArrayList<Movie> movies = new ArrayList<Movie>();
-  java.io.File folder = new java.io.File(dataPath(dir)); 
-  String[] filenames = folder.list(); 
+  java.io.File folder = new java.io.File(dataPath(dir));
+  String[] filenames = folder.list();
   Movie m;
   for (int i = 0; i < filenames.length && i < MAX_MOV; i++) {
     m = new Movie(this, dir + filenames[i]);

@@ -1,4 +1,4 @@
-import controlP5.*;
+ import controlP5.*;
 import java.util.*;
 ControlP5 cp5;
 
@@ -7,17 +7,10 @@ ControlP5 cp5;
 Toggle togMap, togEdit, togShow, togP, togEditMask, togMask, togEdit3D;
 Textlabel timeText;
 Textarea myTextarea;
+int ymen = 0;
 
 void initControls() {
   cp5 = new ControlP5(this);
-
-  //togShow = cp5.addToggle("toggleShow")
-  //  .setPosition(50, 150)
-  //  .setSize(50, 20)
-  //  .setValue(false)
-  //  .setLabel("Testing OFF")
-  //  .setMode(ControlP5.SWITCH)
-  //  ;
 
   // create a toggle and change the default look to a (on/off) switch look
   togMap = cp5.addToggle("toggleMap")
@@ -34,13 +27,6 @@ void initControls() {
     .setSize(80, 19)
     .setLabel("Save Mapping")
     ;
-
-  //cp5.addButton("saveMapAs")
-  //  .setValue(0)
-  //  .setPosition(750, 250)
-  //  .setSize(80, 19)
-  //  .setLabel("Save New Map")
-  //  ;
 
   togP = cp5.addToggle("toggleP")
     .setPosition(xSpace, ySpace + vH + 30)
@@ -107,22 +93,6 @@ void initControls() {
     .setPosition(xSpace, ySpace + 50)
     ;
 
-  //cp5.addTextfield("input")
-  //  .setPosition(500, 150)
-  //  .setSize(200, 20)
-  //  .setFocus(false)
-  //  ;
-
-  //myTextarea = cp5.addTextarea("txt")
-  //  .setPosition(500, 200)
-  //  .setSize(300, 50)
-  //  .setColor(color(128))
-  //  .setColorBackground(color(255, 100))
-  //  .setColorForeground(color(255, 100));
-  //;
-  //myTextarea.setText("");
-
-
 
   String[] songNames = new String[scenes.length];
   for (int i = 0; i < scenes.length; i++) {
@@ -132,7 +102,7 @@ void initControls() {
   /* add a ScrollableList, by default it behaves like a DropdownList */
   cp5.addScrollableList("songs")
     .setColorBackground(color(10, 155, 0))
-    .setPosition(0, 0)
+    .setPosition(0, ymen)
     .setSize(150, 100)
     .setBarHeight(20)
     .setItemHeight(20)
@@ -141,35 +111,8 @@ void initControls() {
 
   l = Arrays.asList("GIF_ALL", "GIF_ACROSS", "IMG_ALL", "IMG_ACROSS", "FFT", "TILE_VID", "VID_ACROSS", "VID_MIRROR");
   cp5.addScrollableList("modeList")
-    .setPosition(150, 0)
+    .setPosition(150, ymen)
     .setColorBackground(color(105, 10, 0))
-    .setSize(150, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
-
-  l = Arrays.asList(subset(getFileNames("_testing/gifs/"), 0, MAX_GIF));
-  cp5.addScrollableList("gifs")
-    .setPosition(300, 0)
-    .setSize(150, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
-
-  l = Arrays.asList(subset(getFileNames("_testing/images/"), 0, MAX_IMG));
-  cp5.addScrollableList("imageList")
-    .setPosition(450, 0)
-    .setSize(150, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
-
-  l = Arrays.asList(subset(getFileNames("_testing/movies/"), 0, MAX_MOV));
-  cp5.addScrollableList("movieList")
-    .setPosition(600, 0)
     .setSize(150, 100)
     .setBarHeight(20)
     .setItemHeight(20)
@@ -178,7 +121,7 @@ void initControls() {
 
   l = Arrays.asList("0", "1");
   cp5.addScrollableList("keystoneList")
-    .setPosition(750, 0)
+    .setPosition(750, ymen)
     .setColorBackground(color(105, 110, 0))
     .setSize(100, 100)
     .setBarHeight(20)
@@ -188,7 +131,7 @@ void initControls() {
 
   l = Arrays.asList("moveXY", "moveZ", "rotateX", "rotateY", "rotateZ", "scale");
   cp5.addScrollableList("cubeEdit")
-    .setPosition(850, 0)
+    .setPosition(850, ymen)
     .setColorBackground(color(105, 170, 0))
     .setSize(100, 100)
     .setBarHeight(20)

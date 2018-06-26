@@ -73,7 +73,7 @@ void checkMaskClick() {
 
 
 void maskScreens() {
-  fill(50);
+  fill(0);
   noStroke();
   beginShape();
   vertex(0, maskPoints[keystoneNum][0].y);
