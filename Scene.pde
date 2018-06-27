@@ -75,6 +75,15 @@ class Scene {
   }
 
   void init() {
+    currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
+    currentImages = loadImages("scenes/" + shortName + "/images/");
+    currentCue = 0;
+
+    songFile = minim.loadFile("music/" + shortName + ".mp3", 1024);
+    songFile.cue(0);
+    songFile.pause();
+    initBeat();
+
     if (song.equals("Delta Waves")) initDelta();
     else if (song.equals("Rite of Spring")) initRite();
     else if (song.equals("When the Moon Comes")) initMoon();
@@ -89,15 +98,6 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
-
-    currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
-    currentImages = loadImages("scenes/" + shortName + "/images/");
-    currentCue = 0;
-
-    songFile = minim.loadFile("music/" + shortName + ".mp3", 1024);
-    songFile.cue(0);
-    songFile.pause();
-    initBeat();
   }
 
 
@@ -118,6 +118,11 @@ class Scene {
       else if (song.equals("Song for M")) displaySong();
       else if (song.equals("Ellon")) displayEllon();
       else if (song.equals("Egrets")) displayEgrets();
+
+      if (currentCue == cues.length-1) {
+        println("next");
+        nextSong();
+      }
     }
   }
 
@@ -137,8 +142,10 @@ ArrayList<PImage> loadImages(String dir) {
   String[] filenames = folder.list();
   PImage p;
   for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
-    p = loadImage(dir + filenames[i]);
-    imgs.add(p);
+    if (!filenames[i].equals(".DS_Store")) {
+      p = loadImage(dir + filenames[i]);
+      imgs.add(p);
+    }
   }
   return imgs;
 }
@@ -168,8 +175,10 @@ ArrayList<Movie> loadMovies(String dir) {
   String[] filenames = folder.list();
   Movie m;
   for (int i = 0; i < filenames.length && i < MAX_MOV; i++) {
-    m = new Movie(this, dir + filenames[i]);
-    movies.add(m);
+    if (!filenames[i].equals(".DS_Store")) {
+      m = new Movie(this, dir + filenames[i]);
+      movies.add(m);
+    }
   }
   return movies;
 }

@@ -1015,16 +1015,95 @@ ArrayList<PVector> starsSpace = new ArrayList<PVector>();
 int convergeX = 1;
 int convergeY = 1;
 
-void displayMoveSpaceAll() {
+void displayMoveSpaceAll(float speed) {
   cycleStarsSpaceModes();
   for (Screen s : screens) {
-    displayMoveSpace(s.s, 0.8);
+    displayMoveSpace(s.s, speed);
   }
 }
 
-void displayMoveSpaceCenter() {
+void displayMoveSpaceCenter(int mode, float speed) {
+  displayMoveSpace(centerScreen.s, mode, speed);
+}
+
+void displayMoveSpaceCenterCycle(float speed) {
   cycleStarsSpaceModes();
-  displayMoveSpace(centerScreen.s, 1.0);
+  displayMoveSpace(centerScreen.s, speed);
+}
+
+//void displayMoveSpaceStage(float speed) {
+//  cycleStarsSpaceModes();
+//  displayMoveSpace(speed);
+//}
+
+//void displayMoveSpace(float speed) {
+//  //int controlX = mouseX;
+//  //int controlY = mouseY;
+//  speed = constrain(speed, 0.6, 1.0);
+//  int controlX = int(map(convergeX, 0, 2, width*(1-speed), width*speed));
+//  int controlY = int(map(convergeY, 0, 2, height*(1-speed), height*speed));
+//  float w2=width/2;
+//  float h2= height/2;
+//  float d2 = dist(0, 0, w2, h2);
+//  noStroke();
+//  fill(0, map(dist(controlX, controlY, w2, h2), 0, d2, 255, 5));
+//  rect(0, 0, width, height);
+//  fill(255);
+
+//  for (int i = 0; i<20; i++) {   // star init
+//    starsSpace.add(new PVector(random(width), random(height), random(1, 3)));
+//  }
+
+//  for (int i = 0; i<starsSpace.size(); i++) {
+//    float x =starsSpace.get(i).x;//local vars
+//    float y =starsSpace.get(i).y;
+//    float d =starsSpace.get(i).z;
+
+//    /* movement+"glitter"*/
+//    starsSpace.set(i, new PVector(x-map(controlX, 0, width, -0.05, 0.05)*(w2-x), y-map(controlY, 0, height, -0.05, 0.05)*(h2-y), d+0.2-0.6*noise(x, y, frameCount)));
+
+//    if (d>3||d<-3) starsSpace.set(i, new PVector(x, y, 3));
+//    if (x<0||x>width||y<0||y>height) starsSpace.remove(i);
+//    if (starsSpace.size()>999) starsSpace.remove(1);
+//    ellipse(x, y, d, d);//draw stars
+//  }
+//}
+
+void displayMoveSpace(PGraphics s, int mode, float speed) {
+  //int controlX = mouseX;
+  //int controlY = mouseY;
+  speed = constrain(speed, 0.6, 1.0);
+  convergeX = (mode/3)%3;
+  convergeY = mode%3;
+  int controlX = int(map(convergeX, 0, 2, s.width*(1-speed), s.width*speed));
+  int controlY = int(map(convergeY, 0, 2, s.height*(1-speed), s.height*speed));
+  float w2=s.width/2;
+  float h2= s.height/2;
+  float d2 = dist(0, 0, w2, h2);
+  s.beginDraw();
+  s.noStroke();
+  s.fill(0, map(dist(controlX, controlY, w2, h2), 0, d2, 255, 5));
+  s.rect(0, 0, s.width, s.height);
+  s.fill(255);
+
+  for (int i = 0; i<20; i++) {   // star init
+    starsSpace.add(new PVector(random(s.width), random(s.height), random(1, 3)));
+  }
+
+  for (int i = 0; i<starsSpace.size(); i++) {
+    float x =starsSpace.get(i).x;//local vars
+    float y =starsSpace.get(i).y;
+    float d =starsSpace.get(i).z;
+
+    /* movement+"glitter"*/
+    starsSpace.set(i, new PVector(x-map(controlX, 0, s.width, -0.05, 0.05)*(w2-x), y-map(controlY, 0, s.height, -0.05, 0.05)*(h2-y), d+0.2-0.6*noise(x, y, frameCount)));
+
+    if (d>3||d<-3) starsSpace.set(i, new PVector(x, y, 3));
+    if (x<0||x>s.width||y<0||y>s.height) starsSpace.remove(i);
+    if (starsSpace.size()>999) starsSpace.remove(1);
+    s.ellipse(x, y, d, d);//draw stars
+  }
+  s.endDraw();
 }
 
 void displayMoveSpace(PGraphics s, float speed) {
@@ -1147,7 +1226,6 @@ ArrayList<PVector> circlePoints(PGraphics s) {
 //////////////////////////////////////////////////////////////////////////////////
 // https://www.openprocessing.org/sketch/219297
 color moonColor = #ffe699;
-float moonRadius = 40;
 int moonFrames = 250;
 int moonCell = 108;
 float moonDelay = 0;
@@ -1156,7 +1234,8 @@ int moonRows = 1;
 
 //Draws the rows and columns of moons.
 //Adds a delay for each moon.
-void displayMoonsAcross() {
+// radius 40
+void displayMoonsAcross(int moonRadius) {
   for (int k = 0; k < screens.length; k++) {
     PGraphics s = screens[k].s;
     s.beginDraw();
@@ -1170,7 +1249,8 @@ void displayMoonsAcross() {
         float y = 100;
         s.pushMatrix();
         s.translate(x, y);
-        drawMoon(s, moonDelay);
+        float t = (((frameCount)%moonFrames*1.5)/(float)moonFrames)+moonDelay;
+        drawMoon(s, moonRadius, t);
         moonDelay = moonDelay+0.025;
         s.popMatrix();
       }
@@ -1181,10 +1261,121 @@ void displayMoonsAcross() {
   moonDelay = 0;
 }
 
+void drawMoonSphere(PImage moon) {
+  float shadow = 0.0;
+  PGraphics s = createGraphics(sphereScreen.s.width, sphereScreen.s.height);
+  s.beginDraw();
+  s.background(0);
+  s.noStroke(); 
+  int moonRadius = s.width;
+  s.fill(0, 40);
+  //s.rect(0, 0, s.width, s.height);
+  s.pushMatrix();
+  s.translate(s.width/2, s.height/2);
+  color moonColor = color(255);//color(255, 0, 0, 40);
+  color noColor = color(0, 0);
+  float t = songFile.position()/(songFile.length()*1.0);
+  if (t < 0.5) { 
+    float tt = map(t, 0, 0.5, 0, 1); 
+
+
+    if (tt < 0.5) { 
+      if (tt < 0.13) shadow = map(tt, 0, 0.13, 0, 0.04);
+      else shadow = map(tt, 0.13, 0.5, 0.04, 0.0);
+
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left moon
+      s.fill(0);
+      // orig
+      //float r = map(tt, 0, 0.5, moonRadius, 0);
+      //s.arc(0, 0, r, moonRadius, PI/2, PI*1.5); //left background shrinking
+      //s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2);
+
+
+
+      for (int i = 0; i < 5; i++) {
+        float r = map(tt, 0, 0.5, moonRadius, 0);
+        s.fill(200 - i * 50);
+        s.arc(0, 0, constrain(r - i*(moonRadius*shadow), 0, moonRadius), moonRadius, PI/2, PI*1.5); //left background shrinking
+      }
+      s.fill(0);
+      s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2);
+    } else {
+      
+      if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
+      else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
+
+      float r = map(tt, 0.5, 1, 0, moonRadius);
+      s.fill(moonColor);
+      // orig
+      //s.arc(0, 0, r, moonRadius, -PI/2, PI/2); //right moon growing
+      //s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left moon
+
+      s.fill(moonColor);
+      s.arc(0, 0, r, moonRadius, -PI/2, PI/2); //right moon growing
+      for (int i = 5; i >= 0; i--) {
+        s.fill(255 - i * 50);
+        s.arc(0, 0, constrain(r + i*(moonRadius*shadow), 0, moonRadius), moonRadius, -PI/2, PI/2); //right moon growing
+      }
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left moon
+    }
+    //Moon shrinking to new moon
+  } else if (t < 1.0) {
+    float tt = map(t, 0.5, 1, 0, 1);
+
+    if (tt < 0.5) {
+      if (tt < 0.13) shadow = map(tt, 0, 0.13, 0, 0.04);
+      else shadow = map(tt, 0.13, 0.5, 0.04, 0.0);
+
+      float r = map(tt, 0, 0.5, moonRadius, 0); 
+      s.fill(0);
+      s.arc(0, 0, moonRadius, moonRadius, PI/2, PI*1.5); //left background
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
+      // orig
+      //s.arc(0, 0, r, moonRadius, PI/2, PI*1.5); //left moon shrinking
+
+
+
+      s.fill(moonColor);
+      for (int i = 0; i < 5; i++) {
+        s.fill(50 + i * 50);
+        s.arc(0, 0, constrain(r-i*(moonRadius*shadow), 0, moonRadius), moonRadius, PI/2, PI*1.5); //left moon shrinking
+      }
+    } else {
+      if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
+      else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
+      
+      float r = map(tt, 0.5, 1, 0, moonRadius); 
+      s.fill(moonColor);
+      s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
+      s.fill(0);
+      // orig
+      //s.arc(0, 0, r, moonRadius, -PI/2, PI/2); //right background growing
+
+      s.fill(0);
+      for (int i = 5; i >= 0; i--) {
+        s.fill(i * 50);
+        s.arc(0, 0, constrain(r+(i*moonRadius*shadow), 0, moonRadius), moonRadius, -PI/2, PI/2); //right background growing
+      }
+    }
+  }
+  s.popMatrix();
+  s.endDraw();
+
+  PImage m = moon.copy();
+  m.mask(s);
+  PGraphics sp = sphereScreen.s;
+  sp.beginDraw();
+  sp.background(0);
+  sp.image(m, 0, 0);
+  sp.endDraw();
+}
+
 //Draws a moon. 
 //This function is a modifiend version of "the moon" by Jerome Herr.
-void drawMoon(PGraphics s, float delay) {
-  float t = (((frameCount)%moonFrames*1.5)/(float)moonFrames)+delay;
+void drawMoon(PGraphics s, int moonRadius, float t) {
   if (t > 1.5) t -= 1.5;
   s.translate(moonCell, moonCell);
   //Moon growing to full moon
@@ -1324,4 +1515,28 @@ void paintFW(PGraphics s) {
 
 void changePerlin() {
   myPerlin = noise(countFW);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// FADE
+//////////////////////////////////////////////////////////////////////////////////
+boolean startFade = false;
+long startFadeTime = 0;
+void fadeOutAllScreens(int seconds) {
+  if (!startFade) {
+    startFadeTime = millis();
+    startFade = true;
+  } else {
+    float timePassed = (millis() - startFadeTime)/1000.0;
+    int brig = constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
+    for (Screen s : screens) {
+      s.drawFadeAlpha(brig);
+    }
+    for (Screen s : topScreens) {
+      s.drawFadeAlpha(brig);
+    }
+    sphereScreen.drawFadeAlpha(brig);
+    centerScreen.drawFadeAlpha(brig);
+  }
 }

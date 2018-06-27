@@ -1,14 +1,5 @@
 {
-  "numBreaks": 2,
+  "numBreaks": 0,
   "songLen": 243357,
-  "breakList": [
-    {
-      "breakType": "s",
-      "time": 3320
-    },
-    {
-      "breakType": "a",
-      "time": 5201
-    }
-  ]
+  "breakList": []
 }

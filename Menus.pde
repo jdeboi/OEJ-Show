@@ -1,13 +1,34 @@
- import controlP5.*;
+import controlP5.*;
 import java.util.*;
+boolean controlsON = false;
 ControlP5 cp5;
 
 // start / stop music
 
-Toggle togMap, togEdit, togShow, togP, togEditMask, togMask, togEdit3D;
+Toggle togMap, togEdit, togShow, togP, togEditMask, togMask, togEdit3D, togEditLines;
 Textlabel timeText;
 Textarea myTextarea;
 int ymen = 0;
+
+//void testControls() {
+//  cp5 = new ControlP5(this);
+
+//  // create a toggle and change the default look to a (on/off) switch look
+//  cp5.addToggle("toggleMap")
+//    .setPosition(750, 150)
+//    .setSize(50, 20)
+//    .setValue(false)
+//    .setLabel("Map OFF")
+//    .setMode(ControlP5.SWITCH)
+//    ;
+
+//  cp5.addButton("saveMap")
+//    .setValue(0)
+//    .setPosition(750, 200)
+//    .setSize(80, 19)
+//    .setLabel("Save Mapping")
+//    ;
+//}
 
 void initControls() {
   cp5 = new ControlP5(this);
@@ -50,7 +71,7 @@ void initControls() {
     .setLabel("Edit Mask Off")
     .setMode(ControlP5.SWITCH)
     ;
-    
+
   togMask = cp5.addToggle("toggleMask")
     .setPosition(950, 100)
     .setSize(50, 20)
@@ -64,6 +85,14 @@ void initControls() {
     .setSize(50, 20)
     .setValue(false)
     .setLabel("Edit 3D Off")
+    .setMode(ControlP5.SWITCH)
+    ;
+
+  togEditLines =  cp5.addToggle("toggleEditLines")
+    .setPosition(1250, 150)
+    .setSize(50, 20)
+    .setValue(false)
+    .setLabel("Edit Lines Off")
     .setMode(ControlP5.SWITCH)
     ;
 
@@ -81,11 +110,25 @@ void initControls() {
     .setLabel("Save Mask")
     ;
 
+  cp5.addButton("snapMask")
+    .setValue(0)
+    .setPosition(950, 250)
+    .setSize(80, 19)
+    .setLabel("Snap Mask To Lines")
+    ;
+
   cp5.addButton("saveBreaks")
     .setValue(0)
     .setPosition(850, 200)
     .setSize(80, 19)
     .setLabel("Save Breaks")
+    ;
+
+  cp5.addButton("saveLines")
+    .setValue(0)
+    .setPosition(1250, 200)
+    .setSize(80, 19)
+    .setLabel("Save Lines")
     ;
 
   timeText = cp5.addTextlabel("label")
@@ -138,9 +181,13 @@ void initControls() {
     .setItemHeight(20)
     .addItems(l)
     ;
-
 }
 
+
+public void controlEvent(ControlEvent theEvent) {
+  //println(theEvent.getController().getName());
+  //n = 0;
+}
 
 void modeList(int n) {
   mode = n + 1;
@@ -155,12 +202,13 @@ void imageList(int n) {
 }
 
 void cubeEdit(int n) {
-  cubeMode = n;
-  println("cube mode : " + cubeMode);
+  if (controlsON) {
+    cubeMode = n;
+    println("cube mode : " + cubeMode);
+  }
 }
 
 void keystoneList(int n) {
-  keystoneNum = n;
   loadKeystone(n);
 }
 
@@ -174,9 +222,11 @@ void songs(int n) {
 }
 
 public void saveMap(int theValue) {
-  println("map saved " + keystoneNum);
-  if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
-  else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
+  if (controlsON) {
+    println("map saved " + keystoneNum);
+    if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
+    else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
+  }
 }
 
 //public void saveMapAs(int theValue) {
@@ -187,19 +237,36 @@ public void saveMap(int theValue) {
 //}
 
 public void saveMask(int theValue) {
-  println("mask saved");
-  saveMaskPoints();
+  if (controlsON) {
+    saveMaskPoints();
+  }
+}
+
+public void snapMask(int theValue) {
+  if (controlsON) {
+    println("mask snapped to outline");
+    snapMaskToOutline();
+  }
 }
 
 public void saveCubes(int theValue) {
-  println("cubes saved");
-  saveCubes();
+  if (controlsON) {
+    println("cubes saved");
+    saveMappedCubes();
+  }
 }
 
 public void saveBreaks(int theValue) {
   println("breaks saved");
   bubbleSort();
   saveToFile();
+}
+
+public void saveLines(int theValue) {
+  if (controlsON) {
+    println("lines saved");
+    saveMappedLines();
+  }
 }
 
 public void input(String theText) {
@@ -210,61 +277,70 @@ public void input(String theText) {
 }
 
 void toggleP(boolean theFlag) {
-  if (startShow) {
-    togglePlay();
-    if (isPlaying) {
-      togP.setLabel("PAUSE");
-    } else {
-      togP.setLabel("PLAY");
+  if (controlsON) {
+    if (startShow) {
+      togglePlay();
+      if (isPlaying) {
+        togP.setLabel("PAUSE");
+      } else {
+        togP.setLabel("PLAY");
+      }
     }
   }
 }
 
 void toggleEditMask(boolean theFlag) {
-  editingMask = theFlag;
-  String o = editingMask?"ON":"OFF";
-  togEditMask.setLabel("Edit Mask " + o);
-  println("toggling edit mask");
+  if (controlsON) {
+    editingMask = theFlag;
+    String o = editingMask?"ON":"OFF";
+    togEditMask.setLabel("Edit Mask " + o);
+    println("toggling edit mask");
+  }
 }
 
 void toggleMask(boolean theFlag) {
-  showMask = theFlag;
-  String o = showMask?"ON":"OFF";
-  togMask.setLabel("Mask " + o);
-  println("toggling show mask");
+  if (controlsON) {
+    showMask = theFlag;
+    String o = showMask?"ON":"OFF";
+    togMask.setLabel("Mask " + o);
+    println("toggling show mask");
+  }
 }
 
 void toggleEdit3D(boolean theFlag) {
-  editing3D = theFlag;
-  String o = editing3D?"ON":"OFF";
-  togEdit3D.setLabel("Edit 3D " + o);
-  println("toggling edit 3D");
+  if (controlsON) {
+    editing3D = theFlag;
+    String o = editing3D?"ON":"OFF";
+    togEdit3D.setLabel("Edit 3D " + o);
+    println("toggling edit 3D");
+  }
+}
+
+void toggleEditLines(boolean theFlag) {
+  if (controlsON) {
+    editingLines = theFlag;
+    String o = editingLines?"ON":"OFF";
+    togEditLines.setLabel("Edit Lines " + o);
+    println("toggling edit lines");
+  }
 }
 
 void toggleEditBreak(boolean theFlag) {
-  editingBreaks = theFlag;
-  String o = editingBreaks?"ON":"OFF";
-  togEdit.setLabel("Edit Breaks " + o);
-  println("toggling edit");
+  if (controlsON) {
+    editingBreaks = theFlag;
+    String o = editingBreaks?"ON":"OFF";
+    togEdit.setLabel("Edit Breaks " + o);
+    println("toggling edit");
+  }
 }
-
-//void toggleShow(boolean theFlag) {
-//  if (theFlag) {
-//    isTesting = theFlag;
-//    togShow.setLabel("TESTING");
-//  }
-//  else {
-//    isTesting = false;
-//    changeScene(0);
-//    togShow.setLabel("SHOW TIME");
-//  }
-//}
 
 
 void toggleMap(boolean theFlag) {
-  editingMapping = theFlag;
-  if (theFlag) ks.startCalibration();
-  else ks.stopCalibration();
-  String o = theFlag?"ON":"OFF";
-  togMap.setLabel("Map " + o);
+  if (controlsON) {
+    editingMapping = theFlag;
+    if (theFlag) ks.startCalibration();
+    else ks.stopCalibration();
+    String o = theFlag?"ON":"OFF";
+    togMap.setLabel("Map " + o);
+  }
 }

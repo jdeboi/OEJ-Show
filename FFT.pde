@@ -61,19 +61,35 @@ void initBeat() {
   bl = new BeatListener(beat, songFile);
 }
 
-void drawSpectrum(int w) {
+void drawFFTBarsCubes() {
+  for (int i = 0; i < numScreens; i++) {
+    screens[i].drawFFTBars();
+  }
+}
+
+void drawFFTBarsTop() {
+  for (int i = 0; i < 2; i++) {
+    topScreens[i].drawFFTBars();
+  }
+}
+
+void drawSpectrumCubes() {
   updateSpectrum();
   for (Screen s : screens) {
-    s.s.beginDraw();
-    s.s.colorMode(HSB, bands.length);
-    for (int i = 0; i < bands.length; i++) {
-      s.s.fill(i, bands.length, bands.length);
-      s.s.noStroke();
-      s.s.rect(i*w, 40, w, bands[i]);
-    }
-    s.s.colorMode(RGB, 255);
-    s.s.endDraw();
+    drawSpectrum(s, screenW);
   }
+}
+
+void drawSpectrum(Screen s, int w) {
+  s.s.beginDraw();
+  s.s.colorMode(HSB, bands.length);
+  for (int i = 0; i < bands.length; i++) {
+    s.s.fill(i, bands.length, bands.length);
+    s.s.noStroke();
+    s.s.rect(i*w, 40, w, bands[i]);
+  }
+  s.s.colorMode(RGB, 255);
+  s.s.endDraw();
 }
 
 int currentCycle = 0;
@@ -84,27 +100,40 @@ void beatCycle(int delayT) {
     currentCycle++;
   }
 }
-void cycleShapeFFT() {
+void cycleShapeFFTTop() {
+  updateSpectrum();
+  beatCycle(300);
+  for (Screen sc : topScreens) {
+    cycleShapeFFT(sc.s);
+  }
+}
+
+void cycleShapeFFTCubes() {
   updateSpectrum();
   beatCycle(300);
   for (Screen sc : screens) {
-    sc.s.beginDraw();
-    sc.s.stroke(255);
-    sc.s.noFill();
-    sc.s.strokeWeight(3);
-    sc.s.rectMode(CENTER);
-    if (currentCycle%4 == 0) sc.s.ellipse(screenW/2, screenH/2, screenW/4, screenW/4);
-    else if (currentCycle%4 == 1) sc.s.rect(screenW/2, screenH/2, screenW/4, screenW/4);
-    else if (currentCycle%4 == 2) {
-      int sz = screenW/4;
-      int x = screenW/2;
-      int y = screenH/2;
-      float alt = sz*sqrt(3)/2.0;
-      sc.s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2);
-    } else sc.s.line(screenW/2, screenH/2 - screenW/8, screenW/2, screenH/2 + screenW/8);
-    sc.s.rectMode(CORNERS);
-    sc.s.endDraw();
+    cycleShapeFFT(sc.s);
   }
+}
+
+void cycleShapeFFT(PGraphics s) {
+  s.beginDraw();
+  s.background(0);
+  s.stroke(255);
+  s.noFill();
+  s.strokeWeight(3);
+  s.rectMode(CENTER);
+  if (currentCycle%4 == 0) s.ellipse(s.width/2, s.height/2, s.width/4, s.width/4);
+  else if (currentCycle%4 == 1) s.rect(s.width/2, s.height/2, s.width/4, s.width/4);
+  else if (currentCycle%4 == 2) {
+    int sz = s.width/4;
+    int x = s.width/2;
+    int y = s.height/2;
+    float alt = sz*sqrt(3)/2.0;
+    s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2);
+  } else s.line(s.width/2, s.height/2 - s.width/8, s.width/2, s.height/2 + s.width/8);
+  s.rectMode(CORNERS);
+  s.endDraw();
 }
 
 PImage[] constellations;
@@ -358,7 +387,7 @@ void displayAmplitudeHoriz() {
     screens[i].s.noStroke();
     screens[i].s.fill(0, 80);
     screens[i].s.rect(0, 0, screenW, screenH);
-    
+
     screens[i].s.fill(255);
     screens[i].s.rect(0, 0, constrain(lev - screenW * i, 0, screenW*4), screenH);
     screens[i].s.endDraw();

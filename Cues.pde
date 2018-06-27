@@ -41,13 +41,7 @@ void initRite() {
   cues[1] = new Cue(5, 'v', 0.0, 0);
   cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
-void initMoon() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-  drawSolidAll(color(0));
-}
+
 void initLollies() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -129,7 +123,7 @@ void displayCrush() {
     movieAcrossAll(vid1, -350);
     haromCenter(color(255), 3, 180);
     //displayNervous();
-     //displayWavyCircle();
+    //displayWavyCircle();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -189,27 +183,126 @@ void displayRite() {
   }
 }
 
+
+void initMoon() {
+  Cue[] cuesT = {
+    new Cue(0, 'v', 0, 0), 
+    new Cue(5, 'v', 0.0, 0), 
+    new Cue(58.7, 'v', 0.0, 0), 
+    new Cue(82, 'v', 0.0, 0), 
+    new Cue(89, 'v', 0.0, 0), 
+    new Cue(94, 'v', 0.0, 0), 
+    new Cue(108, 'v', 0.0, 0), 
+    new Cue(114, 'v', 0.0, 0), 
+    new Cue(118, 'v', 0.0, 0), 
+    new Cue(142, 'v', 0.0, 0), // big boom
+    new Cue(166.5, 'v', 0.0, 0), // calm
+    new Cue(230, 'v', 0.0, 0), 
+    new Cue(238, 'v', 0.0, 0), 
+    new Cue(243.0, 'v', 0.0, 0) // end
+  };
+  cues = cuesT;
+  drawSolidAll(color(0));
+  loadKeystone(1);
+  currentImages.get(0).resize(sphereScreen.s.width, sphereScreen.s.height);
+  startFade = false;
+}
+
 void displayMoon() {
+  int CONVERGE_CENTER = 0;
+  int CONVERGE_VERT_LINE = 1;
+  int DIAG_EXIT_VERT = 2;
+  int CONVERGE_HORIZ_LINE = 3;
+  int STATIC_STARS = 4;
+  int DIVERGE_HORIZ_LINE = 5;
+  int DIAG_EXIT_HORIZ = 6;
+  int DIVERGE_VERT_LINE = 7;
+  int LIGHT_SPEED = 8;
+  drawMoonSphere(currentImages.get(0));
   switch(currentCue) {
-  case 0:
-    
-    drawFFTBarsAll();
+  case 0:    
+    displayMoveSpaceCenterCycle(0.75);
+
+    pulsing(0, 1);
     break;
-  case 1:
+  case 1: 
+    displayMoveSpaceCenter(STATIC_STARS, 0.86);
+
+    pulsing(0, 1);
+    break;
+  case 2:
+    displayMoveSpaceCenter(DIVERGE_HORIZ_LINE, 0.86);
+
+    pulsing(0, 1);
+    break;
+  case 3: 
+    displayMoveSpaceCenter(DIAG_EXIT_VERT, 0.66);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 4: 
+    displayMoveSpaceCenter(DIAG_EXIT_HORIZ, 0.66);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 5: 
+    displayMoveSpaceCenter( DIVERGE_VERT_LINE, 0.66);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 6: 
+    displayMoveSpaceCenter(8, 0.66);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 7: 
+    displayMoveSpaceCenter(9, 0.66);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 8: 
+    displayMoveSpaceCenter(LIGHT_SPEED, 0.86);
+
+    displayLines(color(255, 0, 0));
+    break;
+  case 9:
+    displayMoveSpaceCenter(LIGHT_SPEED, 1);
+
+    displayRandomLines(color(255, 0, 0));
+
+    break;
+  case 10:
+    displayMoveSpaceCenter(LIGHT_SPEED, 1);
+
+    displayRandomLines(color(255, 0, 0));
+
+    startFade = false;  
+    break;
+  case 11: // fade out end
+    displayMoveSpaceCenter(CONVERGE_CENTER, 0.75); 
+    fadeOutAllScreens(8);
+
+    displayLines(color(255, 0, 0));
+    startFadeLine = false;
+    break;
+  case 12: // fade out lines
     drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    fadeOutAllLines(3, color(255, 0, 0));
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
+  
+  
 }
 
 void displayLollies() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    //drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -241,7 +334,7 @@ void displayDirty() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -256,7 +349,7 @@ void displayFifty() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -271,7 +364,7 @@ void displayWiz() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -286,7 +379,7 @@ void displayViolate() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -301,7 +394,7 @@ void displayMood() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -316,7 +409,7 @@ void displaySong() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -331,7 +424,7 @@ void displayEllon() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -346,7 +439,7 @@ void displayEgrets() {
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
-    drawFFTBarsAll();
+    drawFFTBarsCubes();
     break;
   case 1:
     drawSolidAll(color(0));
@@ -417,7 +510,7 @@ void setCurrentCue() {
   for (Cue cue : cues) {
     if (songFile.position() >= cue.startT*1000) {
       c++;
-      if (c >= cues.length) {
+      if (c >= cues.length-1) {
         c = cues.length -1;
         if (c != currentCue) {
           currentCue = c;

@@ -91,6 +91,7 @@ class Screen {
 
   void drawFFTBars() {
     s.beginDraw();
+    s.background(0);
     float rectW = screenW / beat.detectSize();
     for (int i = 0; i < beat.detectSize(); ++i) {    
       if ( beat.isOnset(i) ) {  // test one frequency band for an onset
@@ -121,6 +122,13 @@ class Screen {
     s.noFill();
     float alt = sz*sqrt(3)/2.0;
     s.triangle(x-sz/2, y + alt/2, x, y - alt/2, x+sz/2, y + alt/2); //50, 50, 100, 10, 150, 50);
+    s.endDraw();
+  }
+
+  void drawFadeAlpha(int alpha) {
+    s.beginDraw();
+    s.fill(0, alpha);
+    s.rect(0, 0, s.width, s.height);
     s.endDraw();
   }
 
@@ -186,14 +194,13 @@ void drawSolidAllCubes(color c) {
   for (int i = 0; i < numScreens; i++) {
     screens[i].drawSolid(c);
   }
-  
 }
 
 void drawSolidAll(color c) {
   for (int i = 0; i < numScreens; i++) {
     screens[i].drawSolid(c);
   }
-  for (int i = 0; i < numScreens; i++) {
+  for (int i = 0; i < 2; i++) {
     topScreens[i].drawSolid(c);
   }
   centerScreen.drawSolid(c);
@@ -248,11 +255,7 @@ void drawGifAcross(Gif g, int y) {
   }
 }
 
-void drawFFTBarsAll() {
-  for (int i = 0; i < numScreens; i++) {
-    screens[i].drawFFTBars();
-  }
-}
+
 
 
 void initScreens() {
@@ -285,24 +288,29 @@ void initScreens() {
 }
 
 void loadKeystone(int i) {
-  if (useCenterScreen) ks.load("data/keystone/keystoneCenter" +  i + ".xml");
-  else ks.load("data/keystone/keystone" +  i + ".xml");
+  keystoneNum = i;
+  ks.load("data/keystone/keystoneCenter" +  i + ".xml");
 }
 
 void renderScreens() {
+  // screens below mask
   pushMatrix();
   translate(0, 0, -1);
   for (int i = 0; i < numScreens; i++) {
     surfaces[i].render(screens[i].s);
   }
-  
+  centerSurface.render(centerScreen.s);
+  popMatrix();
+
+  // screens above mask
+  pushMatrix();
+  translate(0, 0, 1);
   for (int i = 0; i < 2; i++) {
     topSurfaces[i].render(topScreens[i].s);
   }
-  
+
   sphereSurface.render(sphereScreen.s);
-  
-  if (useCenterScreen) centerSurface.render(centerScreen.s);
+
   popMatrix();
 }
 
@@ -315,4 +323,19 @@ void numberScreens() {
     screens[i].s.text(i, 50, 50);
     screens[i].s.endDraw();
   }
+}
+
+void circleSphere() {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.fill(255, 0, 0);
+  s.ellipse(s.width/2, s.height/2, s.width, s.width);
+  s.endDraw();
+}
+
+void sphereImage(PImage p) {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.image(p, 0, 0, s.width, s.width);
+  s.endDraw();
 }

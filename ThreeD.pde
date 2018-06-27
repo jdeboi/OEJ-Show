@@ -63,7 +63,7 @@ void updateCubes() {
   }
 }
 
-void saveCubes() {
+void saveMappedCubes() {
   processing.data.JSONObject json;
   json = new processing.data.JSONObject();
   json.setInt("numCubes", cubes.size());

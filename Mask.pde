@@ -16,10 +16,10 @@ void saveMaskPoints() {
   processing.data.JSONArray maskList = new processing.data.JSONArray();      
 
   for (int j = 0; j < numMappings; j++) {
-    for (int i = 0; i < maskPoints[0].length; i++) {
+    for (int i = 0; i < 10; i++) {
       processing.data.JSONObject maskJSON = new processing.data.JSONObject();
       maskJSON.setInt("x", maskPoints[j][i].x);
-      maskJSON.setInt("y", maskPoints[i][i].y);
+      maskJSON.setInt("y", maskPoints[j][i].y);
 
       maskList.setJSONObject(i, maskJSON);
     }
@@ -55,8 +55,13 @@ void moveSelectedMask() {
 }
 
 void drawMaskPoints() {
+  int j = 0;
   for (MPoint mp : maskPoints[keystoneNum]) {
     mp.display();
+    stroke(255);
+    noFill();
+    textSize(30);
+    text(j++, mp.x, mp.y);
   }
 }
 
@@ -72,8 +77,8 @@ void checkMaskClick() {
 }
 
 
-void maskScreens() {
-  fill(0);
+void maskScreens(color c) {
+  fill(c);
   noStroke();
   beginShape();
   vertex(0, maskPoints[keystoneNum][0].y);
@@ -88,6 +93,23 @@ void maskScreens() {
   endShape();
   quad(0, maskPoints[keystoneNum][0].y, maskPoints[keystoneNum][0].x, maskPoints[keystoneNum][0].y, maskPoints[keystoneNum][9].x, maskPoints[keystoneNum][9].y, 0, maskPoints[keystoneNum][9].y);
 }
+
+void snapMaskToOutline() {
+  maskPoints[keystoneNum][0] = new MPoint(int(lines.get(0).p1.x)-5, int(lines.get(0).p1.y)-5); 
+  maskPoints[keystoneNum][1] = new MPoint(int(lines.get(4).p1.x)-5, int(lines.get(4).p1.y)-5); 
+  maskPoints[keystoneNum][2] = new MPoint(int(lines.get(8).p1.x)-5, int(lines.get(8).p1.y)-5); 
+  maskPoints[keystoneNum][3] = new MPoint(int(lines.get(12).p1.x)-5, int(lines.get(12).p1.y)-5); 
+
+
+  maskPoints[keystoneNum][4] = new MPoint(int(lines.get(12).p2.x)+5, int(lines.get(12).p2.y)-5); 
+  maskPoints[keystoneNum][5] = new MPoint(int(lines.get(14).p2.x)+5, int(lines.get(14).p2.y)+5); 
+
+  maskPoints[keystoneNum][6] = new MPoint(int(lines.get(14).p1.x)-5, int(lines.get(14).p1.y)+5); 
+  maskPoints[keystoneNum][7] = new MPoint(int(lines.get(10).p1.x)-5, int(lines.get(10).p1.y)+5);  
+  maskPoints[keystoneNum][8] = new MPoint(int(lines.get(6).p1.x)-5, int(lines.get(6).p1.y)+5);  
+  maskPoints[keystoneNum][9] = new MPoint(int(lines.get(2).p1.x)-5, int(lines.get(2).p1.y)+5); 
+}
+
 
 class MPoint {
   int x, y;

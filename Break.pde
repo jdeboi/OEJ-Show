@@ -168,9 +168,9 @@ void drawPlayer() {
   stroke(255, 0, 0);
   line( position, ySpace, position, ySpace+vH );
 
-  for (int i = 0; i < breaks.size(); i++) {
-    breaks.get(i).display();
-  }
+  //for (int i = 0; i < breaks.size(); i++) {
+  //  breaks.get(i).display();
+  //}
   stroke(255);
   strokeWeight(1);
   textSize(12);
