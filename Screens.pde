@@ -126,6 +126,7 @@ class Screen {
 
   void drawFadeAlpha(int alpha) {
     s.beginDraw();
+    s.noStroke();
     s.fill(0, alpha);
     s.rect(0, 0, s.width, s.height);
     s.endDraw();
@@ -186,6 +187,12 @@ class Screen {
 void blackoutScreens() {
   for (int i = 0; i < numScreens; i++) {
     screens[i].blackOut();
+  }
+}
+
+void drawSolidTop(color c) {
+  for (Screen ts : topScreens) {
+    ts.drawSolid(c);
   }
 }
 
@@ -342,9 +349,17 @@ void sphereImage(PImage p) {
   s.endDraw();
 }
 
+void drawSolidCenter(color c) {
+  centerScreen.drawSolid(c);
+}
 void drawSolidOuter(color c) {
   screens[0].drawSolid(c);
   screens[3].drawSolid(c);
+}
+
+void drawSolidInner(color c) {
+  screens[1].drawSolid(c);
+  screens[2].drawSolid(c);
 }
 
 void centerScreenFront() {
@@ -352,6 +367,7 @@ void centerScreenFront() {
   for (Screen s : screens) {
     s.zIndex = -2;
   }
+  drawSolidInner(color(0)); 
 }
 
 void cubesFront() {
@@ -359,4 +375,5 @@ void cubesFront() {
   for (Screen s : screens) { 
     s.zIndex = -1;
   }
+  drawSolidCenter(color(0));
 }

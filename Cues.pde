@@ -7,27 +7,7 @@ boolean betweenSongs = true;
 //////////////////////////////////////////////////////////////////////////////////
 // INITIALIZE CUES
 //////////////////////////////////////////////////////////////////////////////////
-void initCrush() {
-  initVid("scenes/crush/movies/crush.mp4");
-  cues = new Cue[11];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  //cues[1] = 5;
-  //cues[2] = 9.7;   // X
-  //cues[3] = 14.4;  // X
-  //cues[4] = 17.0;  // Break happens
-  //cues[5] = 19;    // X
-  cues[1] = new Cue(28.8, 'v', 0.0, 0);   // chords slow
-  cues[2] = new Cue(38, 'g', 0.0, 0);    // chords slow
-  cues[3] = new Cue(47.5, 'g', 0.0, 1);  // guitar
-  cues[4] = new Cue(56, 'g', 0.0, 2);    // guitar
-  cues[5] = new Cue(66, 'm', 20.0, 0);    // X
-  //cues[6] = new Cue('v', 0, 75);   // X
-  cues[6] = new Cue(85, 'g', 0.0, 3);   // xylophone
-  cues[7] = new Cue(94, 'v', 0.0, 0);
-  cues[8] = new Cue(103.8, 'v', 0.0, 0);
-  cues[9] = new Cue(135, 'v', 0.0, 0);
-  cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 
 void initDelta() {
   cues = new Cue[3];
@@ -57,20 +37,7 @@ void initCycles() {
   cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
 
-void initDirty() {
-  cues = new Cue[11];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(6, 'v', 0.0, 0);
-  cues[2] = new Cue(12, 'v', 0.0, 0); // tic toc begins
-  cues[3] = new Cue(55, 'v', 0.0, 0); // down chords
-  cues[4] = new Cue(77, 'v', 0.0, 0);  // tic toc
-  cues[5] = new Cue(99, 'v', 0.0, 0);  // down chords
-  cues[6] = new Cue(121, 'v', 0.0, 0);  // down chords
-  cues[7] = new Cue(143, 'v', 0.0, 0);  // down chords
-  cues[8] = new Cue(99, 'v', 0.0, 0);  // down chords
-  cues[9] = new Cue(175, 'v', 0.0, 0);  // down chords
-  cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 
 void initWiz() {
   cues = new Cue[3];
@@ -112,6 +79,28 @@ void initEgrets() {
 //////////////////////////////////////////////////////////////////////////////////
 // DISPLAY CUES
 //////////////////////////////////////////////////////////////////////////////////
+void initCrush() {
+  initVid("scenes/crush/movies/crush.mp4");
+  cues = new Cue[11];
+  cues[0] = new Cue(0, 'm', 0, 0);
+  //cues[1] = 5;
+  //cues[2] = 9.7;   // X
+  //cues[3] = 14.4;  // X
+  //cues[4] = 17.0;  // Break happens
+  //cues[5] = 19;    // X
+  cues[1] = new Cue(28.8, 'v', 0.0, 0);   // chords slow
+  cues[2] = new Cue(38, 'g', 0.0, 0);    // chords slow
+  cues[3] = new Cue(47.5, 'g', 0.0, 1);  // guitar
+  cues[4] = new Cue(56, 'g', 0.0, 2);    // guitar
+  cues[5] = new Cue(66, 'm', 20.0, 0);    // X
+  //cues[6] = new Cue('v', 0, 75);   // X
+  cues[6] = new Cue(85, 'g', 0.0, 3);   // xylophone
+  cues[7] = new Cue(94, 'v', 0.0, 0);
+  cues[8] = new Cue(103.8, 'v', 0.0, 0);
+  cues[9] = new Cue(135, 'v', 0.0, 0);
+  cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
+}
+
 void displayCrush() {
   switch(currentCue) {
   case 0:
@@ -271,7 +260,7 @@ void displayMoon() {
 
     displayRandomLines(color(255, 0, 0));
 
-    startFade = false;  
+    resetFade();  
     break;
   case 11: // fade out end
     displayMoveSpaceCenter(CONVERGE_CENTER, 0.75); 
@@ -323,15 +312,63 @@ void displayCycles() {
   }
 }
 
+void initDirty() {
+  cues = new Cue[12];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(11, 'v', 0.0, 0); // tic toc begins
+  cues[2] = new Cue(33.4, 'v', 0.0, 0); // tic toc repeat
+  cues[3] = new Cue(55, 'v', 0.0, 0); // down chords
+  cues[4] = new Cue(77, 'v', 0.0, 0);  // tic toc
+  cues[5] = new Cue(99, 'v', 0.0, 0);  // down chords
+  cues[6] = new Cue(121, 'v', 0.0, 0);  // guitar
+  cues[7] = new Cue(143.5, 'v', 0.0, 0);  // tic toc
+  cues[8] = new Cue(165.5, 'v', 0.0, 0);  // down chords
+  cues[9] = new Cue(175, 'v', 0.0, 0);  // down chords
+  cues[10] = new Cue(178, 'v', 0.0, 0);  // fade out
+  cues[11] = new Cue(194, 'v', 0.0, 0);  // end
+
+  drawSolidAll(color(0));
+  loadKeystone(1);
+  initSpaceRects();
+
+  resetFade();
+  initTerrainCenter();
+  initTesseract();
+  centerScreenFront();
+}
+
 void displayDirty() {
+  displayStripedMoon(20);
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
+
+    centerScreenFront();
+    displayTerrainCenter(0.01);
+    fadeInAllScreens(4);
     break;
-  case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+  case 1: // tic toc
+  addAudioAmp = true;
+    centerScreenFront();
+    displayTerrainCenter(0.01);
+    cycleShapeFFTTop();
+    break;
+  case 2: // tic toc repeat
+  addAudioAmp = false;
+    centerScreenFront();
+    displayTerrainCenter(0.01);
+    cycleShapeFFTTop();
+    break;
+  case 3:
+    cubesFront();
+    drawSolidTop(color(0));
+    //display3DDots2Screens(100, 0, 0.005);
+    //displayTesseract2Screens();
+    break;
+  case 9:
+    resetFade();
+    break;
+  case 10:
+    fadeOutAllScreens(3);
     break;
   default:
     drawSolidAll(color(0));
@@ -342,32 +379,64 @@ void displayDirty() {
 void initFifty() {
   Cue[] cuesT = {
     new Cue(0, 'v', 0, 0), 
-    new Cue(19.5, 'v', 0.0, 0), 
+    new Cue(6.5, 'v', 0.0, 0), // stop cycling rects
+    new Cue(19.5, 'v', 0.0, 0), // vocals come in; maybe single central slow rects w/ solid rects on top
+
+    new Cue(52, 'v', 0.0, 0), // vocals come in
+    new Cue(85, 'v', 0.0, 0), // teee tahhh tee tahh
     new Cue(190, 'v', 0.0, 0)
   };
   cues = cuesT;
   drawSolidAll(color(0));
   loadKeystone(1);
   initSpaceRects();
+
+  resetFade();
 }
 
 void displayFifty() {
+  drawSolidOuter(color(0));
+  color blue = color(0, 100, 255);
+  color cyan = color(0, 255, 255);
+  color pink = color(#FF05C5);
+
   switch(currentCue) {   
   case 0:
     cubesFront();
-    drawFFTBarsCubes();  
-    drawSolidOuter(color(0));
-    displaySpaceRects();
-    break;           
+    //displayTunnel(screens[1].s, 1300, pink, cyan);
+    displaySpaceRects(5, -1, blue, cyan, pink); 
+    fadeInAllScreens(3);
+    break;  
   case 1:
-    drawSolidOuter(color(0));
+    cubesFront();
+    cyclingRects = false;
+
+    displaySpaceRects(5, -1, blue, cyan, pink); 
+
+    break;
+  case 2:
+    cyclingRects = true;
     centerScreenFront();
-    displayCenterSpaceRects();    
+
+    displayCenterSpaceRects(5, -1, blue, cyan, pink);
+
+    break;
+  case 3:
+    centerScreenFront();
+
+    displayLineBounceCenter(0.01, 50, cyan, pink);
+    break;
+  case 4: 
+    cubesFront();
+    displaySpaceRects(5, 1, blue, cyan, pink); 
     break;
   default:     
     drawSolidAll(color(0));
     break;
   }
+
+  //drawNeonRect(screens[1].s, 0, 0, 50, 50, 5, color(255));
+  //displayLines(color(255, 0, 255));
 }
 void displayWiz() {
   switch(currentCue) {

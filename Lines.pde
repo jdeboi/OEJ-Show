@@ -52,8 +52,8 @@ void snapOutlinesToMask() {
 }
 
 void initLines() {
-  //snapOutlinesToMask();
-  loadLines();
+  snapOutlinesToMask();
+  //loadLines();
   initLineModes();
 }
 

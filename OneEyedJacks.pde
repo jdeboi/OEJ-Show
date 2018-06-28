@@ -1,6 +1,6 @@
 boolean showTime = false;
 boolean isTesting = false;
-boolean mappingON = true;
+boolean mappingON = false;
 boolean useMusic = true;
 //////////
 
@@ -47,7 +47,7 @@ void setup() {
   initMidi();
 
   //initTesting();
-  changeScene(2);
+  changeScene(1);
 
 
   //testControls();
