@@ -1301,7 +1301,7 @@ void drawMoonSphere(PImage moon) {
       s.fill(0);
       s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2);
     } else {
-      
+
       if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
       else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
 
@@ -1346,7 +1346,7 @@ void drawMoonSphere(PImage moon) {
     } else {
       if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
       else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
-      
+
       float r = map(tt, 0.5, 1, 0, moonRadius); 
       s.fill(moonColor);
       s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
@@ -1538,5 +1538,155 @@ void fadeOutAllScreens(int seconds) {
     }
     sphereScreen.drawFadeAlpha(brig);
     centerScreen.drawFadeAlpha(brig);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// 2 point
+//////////////////////////////////////////////////////////////////////////////////
+SpaceRect[] spaceRects;
+float zVel = 1.7;
+int rectSpacing = 50;
+
+int endPSpaceRects = -1200;
+int frontPSpaceRects = 100;
+int numRects = (-endPSpaceRects+frontPSpaceRects)/rectSpacing;
+int direction2Point = 1;
+void initSpaceRects() {
+  spaceRects = new SpaceRect[numRects];
+  for (int r = 0; r < spaceRects.length; r++) {
+    spaceRects [r] = new SpaceRect(new PVector(0, 0, endPSpaceRects+rectSpacing*r), new PVector(0, 0, zVel) );
+  }
+}
+// only onerect at a time changing colors through gradient
+void displaySpaceRects() {
+  for (int i = 1; i < 3; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.rectMode(CENTER);
+    s.pushMatrix();
+    s.translate(s.width/2, s.height/2);
+    for (int j = 0; j < numRects; j++) {
+      s.noFill();
+      s.strokeWeight(3);
+      spaceRects[j].zGradientStroke(s);
+      spaceRects[j].display(s);
+      if (i== 1)spaceRects[j].update(-1);
+    }
+    s.popMatrix();
+    s.endDraw();
+  }
+}
+
+void displayCenterSpaceRects() {
+  PGraphics s = centerScreen.s;
+  s.beginDraw();
+  s.background(0);
+  s.rectMode(CENTER);
+  s.pushMatrix();
+  s.translate(s.width/2, s.height/2);
+  for (int j = 0; j < numRects; j++) {
+    s.noFill();
+    s.strokeWeight(3);
+    spaceRects[j].zGradientStroke(s);
+    spaceRects[j].display(s);
+    spaceRects[j].update(-1);
+  }
+  s.popMatrix();
+  s.endDraw();
+}
+
+
+
+// mismatched but ok?
+//void displayCenterSpaceRects() {
+//  for (int i = 1; i < 3; i++) {
+//    PGraphics s = screens[i].s;
+//    s.beginDraw();
+//    s.background(0);
+//    s.rectMode(CENTER);
+//    s.pushMatrix();
+//    //s.translate(s.width/2, s.height/2);
+//    for (int j = 0; j < numRects; j++) {
+//      s.noFill();
+//      s.strokeWeight(3);
+//      spaceRects[j].zGradientStroke(s);
+//      spaceRects[j].displayCenter(s, i);
+//      //if (i== 1)spaceRects[j].update(-1);
+//    }
+//    s.popMatrix();
+//    s.endDraw();
+//  }
+//  for (SpaceRect spr: spaceRects) {
+//    spr.update(-1);
+//  }
+//}
+
+
+class SpaceRect {
+
+  float w, h;
+  PVector pos;
+  PVector vel;
+  PVector acc;
+  PVector rot;
+
+  SpaceRect(PVector p, PVector v) {
+    pos = p;
+    vel = v;
+    acc = new PVector(0, 0);
+    rot = new PVector(0, 0);
+  }
+
+  void update(int mode) {
+    boolean cyclingRects = true;
+    pos.add(vel);
+    if (cyclingRects) {
+      if (pos.z > frontPSpaceRects) pos.z = endPSpaceRects;
+      else if (pos.z < endPSpaceRects) pos.z = frontPSpaceRects;
+    }
+    vel.add(acc);
+
+    int NONE = -1;
+    int SUPER_TRIPPY = 0;
+    int KINDA_TRIPPY = 1;
+    int SORTA_TRIPPY = 2;
+    int SEESAW = 3;
+    if (mode == SUPER_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/10.0);
+    else if (mode == KINDA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/100.0);
+    else if (mode == SORTA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/1000.0);
+    else if (mode == SEESAW)  vel.z = zVel * 4 * sin(millis()/500.0);
+  }
+
+  void zGradientStroke(PGraphics s) {
+    float zper = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, 2); 
+    color cyan = color(0, 255, 255);
+    color blue = color(0, 100, 255);
+    color pink = color(#FF05C5);
+    color grad;
+    if (zper < 1) grad = lerpColor(blue, cyan, zper);
+    else grad = lerpColor(cyan, pink, zper-1);
+    s.stroke(grad);
+  }
+
+  void display(PGraphics s) {
+    s.pushMatrix();
+    s.rotateX(rot.x);
+    s.rotateY(rot.y);
+    s.rotateZ(rot.z);
+    s.translate(pos.x, pos.y, pos.z);
+    float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
+    s.rect(0, 0, s.width-dw, s.height-dw);
+    s.popMatrix();
+  }
+
+  void displayCenter(PGraphics s, int side) {
+    //float sz = map(-pos.z*pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0); // spazz
+    //float sz = map(pos.z*2, frontPSpaceRects, endPSpaceRects, s.width*4, 0);   // cool
+    float sz = map(pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0);
+    if (side == 1) s.rect(s.width, s.height/2, sz, sz);
+    else s.rect(0, s.height/2, sz, sz);
   }
 }

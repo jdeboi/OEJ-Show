@@ -162,7 +162,7 @@ void initControls() {
     .addItems(l)
     ;
 
-  l = Arrays.asList("0", "1");
+  l = Arrays.asList("0", "1", "2");
   cp5.addScrollableList("keystoneList")
     .setPosition(750, ymen)
     .setColorBackground(color(105, 110, 0))
@@ -209,7 +209,9 @@ void cubeEdit(int n) {
 }
 
 void keystoneList(int n) {
-  loadKeystone(n);
+  if (controlsON) {
+    loadKeystone(n);
+  }
 }
 
 void gifs(int n) {
@@ -224,20 +226,14 @@ void songs(int n) {
 public void saveMap(int theValue) {
   if (controlsON) {
     println("map saved " + keystoneNum);
-    if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
-    else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
+    ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
   }
 }
 
-//public void saveMapAs(int theValue) {
-//  if (millis() > 10000) keystoneNum++;
-//  println("map saved as " + keystoneNum);
-//  if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
-//  else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
-//}
 
 public void saveMask(int theValue) {
   if (controlsON) {
+    println("mask saved");
     saveMaskPoints();
   }
 }

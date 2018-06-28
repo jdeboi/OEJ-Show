@@ -71,12 +71,7 @@ void initDirty() {
   cues[9] = new Cue(175, 'v', 0.0, 0);  // down chords
   cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
-void initFifty() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 void initWiz() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -294,8 +289,6 @@ void displayMoon() {
     drawSolidAll(color(0));
     break;
   }
-  
-  
 }
 
 void displayLollies() {
@@ -345,15 +338,30 @@ void displayDirty() {
     break;
   }
 }
+///////////////////////////////////////////////////////////////////
+void initFifty() {
+  Cue[] cuesT = {
+    new Cue(0, 'v', 0, 0), 
+    new Cue(19.5, 'v', 0.0, 0), 
+    new Cue(190, 'v', 0.0, 0)
+  };
+  cues = cuesT;
+  drawSolidAll(color(0));
+  loadKeystone(0);
+}
 void displayFifty() {
+
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
+    //cubesFront();
+    drawSolidOuter(color(0));
+    drawSolidAllCubes(color(255, 0, 0));
+    //displaySpaceRects();
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    //centerScreenFront();
+    //displayCenterSpaceRects();
+    drawSolidAllCubes(color(255, 0, 0));
     break;
   default:
     drawSolidAll(color(0));

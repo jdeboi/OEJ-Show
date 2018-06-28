@@ -83,6 +83,8 @@ class Scene {
     songFile.cue(0);
     songFile.pause();
     initBeat();
+    
+    startFade = false;
 
     if (song.equals("Delta Waves")) initDelta();
     else if (song.equals("Rite of Spring")) initRite();
