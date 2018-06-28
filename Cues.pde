@@ -347,23 +347,21 @@ void initFifty() {
   };
   cues = cuesT;
   drawSolidAll(color(0));
-  loadKeystone(0);
+  loadKeystone(1);
   initSpaceRects();
 }
 
 void displayFifty() {
   switch(currentCue) {   
   case 0:
-    drawSolidAll(color(0));  
     cubesFront();
     drawFFTBarsCubes();  
     drawSolidOuter(color(0));
-    //drawSolidAllCubes(color(255, 0, 0));
     displaySpaceRects();
     break;           
   case 1:
-    drawSolidAll(color(0));  
-    centerScreenFront();  
+    drawSolidOuter(color(0));
+    centerScreenFront();
     displayCenterSpaceRects();    
     break;
   default:     

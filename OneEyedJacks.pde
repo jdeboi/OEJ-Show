@@ -1,6 +1,6 @@
 boolean showTime = false;
 boolean isTesting = false;
-boolean mappingON = false;
+boolean mappingON = true;
 boolean useMusic = true;
 //////////
 
@@ -235,6 +235,5 @@ void checkEditing() {
     numberScreens();
     circleSphere();
   }
-  strokeWeight(10);
   if (editingLines) displayEditingLines();
 }

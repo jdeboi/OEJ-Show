@@ -43,10 +43,11 @@ void snapOutlinesToMask() {
     { 3, 4, 5, 6}
   };
   for (int i = 0; i < 4; i++) {
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][0]].x+5, maskPoints[keystoneNum][pts[i][0]].y + 5, maskPoints[keystoneNum][pts[i][1]].x-5, maskPoints[keystoneNum][pts[i][1]].y + 5));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][1]].x-5, maskPoints[keystoneNum][pts[i][1]].y + 5, maskPoints[keystoneNum][pts[i][2]].x - 5, maskPoints[keystoneNum][pts[i][2]].y - 5));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][2]].x -5, maskPoints[keystoneNum][pts[i][2]].y - 5, maskPoints[keystoneNum][pts[i][3]].x + 5, maskPoints[keystoneNum][pts[i][3]].y - 5));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][3]].x +5, maskPoints[keystoneNum][pts[i][3]].y - 5, maskPoints[keystoneNum][pts[i][0]].x + 5, maskPoints[keystoneNum][pts[i][0]].y + 5));
+    int g = 3;
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][0]].x+g, maskPoints[keystoneNum][pts[i][0]].y + g, maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g, maskPoints[keystoneNum][pts[i][2]].x - g, maskPoints[keystoneNum][pts[i][2]].y - g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][2]].x -g, maskPoints[keystoneNum][pts[i][2]].y - g, maskPoints[keystoneNum][pts[i][3]].x + g, maskPoints[keystoneNum][pts[i][3]].y - g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][3]].x +g, maskPoints[keystoneNum][pts[i][3]].y - g, maskPoints[keystoneNum][pts[i][0]].x + g, maskPoints[keystoneNum][pts[i][0]].y + g));
   }
 }
 
