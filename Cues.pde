@@ -338,7 +338,7 @@ void displayDirty() {
     break;
   }
 }
-///////////////////////////////////////////////////////////////////
+
 void initFifty() {
   Cue[] cuesT = {
     new Cue(0, 'v', 0, 0), 
@@ -348,22 +348,25 @@ void initFifty() {
   cues = cuesT;
   drawSolidAll(color(0));
   loadKeystone(0);
+  initSpaceRects();
 }
-void displayFifty() {
 
-  switch(currentCue) {
+void displayFifty() {
+  switch(currentCue) {   
   case 0:
-    //cubesFront();
+    drawSolidAll(color(0));  
+    cubesFront();
+    drawFFTBarsCubes();  
     drawSolidOuter(color(0));
-    drawSolidAllCubes(color(255, 0, 0));
-    //displaySpaceRects();
-    break;
+    //drawSolidAllCubes(color(255, 0, 0));
+    displaySpaceRects();
+    break;           
   case 1:
-    //centerScreenFront();
-    //displayCenterSpaceRects();
-    drawSolidAllCubes(color(255, 0, 0));
+    drawSolidAll(color(0));  
+    centerScreenFront();  
+    displayCenterSpaceRects();    
     break;
-  default:
+  default:     
     drawSolidAll(color(0));
     break;
   }

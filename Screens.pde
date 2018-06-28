@@ -10,6 +10,7 @@ int topScreenW = 350;
 int topScreenH = 200;
 //////
 Keystone ks;
+Keystone ksC;
 int keystoneNum = 0;
 CornerPinSurface [] surfaces;
 CornerPinSurface [] topSurfaces;
@@ -26,19 +27,17 @@ boolean editingMapping = false;
 int numMappings = 2;
 
 class Screen {
-  int zIndex;
+
   PGraphics s;
   int snakeLoc;
   Star[] stars;
+  int zIndex = 0;
   //Tesseract tesseract;
 
   Screen(int w, int h, int z) {
-    zIndex = z;
     s = createGraphics(w, h, P3D);
     snakeLoc = int(random(0, w*2 + h*2));
-    //stars = new Star[30];
-    //for (int i = 0; i < stars.length; i++) {
-    //  stars[i] = new Star();
+    zIndex = z;
   }
 
   void blackOut() {
@@ -196,11 +195,6 @@ void drawSolidAllCubes(color c) {
   }
 }
 
-void drawSolidOuter(color c) {
-  screens[0].drawSolid(c);
-  screens[3].drawSolid(c);
-}
-
 void drawSolidAll(color c) {
   for (int i = 0; i < numScreens; i++) {
     screens[i].drawSolid(c);
@@ -261,17 +255,6 @@ void drawGifAcross(Gif g, int y) {
 }
 
 
-void centerScreenFront() {
-  centerScreen.zIndex = -1;
-  for (Screen s : screens) 
-    s.zIndex = -2;
-}
-
-void cubesFront() {
-  centerScreen.zIndex = -2;
-  for (Screen s : screens) 
-    s.zIndex = -1;
-}
 
 
 void initScreens() {
@@ -281,58 +264,56 @@ void initScreens() {
   screens = new Screen[numScreens];
   for (int i = 0; i < numScreens; i++) {
     surfaces[i] = ks.createCornerPinSurface(screenW, screenH, 20);
-    screens[i] = new Screen(-1, screenW, screenH);
+    screens[i] = new Screen(screenW, screenH, -1);
   }
 
   topSurfaces = new CornerPinSurface[2];
   topScreens = new Screen[2];
   for (int i = 0; i < 2; i++) {
     topSurfaces[i] = ks.createCornerPinSurface(topScreenW, topScreenH, 20);
-    topScreens[i] = new Screen(1, topScreenW, topScreenH);
+    topScreens[i] = new Screen(topScreenW, topScreenH, 1);
   } 
 
-  centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
-  centerScreen = new Screen(-2, screenW*4, screenH);
-
+  if (useCenterScreen) {
+    centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
+    centerScreen = new Screen(screenW*4, screenH, -2);
+  }
 
   sphereSurface = ks.createCornerPinSurface(sphereW, sphereW, 20);
-  sphereScreen = new Screen(1, sphereW, sphereW);
+  sphereScreen = new Screen(sphereW, sphereW, 1);
+
 
   loadKeystone(0);
 }
 
 void loadKeystone(int i) {
+  keystoneNum = i;
   ks.load("data/keystone/keystoneCenter" +  i + ".xml");
 }
 
 void renderScreens() {
-   //screens below mask
-  //pushMatrix();
-  //translate(0, 0, screens[0].zIndex);
+  // screens below mask
+  pushMatrix();
+  translate(0, 0, screens[0].zIndex);
   for (int i = 0; i < numScreens; i++) {
     surfaces[i].render(screens[i].s);
   }
-  //popMatrix();
-
-  //pushMatrix();
-  //translate(0, 0, centerScreen.zIndex);
+  popMatrix();
+  pushMatrix();
+  translate(0, 0, centerScreen.zIndex);
   centerSurface.render(centerScreen.s);
-  //popMatrix();
+  popMatrix();
 
   // screens above mask
-  //pushMatrix();
-  //translate(0, 0, topScreens[0].zIndex);
+  pushMatrix();
+  translate(0, 0, topScreens[0].zIndex);
   for (int i = 0; i < 2; i++) {
-
     topSurfaces[i].render(topScreens[i].s);
   }
-  //popMatrix();
-  
-  //pushMatrix();
-  //translate(0, 0, sphereScreen.zIndex);
-  sphereSurface.render(sphereScreen.s);
-  //popMatrix();
 
+  sphereSurface.render(sphereScreen.s);
+
+  popMatrix();
 }
 
 void numberScreens() {
@@ -359,4 +340,23 @@ void sphereImage(PImage p) {
   s.beginDraw();
   s.image(p, 0, 0, s.width, s.width);
   s.endDraw();
+}
+
+void drawSolidOuter(color c) {
+  screens[0].drawSolid(c);
+  screens[3].drawSolid(c);
+}
+
+void centerScreenFront() {
+  centerScreen.zIndex = -1;
+  for (Screen s : screens) {
+    s.zIndex = -2;
+  }
+}
+
+void cubesFront() {
+  centerScreen.zIndex = -2;
+  for (Screen s : screens) { 
+    s.zIndex = -1;
+  }
 }

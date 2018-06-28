@@ -1301,7 +1301,7 @@ void drawMoonSphere(PImage moon) {
       s.fill(0);
       s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2);
     } else {
-
+      
       if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
       else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
 
@@ -1346,7 +1346,7 @@ void drawMoonSphere(PImage moon) {
     } else {
       if (tt < 0.5 + 0.13) shadow = map(tt, 0.5, 0.5 + 0.13, 0, 0.04);
       else shadow = map(tt, 0.5 + 0.13, 1, 0.04, 0.0);
-
+      
       float r = map(tt, 0.5, 1, 0, moonRadius); 
       s.fill(moonColor);
       s.arc(0, 0, moonRadius, moonRadius, -PI/2, PI/2); //right moon
@@ -1540,7 +1540,6 @@ void fadeOutAllScreens(int seconds) {
     centerScreen.drawFadeAlpha(brig);
   }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////
 // 2 point

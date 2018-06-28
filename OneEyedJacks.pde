@@ -46,26 +46,34 @@ void setup() {
   initFFT();
   initMidi();
 
-  changeScene(0);
+  //initTesting();
+  changeScene(2);
 
+
+  //testControls();
   if (!showTime) initControls();
 
   initMask();
   centerScreen.drawSolid(color(0));
   initLines();
-
-  initSpaceRects();
+  
 }
 
 void draw() {
   background(0);
 
-  checkMapping();
-
-  if (isTesting) testShow();
-  else playShow();
-  renderScreens();
-  if (showMask) maskScreens(0);
+  if (mappingON) {
+    //drawSolidAll(color(205, 0, 0));
+    drawSolidAllCubes(color(205, 0, 0));
+    renderScreens();
+    checkEditing();
+    if (showMask) maskScreens(color(50));
+  } else {
+    if (isTesting) testShow();
+    else playShow();
+    renderScreens();
+    if (showMask) maskScreens(0);
+  }
 
   drawControls();
 }
@@ -217,16 +225,6 @@ void togglePlay() {
   } else currentScene.pauseScene();
 }
 
-void checkMapping() {
-  if (mappingON) {
-    //drawSolidAll(color(205, 0, 0));
-    drawOutlineAll(color(205, 255, 0), 5);
-    renderScreens();
-    checkEditing();
-    if (showMask) maskScreens(color(50));
-  }
-}
-
 void checkEditing() {
   strokeWeight(1);
   if (editingMask) {
@@ -237,5 +235,6 @@ void checkEditing() {
     numberScreens();
     circleSphere();
   }
+  strokeWeight(10);
   if (editingLines) displayEditingLines();
 }
