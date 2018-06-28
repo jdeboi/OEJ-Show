@@ -609,6 +609,23 @@ void initTerrainCenter() {
   this.spacingTerr = spacing;
   terrain = new float[colsTerr][rowsTerr];
 }
+
+void resetAudioAmp() {
+  addAudioAmp = false;
+  audioAmpLev = 0;
+}
+
+void rampUpAudioAmp() {
+   addAudioAmp = true;
+  audioAmpLev += 0.01;
+  if (audioAmpLev > 1) audioAmpLev = 1;
+}
+
+void cycleAudioAmp(float start, float end, int numCycles) {
+  float period = (end - start)/numCycles;
+  audioLev = audioAmpLev*sin(period * millis()/1000.0);
+}
+
 void setAudioGrid(float flyingTerrInc) {
   updateSpectrum();
 
@@ -618,10 +635,7 @@ void setAudioGrid(float flyingTerrInc) {
     previousCycle = currentCycle;
   }
   
-  if (addAudioAmp) audioAmpLev += 0.01;
-  if (audioAmpLev > 1) audioAmpLev = 1;
-  audioLev = audioAmpLev*sin(millis()/1000.0);
-
+  
   if (flyingTerrOn) flyingTerr -= flyingTerrInc;
 
   float yoff = flyingTerr;

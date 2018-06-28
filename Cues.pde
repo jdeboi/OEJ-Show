@@ -341,19 +341,20 @@ void displayDirty() {
   displayStripedMoon(20);
   switch(currentCue) {
   case 0:
-
+    resetAudioAmp();
     centerScreenFront();
     displayTerrainCenter(0.01);
     fadeInAllScreens(4);
     break;
   case 1: // tic toc
-  addAudioAmp = true;
+    rampUpAudioAmp();
+    cycleAudioAmp(cues[1].startT, cues[2].startT, 5);
     centerScreenFront();
     displayTerrainCenter(0.01);
     cycleShapeFFTTop();
     break;
   case 2: // tic toc repeat
-  addAudioAmp = false;
+    addAudioAmp = false;
     centerScreenFront();
     displayTerrainCenter(0.01);
     cycleShapeFFTTop();
