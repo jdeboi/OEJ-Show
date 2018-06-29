@@ -192,63 +192,33 @@ class Star {
 //////////////////////////////////////////////////////////////////////////////////
 // Levente Sandor, 2014
 // https://www.openprocessing.org/sketch/153224
-void displayNervous() {
+void displayNervous(PGraphics s) {
   noiseDetail(2, 0.9);
   rectMode(CENTER);
-  for (Screen s : screens) {
-    s.s.beginDraw();
-    s.s.fill(255);
-    s.s.noStroke();
+  s.beginDraw();
+  s.background(0);
+  s.fill(255);
+  s.noStroke();
 
-    for (int x = 10; x < screenW; x += 10) {
-      for (int y = 10; y < screenH; y += 10) {
-        float n = noise(x * 0.005, y * 0.005, frameCount * 0.05);
-        s.s.pushMatrix();
-        s.s.translate(x, y);
-        s.s.rotate(TWO_PI * n);
-        s.s.scale(10 * n);
-        s.s.rect(0, 0, 1, 1);
-        s.s.popMatrix();
-      }
+  for (int x = 10; x < s.width; x += 10) {
+    for (int y = 10; y < s.height; y += 10) {
+      float n = noise(x * 0.005, y * 0.005, frameCount * 0.05);
+      s.pushMatrix();
+      s.translate(x, y);
+      s.rotate(TWO_PI * n);
+      s.scale(10 * n);
+      s.rect(0, 0, 1, 1);
+      s.popMatrix();
     }
-    s.s.endDraw();
   }
+  s.endDraw();
   rectMode(CORNER);
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////
-// CIRCLE PULSE
-//////////////////////////////////////////////////////////////////////////////////
-/**
- * @author aa_debdeb
- * https://www.openprocessing.org/sketch/385808
- */
-
-void initLACircle() {
-  size(640, 640);
-  noFill();
-  strokeWeight(2);
+void displayNervous2Screens() {
+  displayNervous(screens[1].s);
+  displayNervous(screens[2].s);
 }
-
-void displayLACircle() {
-  background(238, 243, 239);
-  translate(width / 2, height / 2);
-  float radius = 200;
-  float step = 5;
-  for (float y = -radius + step / 2; y <= radius - step / 2; y += step) {
-    float X = sqrt(sq(radius) - sq(y)); 
-    float cRate = map(y, -radius + step / 2, radius + step / 2, 0, 1);
-    stroke(lerpColor(color(69, 189, 207), color(234, 84, 93), cRate));
-    beginShape();
-    for (float x = -X; x <= X; x += 1) {
-      vertex(x, y);
-    }
-    endShape();
-  }
-}
-
-
 
 //////////////////////////////////////////////////////////////////////////////////
 // WAVY CIRCLE
@@ -615,16 +585,50 @@ void resetAudioAmp() {
   audioAmpLev = 0;
 }
 
-void rampUpAudioAmp() {
-   addAudioAmp = true;
-  audioAmpLev += 0.01;
-  if (audioAmpLev > 1) audioAmpLev = 1;
+void startAudioAmp() {
+  addAudioAmp = true;
 }
 
-void cycleAudioAmp(float start, float end, int numCycles) {
+//void rampUpAudioAmp() {
+//  audioAmpLev += 0.01;
+//  if (audioAmpLev > 1) audioAmpLev = 1;
+//}
+
+//void rampAudioAmp(float val) {
+//  audioAmpLev += val;
+//  if (audioAmpLev < 0) audioAmpLev = 0;
+//  else if (audioAmpLev > 1) audioAmpLev = 1;
+//}
+
+void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
+  float seconds = songFile.position()/1000.0;
+  // fade in audio amp 
+  if (seconds < start + rampStart) audioLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
+  // fade out audio amp
+  else if (seconds > end - rampEnd) audioLev = constrain(map(seconds, end - rampEnd, end, 1, 0), 0, 1);
+}
+
+void fadeAudioAmp(float start, float end, float rampStart, float rampEnd) {
+  float seconds = songFile.position()/1000.0;
+  // fade in audio amp 
+  if (seconds < start + rampStart) audioAmpLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
+  // fade out audio amp
+  else if (seconds > end - rampEnd) audioAmpLev = constrain(map(seconds, end - rampEnd, end, 1, 0), 0, 1);
+}
+
+void cycleAudioAmp(float start, float end, float numCycles) {
   float period = (end - start)/numCycles;
   audioLev = audioAmpLev*sin(period * millis()/1000.0);
 }
+
+void setSinGrid(float tempo) {
+  for (int y = 0; y < rowsTerr; y++) {
+    for (int x = 0; x < colsTerr; x++) {
+      terrain[x][y] = 10* sin(tempo * millis()/1000.0 + y*5.0);
+    }
+  }
+}
+
 
 void setAudioGrid(float flyingTerrInc) {
   updateSpectrum();
@@ -634,8 +638,8 @@ void setAudioGrid(float flyingTerrInc) {
     acceleratingTerr = true;
     previousCycle = currentCycle;
   }
-  
-  
+
+
   if (flyingTerrOn) flyingTerr -= flyingTerrInc;
 
   float yoff = flyingTerr;
@@ -656,11 +660,6 @@ void setAudioGrid(float flyingTerrInc) {
   }
 }
 
-void setMouseFlyingInc() {
-  if (mouseX< width/3) flyingTerrInc = 0.02;
-  else if (mouseX < width *2/3) flyingTerrInc = -0.02;
-}
-
 void updateFlying(int delayT) {
   if (flyingTerrOn) {
     if (acceleratingTerr) {
@@ -676,24 +675,35 @@ void updateFlying(int delayT) {
 
 int startingTerrain = -1400;
 int endingTerrain = -150;
-int zZoom = startingTerrain;
-boolean isZoomingTerrain = true;
+int zZoom = 0;
 
-void displayTerrainCenter(float flyingRate) {
+void initZZoom() {
+  zZoom = startingTerrain;
+}
+
+void zoomTerrain() {
+  float speed = map(zZoom, startingTerrain, endingTerrain, 10, 0);
+  zZoom += speed;
+  zZoom = constrain(zZoom, startingTerrain, endingTerrain);
+}
+
+void setGridTerrain(int mode, float param) {
+  if (mode == 0) setAudioGrid(param);
+  else if (mode == 1) setSinGrid(param);
+  else if (mode == 1) setSinGrid(param);
+}
+
+void displayTerrainCenter() {
   PGraphics s = centerScreen.s;
   //setGrid();
-  setAudioGrid(flyingRate);
+
   s.beginDraw();
   s.background(0);
   s.pushMatrix();
   s.translate(screenW*2, screenH/2, 0);
   if (beginningTerrain) s.rotateX(radians(millis()/100.0));
   else s.rotateX(radians(60));
-  if (isZoomingTerrain) {
-    float speed = map(zZoom, startingTerrain, endingTerrain, 10, 0);
-    zZoom += speed;
-    if (zZoom > endingTerrain) isZoomingTerrain = false;
-  }
+
   s.translate(0, zZoom, 0);
   s.noFill();
   s.stroke(255);
@@ -703,8 +713,8 @@ void displayTerrainCenter(float flyingRate) {
     s.beginShape(TRIANGLE_STRIP);
     for (int x = 0; x < colsTerr; x++) {
       //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
-      s.vertex(x * spacingTerr, y * spacingTerr, addAudioAmp?terrain[x][y]*audioLev:0);
-      s.vertex(x * spacingTerr, (y+1) * spacingTerr, addAudioAmp?terrain[x][y+1]*audioLev:0);
+      s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]*audioLev);
+      s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]*audioLev);
     }
     s.endShape();
   }
@@ -1529,38 +1539,62 @@ void changePerlin() {
 //////////////////////////////////////////////////////////////////////////////////
 boolean startFade = false;
 long startFadeTime = 0;
-void fadeOutAllScreens(int seconds) {
-  if (!startFade) {
-    startFadeTime = millis();
-    startFade = true;
-  }
-  float timePassed = (millis() - startFadeTime)/1000.0;
-  int brig = constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
+
+
+void fadeOutCubes(float startT, int seconds) {
+  int alph =  getFadeOutAlpha(startT, seconds);
   for (Screen s : screens) {
-    s.drawFadeAlpha(brig);
+    s.drawFadeAlpha(alph);
   }
-  for (Screen s : topScreens) {
-    s.drawFadeAlpha(brig);
+}
+void fadeInCubes(float startT, int seconds) {
+  int alph = getFadeInAlpha(startT, seconds);
+  for (Screen s : screens) {
+    s.drawFadeAlpha(alph);
   }
-  sphereScreen.drawFadeAlpha(brig);
-  centerScreen.drawFadeAlpha(brig);
 }
 
-void fadeInAllScreens(int seconds) {
-  if (!startFade) {
-    startFadeTime = millis();
-    startFade = true;
-  } 
-  float timePassed = (millis() - startFadeTime)/1000.0;
-  int brig = constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
+void fadeOutCenter(float startT, int seconds) {
+  int alph = getFadeOutAlpha(startT, seconds);
+  centerScreen.drawFadeAlpha(alph);
+}
+
+void fadeInCenter(float startT, int seconds) {
+  int alph = getFadeInAlpha(startT, seconds);
+  centerScreen.drawFadeAlpha(alph);
+}
+
+int getFadeOutAlpha(float startT, int seconds) {
+  float playSeconds = songFile.position()/1000.0;
+  float timePassed = playSeconds - startT;
+  return constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
+}
+
+int getFadeInAlpha(float startT, int seconds) {
+  float playSeconds = songFile.position()/1000.0;
+  float timePassed = playSeconds - startT;
+  return constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
+}
+
+void fadeInAllScreens(float startT, int seconds) {
+  int alph = getFadeInAlpha(startT, seconds);
+  setAllScreensAlpha(alph);
+}
+
+void fadeOutAllScreens(float startT, int seconds) {
+  int alph = getFadeOutAlpha(startT, seconds);
+  setAllScreensAlpha(alph);
+}
+
+void setAllScreensAlpha(int alph) {
   for (Screen s : screens) {
-    s.drawFadeAlpha(brig);
+    s.drawFadeAlpha(alph);
   }
   for (Screen s : topScreens) {
-    s.drawFadeAlpha(brig);
+    s.drawFadeAlpha(alph);
   }
-  sphereScreen.drawFadeAlpha(brig);
-  centerScreen.drawFadeAlpha(brig);
+  sphereScreen.drawFadeAlpha(alph);
+  centerScreen.drawFadeAlpha(alph);
 }
 
 void resetFade() {
@@ -1597,8 +1631,7 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
       s.noFill();
       s.strokeWeight(sw);
       spaceRects[j].zGradientStroke(s, c1, c2, c3);
-      //spaceRects[j].display(s);
-      spaceRects[j].displayNeon(s, sw, c1);
+      spaceRects[j].display(s);
       if (i== 1)spaceRects[j].update(mode);
     }
     s.popMatrix();
@@ -1607,7 +1640,30 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
   }
 }
 
+float sphereCycle = 0;
+void paradiseSphere(int spacing, color c1, color c2, color c3) {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.background(0);
+  s.noFill();
+  s.strokeWeight(5);
+  for (int i = s.width; i >= spacing; i -= spacing) {
+    float per = map(i, s.width, 0, 0, 1);
+    //if (per + sphereCycle > 1) s.stroke(paradiseStroke((per + sphereCycle)-1, c1, c2, c3));
+    //else s.stroke(paradiseStroke((per + sphereCycle), c1, c2, c3));
+    s.stroke(paradiseStroke(per, c1, c2, c3));
+    s.ellipse(s.width/2, s.height/2, i, i);
+  }
+  //sphereCycle += 0.02;
+  //if (sphereCycle > 1) sphereCycle = 0;
+  s.endDraw();
+}
 
+color paradiseStroke(float per, color c1, color c2, color c3) {
+  per *= 2;
+  if (per < 1) return lerpColor(c1, c2, per);
+  return lerpColor(c2, c3, per-1);
+}
 
 void displayTunnel(PGraphics s, int len, color c1, color c2) {
   int gap = 5;
@@ -1732,13 +1788,7 @@ class SpaceRect {
     else if (mode == SEESAW)  vel.z = zVel * 4 * sin(millis()/500.0);
   }
 
-  void zGradientStroke(PGraphics s, color c1, color c2, color c3) {
-    float zper = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, 2); 
-    color grad;
-    if (zper < 1) grad = lerpColor(c1, c2, zper);
-    else grad = lerpColor(c2, c3, zper-1);
-    s.stroke(grad);
-  }
+
 
   void display(PGraphics s) {
     s.pushMatrix();
@@ -1764,6 +1814,11 @@ class SpaceRect {
   }
 
   void changeRectSpacing(int sp) {
+  }
+
+  void zGradientStroke(PGraphics s, color c1, color c2, color c3) {
+    float zper = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, 1); 
+    s.stroke(paradiseStroke(zper, c1, c2, c3));
   }
 
 
@@ -1794,7 +1849,7 @@ void neonrect(PGraphics s, int x, int y, int w, int h, int sw, color c) {
   neonline(s, x-w/2, y-h/2, x+w/2, y-h/2, sw, c);
   neonline(s, x+w/2, y-h/2, x+w/2, y+h/2, sw, c);
   neonline(s, x+w/2, y+h/2, x-w/2, y+h/2, sw, c);
-  neonline(s, x-w/2, y+h/2, x-w/2, y-h/2, sw, c);
+  //neonline(s, x-w/2, y+h/2, x-w/2, y-h/2, sw, c);
 
   s.popMatrix();
 }
@@ -1802,17 +1857,23 @@ void neonline(PGraphics s, PVector p0, PVector p1, int sw, color c) {
   neonline(s, int(p0.x), int(p0.y), int(p1.x), int(p1.y), sw, c);
 }
 void neonline(PGraphics s, int x0, int y0, int x1, int y1, int sw, color c) {
+  float len = abs(dist(x0, y0, x1, y1));
+  float rot = atan2(1.0*(y1-y0), 1.0*(x1-x0));
+  println(rot);
+
   s.pushMatrix();
   s.noStroke();
-  for (int i = 5; i >= 0; i--) {
-    int w = sw+i*3;
-    s.fill(c, 50 + i * 41);
-    s.beginShape();
-    s.vertex(x0, y0);
-    s.vertex(x1, y1);
-    s.vertex(x1, y1+w);
-    s.vertex(x0, y0+w);
+  s.rotate(rot);
+  s.translate(x0, y0);
+  for (int i = 4; i >= 0; i--) {
+    int w = sw+i*4;
 
+    s.fill(255, 50 + (4-i) * 50);
+    s.beginShape(QUAD);
+    s.vertex(-len/2, -w/2);
+    s.vertex(len/2, -w/2);
+    s.vertex(len/2, w/2);
+    s.vertex(-len/2, w/2);
     s.endShape();
   }
 
@@ -1929,20 +1990,151 @@ void displayStripedMoon(int step) {
   displayLACircle(sphereScreen.s, sphereScreen.s.width/2, step);
 }
 
-void displayLACircle(PGraphics s, float radius, float step){
+void displayLACircle(PGraphics s, float radius, float step) {
   s.beginDraw();
   s.pushMatrix();
   s.translate(s.width / 2, s.height / 2);
-  for(float y = -radius + step / 2; y <= radius - step / 2; y += step){
+  for (float y = -radius + step / 2; y <= radius - step / 2; y += step) {
     float X = sqrt(sq(radius) - sq(y)); 
     float cRate = map(y, -radius + step / 2, radius + step / 2, 0, 1);
+    float str = map(cRate, 0, 1, 255, 50);
     //s.stroke(lerpColor(color(69, 189, 207), color(234, 84, 93), cRate));
-    s.stroke(255 - cRate * y);
+    s.stroke(str);
+    s.strokeWeight(3);
+    s.fill(str);
     s.beginShape();
-    for(float x = -X; x <= X; x += 1){
+    for (float x = -X; x <= X; x += 1) {
       s.vertex(x, y);
     }
     s.endShape();
+  }
+  s.popMatrix();
+  s.endDraw();
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// OP ART
+//////////////////////////////////////////////////////////////////////////////////
+// Richard Anuszkiewicz art
+void displayDivisionOfIntensity2Screens(float space, int sqX, int sqY) {
+  displayDivisionOfIntensity(screens[1].s, space, sqX, sqY);
+  displayDivisionOfIntensity(screens[2].s, space, sqX, sqY);
+}
+void displayDivisionOfIntensity(PGraphics s, float space, int sqX, int sqY) {
+  if (space < 5) space = 5;
+  if (space > 55) space = 55;
+  s.beginDraw();
+  s.pushMatrix();
+  s.background(0);
+  s.translate(s.width/2, s.height/2);
+
+  //if (mode == 1) rotateZ(frameCount/100.0);
+  //else if (mode == 2) rotateY(frameCount/100.0);
+  //else if (mode == 3) rotateX(frameCount/100.0);
+
+  s.strokeWeight(2);
+  s.stroke(255);
+  int sqThick = 10;
+  int sqW = s.width/2;
+
+  int sqSmLen = (sqW-2*sqThick)/2;
+  float i = 0;
+  while (i < sqSmLen) {
+
+    // top left
+    int x0 = sqX - sqSmLen;
+    int y0 = sqY - sqSmLen;
+    s.line(x0, y0, x0 + sqSmLen, y0 + i);
+    s.line(x0, y0, x0 + i, y0 + sqSmLen);
+
+    // top right
+    x0 = sqX + sqSmLen;
+    y0 = sqY - sqSmLen;
+    s.line(x0, y0, x0 - sqSmLen, y0 + i);
+    s.line(x0, y0, x0 - i, y0 + sqSmLen);
+
+    // bottom left
+    x0 = sqX + sqSmLen;
+    y0 = sqY + sqSmLen;
+    s.line(x0, y0, x0 - sqSmLen, y0 - i);
+    s.line(x0, y0, x0 - i, y0 - sqSmLen);
+
+    // bottom right
+    x0 = sqX - sqSmLen;
+    y0 = sqY + sqSmLen;
+    s.line(x0, y0, x0 + sqSmLen, y0 - i);
+    s.line(x0, y0, x0 + i, y0 - sqSmLen);
+
+    // top
+    x0 = sqX - sqSmLen + sqThick/2;
+    y0 = sqY - sqSmLen - sqThick;
+    s.line(x0, y0, x0 + sqSmLen, y0 - i);
+    s.line(x0+sqSmLen, y0 - i, x0 + sqSmLen*2 - sqThick, y0);
+
+    // bottom
+    x0 = sqX - sqSmLen + sqThick/2;
+    y0 = sqY + sqSmLen + sqThick;
+    s.line(x0, y0, x0 + sqSmLen, y0 + i);
+    s.line(x0+sqSmLen, y0 + i, x0 + sqSmLen*2 - sqThick, y0);
+
+    // left
+    x0 = sqX - sqSmLen - sqThick;
+    y0 = sqY - sqSmLen + sqThick/2;
+    s.line(x0, y0, x0 - i, y0 + sqSmLen);
+    s.line(x0 - i, y0 + sqSmLen, x0, y0 + sqSmLen*2 - sqThick);
+
+    // right
+    x0 = sqX + sqSmLen + sqThick;
+    y0 = sqY - sqSmLen + sqThick/2;
+    s.line(x0, y0, x0 + i, y0 + sqSmLen);
+    s.line(x0 + i, y0 + sqSmLen, x0, y0 + sqSmLen*2 - sqThick);
+
+    i+= space;
+  }
+  i = 0;
+  while (i < sqSmLen + sqThick) {
+    // diag top left
+    int x0 = int(sqX - 2 * sqSmLen - 1.5*sqThick);
+    int y0 = int(sqY - 2 * sqSmLen - 1.5*sqThick);
+    int x1 = int(sqX - .5* sqThick);
+    int y1 = y0;
+    int x2 = x0;
+    int y2 = int(sqY -.5 * sqThick);
+    s.line(x0 + i, y0 + i, x1, y1);
+    s.line(x0 + i, y0 + i, x2, y2);
+
+
+    // diag top right
+    x0 = int(sqX + 2 * sqSmLen + 1.5*sqThick);
+    y0 = int(sqY - 2 * sqSmLen - 1.5*sqThick);
+    x1 = int(sqX + 1.5* sqThick);
+    y1 = y0;
+    x2 = x0;
+    y2 = int(sqY -.5 * sqThick);
+    s.line(x0 - i, y0 + i, x1, y1);
+    s.line(x0 - i, y0 + i, x2, y2);
+
+    // diag bottom right
+    x0 = int(sqX + 2 * sqSmLen + 1.5*sqThick);
+    y0 = int(sqY + 2 * sqSmLen + 1.5*sqThick);
+    x1 = int(sqX + 1.5* sqThick);
+    y1 = y0;
+    x2 = x0;
+    y2 = int(sqY +1.5 * sqThick);
+    s.line(x0 - i, y0 - i, x1, y1);
+    s.line(x0 - i, y0 - i, x2, y2);
+
+    // diag bottom left
+    x0 = int(sqX - 2 * sqSmLen - 1.5*sqThick);
+    y0 = int(sqY + 2 * sqSmLen + 1.5*sqThick);
+    x1 = int(sqX - .5* sqThick);
+    y1 = y0;
+    x2 = x0;
+    y2 = int(sqY +1.5 * sqThick);
+    s.line(x0 + i, y0 - i, x1, y1);
+    s.line(x0 + i, y0 - i, x2, y2);
+
+    i+= space;
   }
   s.popMatrix();
   s.endDraw();

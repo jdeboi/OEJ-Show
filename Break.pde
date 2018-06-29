@@ -160,12 +160,12 @@ void initBreaks() {
 
 void drawPlayer() {
   stroke(255);
-  strokeWeight(1);
+  strokeWeight(2);
   noFill();
   //if (editingBreaks) fill(255);
   rect(xSpace, ySpace, vW, vH);
   float position = map( songFile.position(), 0, songFile.length(), xSpace, xSpace+vW );
-  stroke(255, 0, 0);
+  stroke(255);
   line( position, ySpace, position, ySpace+vH );
 
   //for (int i = 0; i < breaks.size(); i++) {
@@ -176,6 +176,9 @@ void drawPlayer() {
   textSize(12);
   timeText.setText((nf(songFile.position()/1000.0, 3, 2)));
   //text(nf(songFile.position()/1000.0, 3,2), xSpace, ySpace + vH);
+  
+  strokeWeight(1);
+  displayCues();
 }
 
 void drawSongLabel() {

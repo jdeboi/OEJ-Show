@@ -127,7 +127,6 @@ void displayCrush() {
     break;
   case 6:
     drawSolidAll(color(0));
-    displayNervous();
     break;
   default:
     drawSolidAll(color(0));
@@ -264,7 +263,7 @@ void displayMoon() {
     break;
   case 11: // fade out end
     displayMoveSpaceCenter(CONVERGE_CENTER, 0.75); 
-    fadeOutAllScreens(8);
+    fadeOutAllScreens(cues[11].startT, 8);
 
     displayLines(color(255, 0, 0));
     startFadeLine = false;
@@ -313,7 +312,7 @@ void displayCycles() {
 }
 
 void initDirty() {
-  cues = new Cue[12];
+  cues = new Cue[11];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(11, 'v', 0.0, 0); // tic toc begins
   cues[2] = new Cue(33.4, 'v', 0.0, 0); // tic toc repeat
@@ -323,9 +322,8 @@ void initDirty() {
   cues[6] = new Cue(121, 'v', 0.0, 0);  // guitar
   cues[7] = new Cue(143.5, 'v', 0.0, 0);  // tic toc
   cues[8] = new Cue(165.5, 'v', 0.0, 0);  // down chords
-  cues[9] = new Cue(175, 'v', 0.0, 0);  // down chords
-  cues[10] = new Cue(178, 'v', 0.0, 0);  // fade out
-  cues[11] = new Cue(194, 'v', 0.0, 0);  // end
+  cues[9] = new Cue(178, 'v', 0.0, 0);  // fade out
+  cues[10] = new Cue(184, 'v', 0.0, 0);  // end
 
   drawSolidAll(color(0));
   loadKeystone(1);
@@ -335,41 +333,96 @@ void initDirty() {
   initTerrainCenter();
   initTesseract();
   centerScreenFront();
+
+  initZZoom();
+  resetAudioAmp();
 }
 
 void displayDirty() {
   displayStripedMoon(20);
   switch(currentCue) {
   case 0:
-    resetAudioAmp();
     centerScreenFront();
-    displayTerrainCenter(0.01);
-    fadeInAllScreens(4);
+    zoomTerrain();
+    setGridTerrain(0, 0.01);
+    displayTerrainCenter();
+    fadeInAllScreens(cues[0].startT, 4);
     break;
   case 1: // tic toc
-    rampUpAudioAmp();
-    cycleAudioAmp(cues[1].startT, cues[2].startT, 5);
+    zZoom = endingTerrain;
     centerScreenFront();
-    displayTerrainCenter(0.01);
+    startAudioAmp();
+    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
+    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
+    fadeAudioAmp(cues[1].startT, cues[2].startT, 1, 1);
+    cycleAudioAmp(cues[1].startT, cues[2].startT, 4.5);
+
+    setGridTerrain(0, 0.01);
+    displayTerrainCenter();
     cycleShapeFFTTop();
     break;
   case 2: // tic toc repeat
-    addAudioAmp = false;
+    zZoom = endingTerrain;
     centerScreenFront();
-    displayTerrainCenter(0.01);
+    fadeAudioLev(cues[2].startT, cues[3].startT, 1, 1);
+    setGridTerrain(1, 1); // sin
+    displayTerrainCenter();
     cycleShapeFFTTop();
     break;
-  case 3:
+  case 3: // dooo, doo, do
     cubesFront();
     drawSolidTop(color(0));
+    displayDivisionOfIntensity2Screens(sin(millis()/1000.0)*20 + 30, 0, 0);
+    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
     //display3DDots2Screens(100, 0, 0.005);
     //displayTesseract2Screens();
     break;
-  case 9:
+  case 4: // tic toc
+    zZoom = endingTerrain;
+    centerScreenFront();
+    startAudioAmp();
+    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
+    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
+    fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
+    cycleAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1.5);
+
+    setGridTerrain(0, 0.01);
+    displayTerrainCenter();
+    cycleShapeFFTTop();
+    fadeInCenter(cues[currentCue].startT, 2);
+    break;
+  case 5:
+    cubesFront();
+    drawSolidTop(color(0));
+    displayDivisionOfIntensity2Screens(sin(millis()/1000.0)*20 + 30, 0, 0);
+    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
+    break;
+  case 6: 
+    // something up top?
+    cubesFront();
+    displayNervous2Screens();
+    fadeInCubes(cues[currentCue].startT, 2);
+    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
+    break;
+  case 7: // tic toc
+    zZoom = endingTerrain;
+    centerScreenFront();
+    startAudioAmp();
+    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
+    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
+    fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
+    cycleAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1.5);
+
+    setGridTerrain(0, 0.01);
+    displayTerrainCenter();
+    cycleShapeFFTTop();
+    fadeInCenter(cues[currentCue].startT, 2);
+    break;
+  case 8:
     resetFade();
     break;
-  case 10:
-    fadeOutAllScreens(3);
+  case 9:
+    fadeOutAllScreens(cues[currentCue].startT, 3);
     break;
   default:
     drawSolidAll(color(0));
@@ -378,16 +431,17 @@ void displayDirty() {
 }
 
 void initFifty() {
-  Cue[] cuesT = {
-    new Cue(0, 'v', 0, 0), 
-    new Cue(6.5, 'v', 0.0, 0), // stop cycling rects
-    new Cue(19.5, 'v', 0.0, 0), // vocals come in; maybe single central slow rects w/ solid rects on top
+  cues = new Cue[8];
+  cues[0] = new Cue(0, 'v', 0, 0); 
+  cues[1] = new Cue(6.5, 'v', 0.0, 0); // stop cycling rects
+  cues[2] = new Cue(19.5, 'v', 0.0, 0); // vocals come in; maybe single central slow rects w/ solid rects on top
 
-    new Cue(52, 'v', 0.0, 0), // vocals come in
-    new Cue(85, 'v', 0.0, 0), // teee tahhh tee tahh
-    new Cue(190, 'v', 0.0, 0)
-  };
-  cues = cuesT;
+  cues[3] = new Cue(52, 'v', 0.0, 0); // vocals come in
+  cues[4] = new Cue(85, 'v', 0.0, 0); // teee tahhh tee tahh
+  cues[5] = new Cue(104, 'v', 0.0, 0); // maybe this could be just a few solid shapes flying in
+  cues[6] =  new Cue(136, 'v', 0.0, 0); // in the ennndd ...
+  cues[7] = new Cue(190, 'v', 0.0, 0);
+
   drawSolidAll(color(0));
   loadKeystone(1);
   initSpaceRects();
@@ -403,10 +457,11 @@ void displayFifty() {
 
   switch(currentCue) {   
   case 0:
+    paradiseSphere(50, pink, blue, cyan);
     cubesFront();
     //displayTunnel(screens[1].s, 1300, pink, cyan);
     displaySpaceRects(5, -1, blue, cyan, pink); 
-    fadeInAllScreens(3);
+    fadeInAllScreens(cues[0].startT, 3);
     break;  
   case 1:
     cubesFront();
@@ -652,4 +707,21 @@ void printMidi(String message, int channel, int pitch, int velocity) {
 void controllerChange(int channel, int number, int value) {
   // Receive a controllerChange
   printMidi("Controller change", channel, number, value);
+}
+
+void displayCues() {
+  int j = 0;
+  for (Cue c : cues) {
+    strokeWeight(1);
+    noFill();
+    float position = map( c.startT, 0, songFile.length()/1000.0, xSpace, xSpace+vW );
+    float hue = map( c.startT, 0, songFile.length()/1000.0, 0, 255 );
+    colorMode(HSB, 255);
+    stroke(hue, 255, 255);
+    if (c.startT < songFile.length()/1000.0) {
+      line( position, ySpace, position, ySpace+vH );
+      text(j++, position, ySpace + vH/2);
+    }
+    colorMode(RGB, 255);
+  }
 }
