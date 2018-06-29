@@ -126,6 +126,7 @@ class Screen {
 
   void drawFadeAlpha(int alpha) {
     s.beginDraw();
+    s.blendMode(BLEND);
     s.noStroke();
     s.fill(0, alpha);
     s.rect(0, 0, s.width, s.height);

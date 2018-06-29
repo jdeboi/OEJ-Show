@@ -980,20 +980,28 @@ void cycleWaves() {
 // modified by jdeboi
 float angleBottom = 0;
 
-void displayLineBounceAll(color c1, color c2) {
+void displayLineBounceAll(color c1, color c2, int sw) {
   for (Screen s : screens) {
-    displayLineBounce(s.s, 30, c2, c2);
+    displayLineBounce(s.s, 30, c2, c2, sw);
   }
   angleBottom += 0.01;
 }
-void displayLineBounceCenter(float rate, int spacing, color c1, color c2) {
-  displayLineBounce(centerScreen.s, spacing, c1, c2);
+void displayLineBounceCenter(float rate, int spacing, color c1, color c2, int sw) {
+  displayLineBounce(centerScreen.s, spacing, c1, c2, sw);
   angleBottom += rate;
 }
-void displayLineBounce(PGraphics s, int spacing, color c1, color c2) {
+void set2ScreensBlend(int mode) {
+  for (int i = 1; i < 3; i++) {
+    screens[i].s.beginDraw();
+    screens[i].s.blendMode(SCREEN);
+    screens[i].s.endDraw();
+  }
+}
+void displayLineBounce(PGraphics s, int spacing, color c1, color c2, int sw) {
   s.beginDraw();
   s.background(0);
-
+  s.blendMode(SCREEN);
+  s.strokeWeight(sw);
   int w = s.width;
   int h = s.height ;
   int centerX = w/2;
@@ -1541,36 +1549,36 @@ boolean startFade = false;
 long startFadeTime = 0;
 
 
-void fadeOutCubes(float startT, int seconds) {
+void fadeOutCubes(float startT, float seconds) {
   int alph =  getFadeOutAlpha(startT, seconds);
   for (Screen s : screens) {
     s.drawFadeAlpha(alph);
   }
 }
-void fadeInCubes(float startT, int seconds) {
+void fadeInCubes(float startT, float  seconds) {
   int alph = getFadeInAlpha(startT, seconds);
   for (Screen s : screens) {
     s.drawFadeAlpha(alph);
   }
 }
 
-void fadeOutCenter(float startT, int seconds) {
+void fadeOutCenter(float startT, float seconds) {
   int alph = getFadeOutAlpha(startT, seconds);
   centerScreen.drawFadeAlpha(alph);
 }
 
-void fadeInCenter(float startT, int seconds) {
+void fadeInCenter(float startT, float  seconds) {
   int alph = getFadeInAlpha(startT, seconds);
   centerScreen.drawFadeAlpha(alph);
 }
 
-int getFadeOutAlpha(float startT, int seconds) {
+int getFadeOutAlpha(float startT, float seconds) {
   float playSeconds = songFile.position()/1000.0;
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
 }
 
-int getFadeInAlpha(float startT, int seconds) {
+int getFadeInAlpha(float startT, float  seconds) {
   float playSeconds = songFile.position()/1000.0;
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
@@ -1581,7 +1589,7 @@ void fadeInAllScreens(float startT, int seconds) {
   setAllScreensAlpha(alph);
 }
 
-void fadeOutAllScreens(float startT, int seconds) {
+void fadeOutAllScreens(float startT, float  seconds) {
   int alph = getFadeOutAlpha(startT, seconds);
   setAllScreensAlpha(alph);
 }
@@ -1617,6 +1625,9 @@ void initSpaceRects() {
   for (int r = 0; r < spaceRects.length; r++) {
     spaceRects [r] = new SpaceRect(new PVector(0, 0, endPSpaceRects+rectSpacing*r), new PVector(0, 0, zVel) );
   }
+  blue = color(0, 100, 255);
+  cyan = color(0, 255, 255);
+  pink = color(#FF05C5);
 }
 
 boolean hasResetRects = true;
@@ -1651,6 +1662,61 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
   }
 }
 
+void displayTwoScreenCascade() {
+  //PGraphics s = centerScreen.s;
+  for (int j = 1; j < 3; j++) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    s.blendMode(BLEND);
+    //s.fill(0, 1);
+    //s.rect(0, 0, s.width, s.height);
+    s.background(0, 100, 0, 1);
+    s.blendMode(SCREEN);
+    s.noFill();
+    s.strokeWeight(10);
+    int num = 10;
+    int spacing = 100;
+    int bounceD = 200;
+    s.noFill();
+    s.strokeWeight(10);
+    for (int i = 0; i < num; i++) {
+      spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
+      spaceRects[i].display(s);
+    }
+    s.endDraw();
+  }
+}
+color blue, cyan, pink;
+void displayTwoWayTunnels() {
+  PGraphics s = centerScreen.s;
+  s.beginDraw();
+  s.blendMode(SCREEN);
+  s.background(0);
+  //int spacing = 50;
+  //for (int i = 0; i < s.height; i += spacing) {
+  //  line(0, 0, 
+  //int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
+  //displayTunnelCenter(150, 3, 0,z, color(0, 255, 255), color(0, 0, 255), false);
+  //displayTunnelCenter(150, 3, 0,-z, color(0, 255, 255), color(0, 0, 255), false);
+  int num = 5;
+  int spacing = 20;
+  int bounceD = 400;
+  s.noFill();
+  s.strokeWeight(10);
+  for (int i = 0; i < num; i++) {
+    spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].zGradientStroke(s, cyan, blue, pink);
+    spaceRects[i].display(s);
+  }
+  for (int i = num; i < num*2 && i < spaceRects.length; i++) {
+    spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].zGradientStroke(s, cyan, blue, pink);
+    spaceRects[i].display(s);
+  }
+  s.endDraw();
+}
+
 float sphereCycle = 0;
 void paradiseSphere(int spacing, color c1, color c2, color c3) {
   PGraphics s = sphereScreen.s;
@@ -1659,17 +1725,22 @@ void paradiseSphere(int spacing, color c1, color c2, color c3) {
   s.noFill();
   s.strokeWeight(5);
   for (int i = s.width; i >= spacing; i -= spacing) {
-    int per = int(map(i, s.width, 0, 0, 1000));
-    per += millis()/10;
-    per %= 1000;
-    //if (per + sphereCycle > 1) s.stroke(paradiseStroke((per + sphereCycle)-1, c1, c2, c3));
-    //else s.stroke(paradiseStroke((per + sphereCycle), c1, c2, c3));
-    s.stroke(paradiseStroke(per/1000.0, c1, c2, c3));
+    float per = map(i, s.width, 0, 0, 0.5);
+    per += millis()/4000.0;
+    per %= 1;
+    s.stroke(paradiseStrokeReturn(per, c1, c2, c3));
     s.ellipse(s.width/2, s.height/2, i, i);
   }
   //sphereCycle += 0.02;
   //if (sphereCycle > 1) sphereCycle = 0;
   s.endDraw();
+}
+
+color paradiseStrokeReturn(float per, color c1, color c2, color c3) {
+  per *= 3;
+  if (per < 1) return lerpColor(c1, c2, per);
+  else if (per < 2) return lerpColor(c2, c3, per-1);
+  return lerpColor(c3, c1, per-2);
 }
 
 color paradiseStroke(float per, color c1, color c2, color c3) {
@@ -1692,7 +1763,7 @@ void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, colo
 
   for (int i = 0; i < num; i++) {
     // top
-    
+
     s.pushMatrix();
     s.rotateX(radians(-90 + gap));
     s.translate(0, -z, 0);
@@ -1749,7 +1820,7 @@ void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, colo
     s.translate (0, 0, s.width);
     s.rotateY(radians(gap));
     s.translate(-z, 0, 0);
-    
+
     s.beginShape(QUADS);
     if (isGradient) s.fill(c1);
     s.vertex(-1, -1);
@@ -1813,9 +1884,12 @@ class SpaceRect {
     int KINDA_TRIPPY = 1;
     int SORTA_TRIPPY = 2;
     int SEESAW = 3;
-    if (mode == SUPER_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/10.0);
-    else if (mode == KINDA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/100.0);
-    else if (mode == SORTA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/1000.0);
+    float timePassed = (songFile.position()/1000.0 - cues[currentCue].startT);
+    if (mode == NONE) rot.z = 0;
+
+    else if (mode == SUPER_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, timePassed);
+    else if (mode == KINDA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, timePassed/5); //map(pos.z, endPSpaceRects, frontPSpaceRects, 0, frameCount/100.0);
+    else if (mode == SORTA_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, timePassed/10);
     else if (mode == SEESAW)  vel.z = zVel * 4 * sin(millis()/500.0);
   }
 
@@ -1828,6 +1902,20 @@ class SpaceRect {
     s.translate(pos.x, pos.y, pos.z);
     float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
     if (pos.z > endPSpaceRects) s.rect(0, 0, s.width-dw, s.height-dw);
+    s.popMatrix();
+  }
+  void displayTopSides(PGraphics s) {
+    s.pushMatrix();
+    s.rotateX(rot.x);
+    s.rotateY(rot.y);
+    s.rotateZ(rot.z);
+    s.translate(pos.x, pos.y, pos.z);
+    float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
+    if (pos.z > endPSpaceRects) {
+      s.line(0, 0, s.width-dw, 0);
+      s.translate(0, s.height-dw, 0);
+      s.line(0, 0, s.width-dw, 0);
+    }
     s.popMatrix();
   }
 
@@ -1847,8 +1935,13 @@ class SpaceRect {
   }
 
   void zGradientStroke(PGraphics s, color c1, color c2, color c3) {
-    float zper = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, 1); 
-    s.stroke(paradiseStroke(zper, c1, c2, c3));
+    float zper = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, 1);
+    color grad = paradiseStroke(zper, c1, c2, c3);
+    //s.colorMode(HSB, 255);
+    //float sat = map(pos.z, endPSpaceRects, endPSpaceRects/2, 0, 255);
+    //color grad2 = color(hue(grad), sat, 255);
+    //colorMode(RGB, 255);
+    s.stroke(grad);
   }
 
 

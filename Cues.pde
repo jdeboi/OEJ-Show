@@ -186,9 +186,10 @@ void initMoon() {
   };
   cues = cuesT;
   drawSolidAll(color(0));
-  loadKeystone(1);
+  loadKeystone(0);
   currentImages.get(0).resize(sphereScreen.s.width, sphereScreen.s.height);
   startFade = false;
+  centerScreenFront();
 }
 
 void displayMoon() {
@@ -442,7 +443,7 @@ void initFifty() {
   cues[6] = new Cue(120, 'v', 0.0, 0); 
   cues[7] =  new Cue(136, 'v', 0.0, 0); // "we're all coins"
   cues[8] =  new Cue(151, 'v', 0.0, 0);
-  cues[9] =  new Cue(151, 'v', 0.0, 0);  // teee tahhh tee tahh
+  cues[9] =  new Cue(172, 'v', 0.0, 0);  // teee tahhh tee tahh
   cues[10] = new Cue(190, 'v', 0.0, 0);
 
   drawSolidAll(color(0));
@@ -454,50 +455,92 @@ void initFifty() {
 
 void displayFifty() {
   drawSolidOuter(color(0));
-  color blue = color(0, 100, 255);
-  color cyan = color(0, 255, 255);
-  color pink = color(#FF05C5);
 
+  //colorMode(RGB, 255);
   switch(currentCue) {   
   case 0:
+
     paradiseSphere(50, pink, blue, cyan);
     cubesFront();
-    
-    displaySpaceRects(5, -1, blue, cyan, pink); 
+
+    displaySpaceRects(5, -1, pink, blue, cyan); 
     fadeInAllScreens(cues[0].startT, 3);
     break;  
   case 1:
+
     paradiseSphere(50, pink, blue, cyan);
     cubesFront();
 
 
-    displaySpaceRects(5, -1, blue, cyan, pink); 
+    displaySpaceRects(5, -1, pink, blue, cyan); 
     cyclingRects = false;
     hasResetRects = false;
     break;
   case 2:
+
+    paradiseSphere(50, pink, blue, cyan);
     cyclingRects = false;
     centerScreenFront();
-    int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
-    displayTunnelCenter(150, 3, 0,z, blue, cyan, false);
+    displayTwoWayTunnels();
+    fadeInCenter(cues[currentCue].startT, 2);
     break;
   case 3:
     paradiseSphere(50, pink, blue, cyan);
     centerScreenFront();
 
-    displayLineBounceCenter(0.01, 50, cyan, pink);
+    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
+    hasResetRects = false;
+    resetSpaceRects(false);
     break;
   case 4: 
+    cubesFront();
+    cyclingRects = true;
+    displaySpaceRects(5, 1, pink, blue, cyan);
+
+    break;
+  case 5:
     cyclingRects = true;
     resetSpaceRects(false);
-    paradiseSphere(50, pink, blue, cyan);
+    paradiseSphere(50, 0, blue, cyan);
 
 
     centerScreenFront();
 
     displayCenterSpaceRects(5, -1, blue, cyan, pink);
-
     break;
+  case 6:
+    paradiseSphere(50, pink, blue, cyan);
+    cubesFront();
+    displaySpaceRects(5, -1, pink, blue, cyan); 
+    cyclingRects = true;
+    hasResetRects = false;
+    break;
+  case 7:
+    paradiseSphere(50, pink, blue, cyan);
+    centerScreenFront();
+
+    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
+    hasResetRects = false;
+    resetSpaceRects(false);
+
+    fadeOutCenter(cues[currentCue+1].startT - .5, .5);
+    break;
+  case 8:
+
+    paradiseSphere(50, pink, blue, cyan);
+    cyclingRects = false;
+    centerScreenFront();
+    displayTwoWayTunnels();
+    fadeInCenter(cues[currentCue].startT, 2);
+    break;
+  case 9: // tee tahh
+    cubesFront();
+    cyclingRects = true;
+    displaySpaceRects(5, 1, pink, blue, cyan);
+
+    fadeOutAllScreens(cues[currentCue + 1].startT - 4, 4);
+    break;
+
   default:     
     drawSolidAll(color(0));
     break;

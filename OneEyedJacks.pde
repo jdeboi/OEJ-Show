@@ -47,7 +47,7 @@ void setup() {
   initMidi();
 
   //initTesting();
-  changeScene(2);
+  changeScene(0);
 
 
   //testControls();
