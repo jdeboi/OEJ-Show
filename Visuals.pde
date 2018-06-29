@@ -1618,6 +1618,17 @@ void initSpaceRects() {
     spaceRects [r] = new SpaceRect(new PVector(0, 0, endPSpaceRects+rectSpacing*r), new PVector(0, 0, zVel) );
   }
 }
+
+boolean hasResetRects = true;
+void resetSpaceRects(boolean zoomIn) {
+  if (!hasResetRects) {
+    hasResetRects = true;
+    for (int r = 0; r < spaceRects.length; r++) {
+      if (zoomIn) spaceRects[r].pos.set(0, 0, -endPSpaceRects+rectSpacing*r-1200); // not going to work with cycling
+      else spaceRects[r].pos.set(0, 0, endPSpaceRects+rectSpacing*r);
+    }
+  }
+}
 // only onerect at a time changing colors through gradient
 void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
   for (int i = 1; i < 3; i++) {
@@ -1648,10 +1659,12 @@ void paradiseSphere(int spacing, color c1, color c2, color c3) {
   s.noFill();
   s.strokeWeight(5);
   for (int i = s.width; i >= spacing; i -= spacing) {
-    float per = map(i, s.width, 0, 0, 1);
+    int per = int(map(i, s.width, 0, 0, 1000));
+    per += millis()/10;
+    per %= 1000;
     //if (per + sphereCycle > 1) s.stroke(paradiseStroke((per + sphereCycle)-1, c1, c2, c3));
     //else s.stroke(paradiseStroke((per + sphereCycle), c1, c2, c3));
-    s.stroke(paradiseStroke(per, c1, c2, c3));
+    s.stroke(paradiseStroke(per/1000.0, c1, c2, c3));
     s.ellipse(s.width/2, s.height/2, i, i);
   }
   //sphereCycle += 0.02;
@@ -1665,71 +1678,90 @@ color paradiseStroke(float per, color c1, color c2, color c3) {
   return lerpColor(c2, c3, per-1);
 }
 
-void displayTunnel(PGraphics s, int len, color c1, color c2) {
-  int gap = 5;
-  s.beginDraw();
-  s.background(0);
+void displayTunnel2Screens(int len, int num, int gap, int z, color c1, color c2, boolean isGradient) {
+  displayTunnel(screens[1].s, len, num, gap, z, c1, c2, isGradient);
+  displayTunnel(screens[1].s, len, num, gap, z, c1, c2, isGradient);
+}
 
-  // top
-  s.pushMatrix();
-  s.rotateX(radians(-90 + gap));
-  //s.translate(0, s.height, 0);
-  s.beginShape();
-  s.fill(c1);
-  s.vertex(-1, -1);
-  s.vertex(s.width+1, -1);
-  s.fill(c2);
-  s.vertex(s.width+1, len);
-  s.vertex(-1, len);
-  s.endShape();
-  s.popMatrix();
+void displayTunnelCenter(int len, int num, int gap, int z, color c1, color c2, boolean isGradient) {
+  displayTunnel(centerScreen.s, len, num, gap, z, c1, c2, isGradient);
+}
+void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, color c2, boolean isGradient) {
+  //s.pointLight(255, 255, 255, s.width/2 + 50* sin(millis()/1000.0),s.height/2 + 47* sin(millis()/700.0), -100);
+  s.noStroke();
 
-  // bottom
-  s.pushMatrix();
-  s.rotateX(radians(-90));
-  s.translate(0, 0, s.height);
-  s.rotateX(radians(-gap));
-  s.beginShape();
-  s.fill(c1);
-  s.vertex(-1, -1);
-  s.vertex(s.width+1, -1);
-  s.fill(c2);
-  s.vertex(s.width+1, len);
-  s.vertex(-1, len);
-  s.endShape();
-  s.popMatrix();
+  for (int i = 0; i < num; i++) {
+    // top
+    
+    s.pushMatrix();
+    s.rotateX(radians(-90 + gap));
+    s.translate(0, -z, 0);
+    float per;
+    if (num > 1) per = map(i, 0, num -1, 0, 1);
+    else per = 1;
+    s.fill(lerpColor(c1, c2, per));
+    s.beginShape();
+    if (isGradient) s.fill(c1);
+    s.vertex(-1, -1);
+    s.vertex(s.width+1, -1);
+    if (isGradient) s.fill(c2);
+    s.vertex(s.width+1, len);
+    s.vertex(-1, len);
+    s.endShape();
+    s.popMatrix();
 
-  // left
-  s.pushMatrix();
-  s.rotateY(radians(90 - gap));
-  //s.translate (0,0, s.height);
-  s.beginShape(QUADS);
-  s.fill(c1);
-  s.vertex(-1, -1);
-  s.fill(c2);
-  s.vertex(len, -1);
-  s.vertex(len, s.height+1);
-  s.fill(c1); 
-  s.vertex(-1, s.height+1);
-  s.endShape();
-  s.popMatrix();
+    // bottom
+    s.pushMatrix();
+    s.rotateX(radians(-90));
+    s.translate(0, 0, s.height);
+    s.rotateX(radians(-gap));
+    s.translate(0, -z, 0);
 
-  // right
-  s.pushMatrix();
-  s.rotateY(radians(90));
-  s.translate (0, 0, s.width);
-  s.rotateY(radians(gap));
-  s.beginShape(QUADS);
-  s.fill(c1);
-  s.vertex(-1, -1);
-  s.fill(c2);
-  s.vertex(len, -1);
-  s.vertex(len, s.height+1);
-  s.fill(c1); 
-  s.vertex(-1, s.height+1);
-  s.endShape();
-  s.popMatrix();
-  s.endDraw();
+    s.beginShape();
+    if (isGradient) s.fill(c1);
+    s.vertex(-1, -1);
+    s.vertex(s.width+1, -1);
+    if (isGradient) s.fill(c2);
+    s.vertex(s.width+1, len);
+    s.vertex(-1, len);
+    s.endShape();
+    s.popMatrix();
+
+    // left
+    s.pushMatrix();
+    s.rotateY(radians(90 - gap));
+    s.translate(-z, 0, 0);
+
+    s.beginShape(QUADS);
+    if (isGradient) s.fill(c1);
+    s.vertex(-1, -1);
+    if (isGradient) s.fill(c2);
+    s.vertex(len, -1);
+    s.vertex(len, s.height+1);
+    if (isGradient) s.fill(c1); 
+    s.vertex(-1, s.height+1);
+    s.endShape();
+    s.popMatrix();
+
+    // right
+    s.pushMatrix();
+    s.rotateY(radians(90));
+    s.translate (0, 0, s.width);
+    s.rotateY(radians(gap));
+    s.translate(-z, 0, 0);
+    
+    s.beginShape(QUADS);
+    if (isGradient) s.fill(c1);
+    s.vertex(-1, -1);
+    if (isGradient) s.fill(c2);
+    s.vertex(len, -1);
+    s.vertex(len, s.height+1);
+    if (isGradient) s.fill(c1); 
+    s.vertex(-1, s.height+1);
+    s.endShape();
+    s.popMatrix();
+    z -= len;
+  }
 }
 
 void displayCenterSpaceRects(int sw, int mode, color c1, color c2, color c3) {
@@ -1769,7 +1801,6 @@ class SpaceRect {
   }
 
   void update(int mode) {
-
     pos.add(vel);
     if (cyclingRects) {
       if (pos.z > frontPSpaceRects) pos.z = endPSpaceRects;
@@ -1789,7 +1820,6 @@ class SpaceRect {
   }
 
 
-
   void display(PGraphics s) {
     s.pushMatrix();
     s.rotateX(rot.x);
@@ -1797,7 +1827,7 @@ class SpaceRect {
     s.rotateZ(rot.z);
     s.translate(pos.x, pos.y, pos.z);
     float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
-    s.rect(0, 0, s.width-dw, s.height-dw);
+    if (pos.z > endPSpaceRects) s.rect(0, 0, s.width-dw, s.height-dw);
     s.popMatrix();
   }
 
@@ -1822,13 +1852,13 @@ class SpaceRect {
   }
 
 
-  void displayCenter(PGraphics s, int side) {
-    //float sz = map(-pos.z*pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0); // spazz
-    //float sz = map(pos.z*2, frontPSpaceRects, endPSpaceRects, s.width*4, 0);   // cool
-    float sz = map(pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0);
-    if (side == 1) s.rect(s.width, s.height/2, sz, sz);
-    else s.rect(0, s.height/2, sz, sz);
-  }
+  //void displayCenter(PGraphics s, int side) {
+  //  //float sz = map(-pos.z*pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0); // spazz
+  //  //float sz = map(pos.z*2, frontPSpaceRects, endPSpaceRects, s.width*4, 0);   // cool
+  //  float sz = map(pos.z, frontPSpaceRects, endPSpaceRects, s.width*4, 0);
+  //  if (side == 1) s.rect(s.width, s.height/2, sz, sz);
+  //  else s.rect(0, s.height/2, sz, sz);
+  //}
 }
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -431,16 +431,19 @@ void displayDirty() {
 }
 
 void initFifty() {
-  cues = new Cue[8];
+  cues = new Cue[11];
   cues[0] = new Cue(0, 'v', 0, 0); 
   cues[1] = new Cue(6.5, 'v', 0.0, 0); // stop cycling rects
   cues[2] = new Cue(19.5, 'v', 0.0, 0); // vocals come in; maybe single central slow rects w/ solid rects on top
 
-  cues[3] = new Cue(52, 'v', 0.0, 0); // vocals come in
+  cues[3] = new Cue(52, 'v', 0.0, 0); // "we're all coins"
   cues[4] = new Cue(85, 'v', 0.0, 0); // teee tahhh tee tahh
-  cues[5] = new Cue(104, 'v', 0.0, 0); // maybe this could be just a few solid shapes flying in
-  cues[6] =  new Cue(136, 'v', 0.0, 0); // in the ennndd ...
-  cues[7] = new Cue(190, 'v', 0.0, 0);
+  cues[5] = new Cue(104, 'v', 0.0, 0); // same as 2; maybe this could be just a few solid shapes flying in
+  cues[6] = new Cue(120, 'v', 0.0, 0); 
+  cues[7] =  new Cue(136, 'v', 0.0, 0); // "we're all coins"
+  cues[8] =  new Cue(151, 'v', 0.0, 0);
+  cues[9] =  new Cue(151, 'v', 0.0, 0);  // teee tahhh tee tahh
+  cues[10] = new Cue(190, 'v', 0.0, 0);
 
   drawSolidAll(color(0));
   loadKeystone(1);
@@ -459,32 +462,41 @@ void displayFifty() {
   case 0:
     paradiseSphere(50, pink, blue, cyan);
     cubesFront();
-    //displayTunnel(screens[1].s, 1300, pink, cyan);
+    
     displaySpaceRects(5, -1, blue, cyan, pink); 
     fadeInAllScreens(cues[0].startT, 3);
     break;  
   case 1:
+    paradiseSphere(50, pink, blue, cyan);
     cubesFront();
-    cyclingRects = false;
+
 
     displaySpaceRects(5, -1, blue, cyan, pink); 
-
+    cyclingRects = false;
+    hasResetRects = false;
     break;
   case 2:
-    cyclingRects = true;
+    cyclingRects = false;
     centerScreenFront();
-
-    displayCenterSpaceRects(5, -1, blue, cyan, pink);
-
+    int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
+    displayTunnelCenter(150, 3, 0,z, blue, cyan, false);
     break;
   case 3:
+    paradiseSphere(50, pink, blue, cyan);
     centerScreenFront();
 
     displayLineBounceCenter(0.01, 50, cyan, pink);
     break;
   case 4: 
-    cubesFront();
-    displaySpaceRects(5, 1, blue, cyan, pink); 
+    cyclingRects = true;
+    resetSpaceRects(false);
+    paradiseSphere(50, pink, blue, cyan);
+
+
+    centerScreenFront();
+
+    displayCenterSpaceRects(5, -1, blue, cyan, pink);
+
     break;
   default:     
     drawSolidAll(color(0));
