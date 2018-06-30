@@ -425,30 +425,29 @@ void drawFFT() {
   //if ( beat.isHat() ) hatSize = 32;
 }
 
-float percentToNextMeasure(float startT, int timeSig) {
+float percentToNumBeats(int numBeats) {
+  return percentToNumBeats(0, numBeats);
+}
+float percentToNumBeats(float startT, int numBeats) {
   float timePassed = songFile.position()/1000.0 - startT;
   float bps = tempo / 60.0;
 
   float spb = 1.0 / bps;
   
-  int currentMeasure = (currentCycle-1) / timeSig;
-  if (currentCycle == 0) currentMeasure = 0;
-  float timePerMeasure = timeSig * spb;
-  float timeFromLastMeasure = timePassed - (currentMeasure * timePerMeasure);
-  float perMeasure = map(timeFromLastMeasure, 0, timePerMeasure, 0, 1);
-  return perMeasure; 
+  int currentGroup = (currentCycle-1) / numBeats;
+  if (currentCycle == 0) currentGroup = 0;
+  float timePerGroup = numBeats * spb;
+  float timeFromLastGroup = timePassed - (currentGroup * timePerGroup);
+  float perGroup = map(timeFromLastGroup, 0, timePerGroup, 0, 1);
+  return perGroup; 
+}
+
+float percentToNextMeasure(float startT, int timeSig) {
+  return percentToNumBeats(startT, timeSig);
 }
 
 float percentToNextBeat(float startT) {
-  float timePassed = songFile.position()/1000.0 - startT;
-  float bps = tempo / 60.0;
-  float spb = 1.0 / bps;
-  
-  int currentBeat = (currentCycle-1);
-  if (currentCycle == 0) currentBeat = 0;
-  float timeFromLastBeat = timePassed - currentBeat * spb;
-  float per = map(timeFromLastBeat, 0, spb, 0, 1);
-  return per; 
+  return percentToNumBeats(startT, 1); 
 }
 
 

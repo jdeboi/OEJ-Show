@@ -143,8 +143,8 @@ void initDelta() {
 
 void displayDelta() {
   stroke(255, 0, 255);
-  
-  
+
+
   switch(currentCue) {
   case 0:
     displayFlowyWavesAll();
@@ -597,42 +597,45 @@ void initWiz() {
   cues[5] = new Cue(78, 'v', 0.0, 0);
   cues[6] = new Cue(90.8, 'v', 0.0, 0);
   cues[7] = new Cue(104, 'v', 0.0, 0);
-  cues[8] = new Cue(songFile.length()/1000.0, 'v', 0.0, 0);
+  cues[8] = new Cue(110, 'v', 0.0, 0);
+  
+  tempo = 148;
 }
 
 void displayWiz() {
-  //transit(0);
-  //displayCubeLines(color(0, 255, 255), color(255, 0, 255));
-  //displayCubesAlternateColorCycle(cyan, pink);
   
-  //displayCycle4FaceLines(color(0, 255, 255), 2); 
-  //displayCycleSingleFaceLines(color(0, 255, 255), -1); 
-  //linesGradientFaceCycle(color(0, 255, 255), color(0, 50, 255)); 
-  //sineGradientFaceCycle(color(255), color(0), percentToNextMeasure(0, 4)*2, 0.8);
-
-  //pulseLinesCenterBeat(0);
-  //pulseVertLinesCenterBeat(0);
-  //pulseHorizLinesCenterBeat(0);
-  //pulseVertHorizCenterBeatCycle(0);
-  //pulseVertLongCenterBeat(percentToNextMeasure(0, 4)*2);
-  //pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
-  //pulsingGrad(pink, cyan, percentToNextMeasure(0, 4));
-
-  //sineWaveVert(0, percentToNextMeasure(0, 4)*2, 0.8);
-
-  //snakeFaceAll(percentToNextMeasure(0, 4), 2);
-  //growBlockEntire(percentToNextMeasure(0, 4));
-  //displayYPoints(percentToNextMeasure(0, 4));
-  
-  //showOne(percentToNextMeasure(0, 4));
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
+    //drawSolidAll(color(0));
+    //drawFFTBarsCubes();
+    stroke(255);
+    fill(255);
+    pulseHorizLinesCenterBeat(percentToNumBeats(16));
+    //snakeFaceAll(percentToNextMeasure(0, 4), 2);
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    transit(0);
+    break;
+  case 2:
+    sineWaveVert(percentToNextMeasure(0, 4)*2, 0.8);
+    break;
+  case 3:
+    
+    break;
+  case 4:
+    pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
+    break;
+  case 5:
+    growBlockEntire(percentToNextMeasure(0, 4));
+    break;
+  case 6: 
+    displayCycleSingleFaceLines(color(0, 255, 255), -1); 
+    break;
+  case 7:
+    pulseVertLongCenterBeat(percentToNextMeasure(0, 4)*2);
+    break;
+  case 8:
+    displayCubesAlternateColorCycle(cyan, pink);
     break;
   default:
     drawSolidAll(color(0));

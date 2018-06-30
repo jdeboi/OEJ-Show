@@ -187,8 +187,8 @@ void pulseVertLinesCenterBeat(float startT) {
     lines.get(i).displayCenterPulse(per);
   }
 }
-void pulseHorizLinesCenterBeat(float startT) {
-  float per = percentToNextMeasure(startT, 4)*2;
+void pulseHorizLinesCenterBeat(float per) {
+  per *= 2;
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i+=2) {
     lines.get(i).displayCenterPulse(per);
