@@ -1,5 +1,4 @@
 boolean showTime = false;
-boolean isTesting = false;
 boolean mappingON = false;
 boolean useMusic = true;
 //////////
@@ -46,16 +45,17 @@ void setup() {
   initFFT();
   initMidi();
 
-  //initTesting();
-  changeScene(0);
+  changeScene(5);
 
-
-  //testControls();
   if (!showTime) initControls();
 
   initMask();
   centerScreen.drawSolid(color(0));
   initLines();
+  
+  blue = color(0, 100, 255);
+  cyan = color(0, 255, 255);
+  pink = color(#FF05C5);
   
 }
 
@@ -69,13 +69,14 @@ void draw() {
     checkEditing();
     if (showMask) maskScreens(color(50));
   } else {
-    if (isTesting) testShow();
-    else playShow();
+    playShow();
     renderScreens();
     if (showMask) maskScreens(0);
   }
 
   drawControls();
+  
+  
 }
 
 void playShow() {

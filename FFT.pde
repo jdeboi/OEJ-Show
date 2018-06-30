@@ -5,6 +5,8 @@ Minim minim;
 AudioPlayer songFile;
 BeatDetect beat;
 BeatListener bl;
+int currentCycle = 0;
+int lastCheckedShape = 0;
 int previousCycle = 0;
 
 FFT         myAudioFFT;
@@ -74,7 +76,7 @@ void drawFFTBarsTop() {
 }
 
 void drawSpectrumCubes() {
-  updateSpectrum();
+  //updateSpectrum();
   for (Screen s : screens) {
     drawSpectrum(s, screenW);
   }
@@ -92,8 +94,7 @@ void drawSpectrum(Screen s, int w) {
   s.s.endDraw();
 }
 
-int currentCycle = 0;
-int lastCheckedShape = 0;
+
 void beatCycle(int delayT) {
   if (bands[3] > 225 && millis() - lastCheckedShape > delayT) {
     lastCheckedShape = millis();
@@ -101,16 +102,14 @@ void beatCycle(int delayT) {
   }
 }
 void cycleShapeFFTTop() {
-  updateSpectrum();
-  beatCycle(300);
   for (Screen sc : topScreens) {
     cycleShapeFFT(sc.s);
   }
 }
 
 void cycleShapeFFTCubes() {
-  updateSpectrum();
-  beatCycle(300);
+  //updateSpectrum();
+  //beatCycle(300);
   for (Screen sc : screens) {
     cycleShapeFFT(sc.s);
   }
@@ -147,8 +146,8 @@ void initConst() {
   constellations[4] = loadImage("images/constellations/4.png");
 }
 void cycleConstFFT() {
-  updateSpectrum();
-  beatCycle(300);
+  //updateSpectrum();
+  //beatCycle(300);
   for (Screen sc : screens) {
     sc.s.beginDraw();
     sc.s.stroke(255);
@@ -170,8 +169,8 @@ void initHands() {
   hands[4] = loadImage("images/hand/hand4.jpg");
 }
 void cycleHandsFFT() {
-  updateSpectrum();
-  beatCycle(300);
+  //updateSpectrum();
+  //beatCycle(300);
   int j = 0;
   for (Screen sc : screens) {
     sc.s.beginDraw();
@@ -193,8 +192,8 @@ void cycleHandsFFT() {
 
 
 void beatTile() {
-  updateSpectrum();
-  beatCycle(300);
+  //updateSpectrum();
+  //beatCycle(300);
   int k = 0;
   for (Screen sc : screens) {
     sc.s.beginDraw();
@@ -424,4 +423,45 @@ void drawFFT() {
   //if ( beat.isKick() ) kickSize = 32;
   //if ( beat.isSnare() ) snareSize = 32;
   //if ( beat.isHat() ) hatSize = 32;
+}
+
+float percentToNextMeasure(float startT, int timeSig) {
+  float timePassed = songFile.position()/1000.0 - startT;
+  float bps = tempo / 60.0;
+
+  float spb = 1.0 / bps;
+  
+  int currentMeasure = (currentCycle-1) / timeSig;
+  if (currentCycle == 0) currentMeasure = 0;
+  float timePerMeasure = timeSig * spb;
+  float timeFromLastMeasure = timePassed - (currentMeasure * timePerMeasure);
+  float perMeasure = map(timeFromLastMeasure, 0, timePerMeasure, 0, 1);
+  return perMeasure; 
+}
+
+float percentToNextBeat(float startT) {
+  float timePassed = songFile.position()/1000.0 - startT;
+  float bps = tempo / 60.0;
+  float spb = 1.0 / bps;
+  
+  int currentBeat = (currentCycle-1);
+  if (currentCycle == 0) currentBeat = 0;
+  float timeFromLastBeat = timePassed - currentBeat * spb;
+  float per = map(timeFromLastBeat, 0, spb, 0, 1);
+  return per; 
+}
+
+
+void checkBeatReady(float startT) {
+  float timePassed = songFile.position()/1000.0 - startT;
+  float bps = tempo / 60.0;
+  float spb = 1.0 / bps;
+
+  if (currentCycle == 0) {
+    if (timePassed > spb)
+      currentCycle++;
+  }
+  else if (timePassed > currentCycle * spb) {
+    currentCycle++;
+  }
 }

@@ -1,23 +1,5 @@
 
 
-void testLineMode() {
-  stroke(255);
-  pulseLineRight(90, 80);
-}
-//if (visualMode == V_ROTATE_ANGLE_COUNT) rotateAngleCounter(100, 20);
-//  else if (visualMode == V_PULSE_LINE_BACK) pulseLineBack(500);
-//  else if (visualMode == V_PULSE_LINE_RIGHT) pulseLineRight(90, 80);
-//  else if (visualMode == V_PULSE_LINE_LEFT)  pulseLineLeft(90, 80);
-//  else if (visualMode == V_PULSE_LINE_UP) pulseLineUp(90, 80);
-//  else if (visualMode == V_PULSE_LINE_DOWN) pulseLineDown(90, 80);
-//  else if (visualMode == V_CYCLE_CONST) cycleConstellation(150);
-//  else if (visualMode == V_PULSING) pulsing(90);
-//  else if (visualMode == V_SHOW_ONE) showOne(100);
-//  else if (visualMode == V_PULSING_ON_LINE) pulseLinesCenter(1);
-//  else if (visualMode == V_SEGMENT_SHIFT) segmentShift(10);
-//  else if (visualMode == V_TRANSIT) transit(30);
-//  else if (visualMode == V_DISPLAY) displayLines(255);
-
 
 void testShow() {
 
@@ -115,8 +97,4 @@ void testShow() {
   //}
   //snakeOutlineAll(color(0, 255, 255), 30, 150, 5);
 
-  ///////////////////////////
-  // lines
-  strokeWeight(10);
-  if (!editingLines) testLineMode(); //displayLineMode();
 }

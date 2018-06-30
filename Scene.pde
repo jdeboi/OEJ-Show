@@ -2,6 +2,7 @@ Scene[] scenes = new Scene[14];
 Scene currentScene;
 int currentSceneIndex = 0;
 boolean isPlaying = false;
+float tempo;
 
 void initScenes() {
   scenes[0] = new Scene("When the Moon Comes", "moon", 1);
@@ -85,7 +86,8 @@ class Scene {
     initBeat();
 
     startFade = false;
-    
+    currentCycle = 0;
+
     if (song.equals("Delta Waves")) initDelta();
     else if (song.equals("Rite of Spring")) initRite();
     else if (song.equals("When the Moon Comes")) initMoon();
@@ -105,6 +107,10 @@ class Scene {
 
   void display() {
     if (isPlaying) {
+      
+      updateSpectrum();
+      checkBeatReady(0);
+      
       setCurrentCue();
       if (song.equals("Delta Waves")) displayDelta();
       else if (song.equals("Rite of Spring")) displayRite();
@@ -121,10 +127,15 @@ class Scene {
       else if (song.equals("Ellon")) displayEllon();
       else if (song.equals("Egrets")) displayEgrets();
 
+      previousCycle = currentCycle;
+  
       if (currentCue == cues.length-1) {
         println("next");
         nextSong();
       }
+      
+      
+      
     }
   }
 

@@ -9,12 +9,7 @@ boolean betweenSongs = true;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-void initDelta() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(135, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 void initRite() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -39,12 +34,7 @@ void initCycles() {
 
 
 
-void initWiz() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 void initViolate() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -134,15 +124,62 @@ void displayCrush() {
   }
 }
 
+void initDelta() {
+  tempo = 133;
+  cues = new Cue[10];
+  cues[0] = new Cue(0, 'm', 0, 0);
+  cues[1] = new Cue(36, 'g', 0.0, 0); // derrr neener derrr
+  cues[2] = new Cue(50.6, 'v', 0.0, 0); // "help meee coffee"
+  cues[3] = new Cue(72.2, 'v', 0.0, 0);  // wooo
+  cues[4] = new Cue(101, 'v', 0.0, 0);  // "delta waves"
+  cues[5] = new Cue(115, 'v', 0.0, 0);
+  cues[6] = new Cue(137, 'v', 0.0, 0);// woo
+  cues[7] = new Cue(166, 'v', 0.0, 0);
+  cues[8] = new Cue(199, 'v', 0.0, 0);
+  cues[9] = new Cue(203, 'v', 0.0, 0);
+  initAllFlowyWaves();
+  cubesFront();
+}
+
 void displayDelta() {
+  stroke(255, 0, 255);
+  
+  
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    haromCenter(color(255), 3, 180);
+    displayFlowyWavesAll();
+    //displayCycleFaceLines(0, color(255, 0, 255));
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+
+    break;
+  case 2:
+    displayFlowyWavesAll();
+    break;
+  case 3:
+    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    break;
+  case 4:
+    displayFlowyWavesAll();
+    break;
+  case 5:
+    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    break;
+  case 6:
+    displayFlowyWavesAll();
+    break;
+  case 7:
+    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    break;
+  case 8:
+    displayFlowyWavesAll();
+    break;
+  case 9:
+    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    break;
+  case 10:
+    displayFlowyWavesAll();
     break;
   default:
     drawSolidAll(color(0));
@@ -549,7 +586,45 @@ void displayFifty() {
   //drawNeonRect(screens[1].s, 0, 0, 50, 50, 5, color(255));
   //displayLines(color(255, 0, 255));
 }
+
+void initWiz() {
+  cues = new Cue[9];
+  cues[0] = new Cue(0, 'm', 0, 0);
+  cues[1] = new Cue(13, 'v', 0.0, 0);
+  cues[2] = new Cue(25.5, 'v', 0.0, 0);
+  cues[3] = new Cue(39, 'v', 0.0, 0);
+  cues[4] = new Cue(52, 'v', 0.0, 0);
+  cues[5] = new Cue(78, 'v', 0.0, 0);
+  cues[6] = new Cue(90.8, 'v', 0.0, 0);
+  cues[7] = new Cue(104, 'v', 0.0, 0);
+  cues[8] = new Cue(songFile.length()/1000.0, 'v', 0.0, 0);
+}
+
 void displayWiz() {
+  //transit(0);
+  //displayCubeLines(color(0, 255, 255), color(255, 0, 255));
+  //displayCubesAlternateColorCycle(cyan, pink);
+  
+  //displayCycle4FaceLines(color(0, 255, 255), 2); 
+  //displayCycleSingleFaceLines(color(0, 255, 255), -1); 
+  //linesGradientFaceCycle(color(0, 255, 255), color(0, 50, 255)); 
+  //sineGradientFaceCycle(color(255), color(0), percentToNextMeasure(0, 4)*2, 0.8);
+
+  //pulseLinesCenterBeat(0);
+  //pulseVertLinesCenterBeat(0);
+  //pulseHorizLinesCenterBeat(0);
+  //pulseVertHorizCenterBeatCycle(0);
+  //pulseVertLongCenterBeat(percentToNextMeasure(0, 4)*2);
+  //pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
+  //pulsingGrad(pink, cyan, percentToNextMeasure(0, 4));
+
+  //sineWaveVert(0, percentToNextMeasure(0, 4)*2, 0.8);
+
+  //snakeFaceAll(percentToNextMeasure(0, 4), 2);
+  //growBlockEntire(percentToNextMeasure(0, 4));
+  //displayYPoints(percentToNextMeasure(0, 4));
+  
+  //showOne(percentToNextMeasure(0, 4));
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));

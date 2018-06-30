@@ -1,297 +1,20 @@
 ArrayList<Line> lines;
-int visualMode = -1;
 boolean editingLines = false;
 PVector selectedLineP = null;
 int origLineW = 10;
 int lineW = origLineW;
-
-///////////////////////
-// OTHER VARIABLES
-int pulseIndex = 0;
-int lastCheckedPulse = 0;
-int pointDirection = 4;
-int seesawVals[] = {0, 0};
-
-
-/////////////////////
-// VISUAL MODES
-int V_NONE, 
-  V_PULSING, 
-  V_ROTATE_ANGLE_COUNT, 
-  V_ROTATE_ANGLE, 
-  V_PULSE_LINE_BACK, 
-  V_PULSE_LINE_RIGHT, 
-  V_PULSE_LINE_LEFT, 
-  V_PULSE_LINE_UP, 
-  V_PULSE_LINE_DOWN, 
-  V_CYCLE_CONST, 
-  V_SHOW_ONE, 
-  V_ROTATE_ANGLE_BEATS, 
-  V_PULSING_ON_LINE, 
-  V_SEGMENT_SHIFT, 
-  V_FADE, 
-  V_DISPLAY, 
-  V_TRANSIT;
-
-
-void snapOutlinesToMask() {
-  lines = new ArrayList<Line>();
-  int[][] pts = {  
-    { 0, 1, 8, 9 }, 
-    { 1, 2, 7, 8 }, 
-    { 2, 3, 6, 7 }, 
-    { 3, 4, 5, 6}
-  };
-  for (int i = 0; i < 4; i++) {
-    int g = 3;
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][0]].x+g, maskPoints[keystoneNum][pts[i][0]].y + g, maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g, maskPoints[keystoneNum][pts[i][2]].x - g, maskPoints[keystoneNum][pts[i][2]].y - g));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][2]].x -g, maskPoints[keystoneNum][pts[i][2]].y - g, maskPoints[keystoneNum][pts[i][3]].x + g, maskPoints[keystoneNum][pts[i][3]].y - g));
-    lines.add(new Line(maskPoints[keystoneNum][pts[i][3]].x +g, maskPoints[keystoneNum][pts[i][3]].y - g, maskPoints[keystoneNum][pts[i][0]].x + g, maskPoints[keystoneNum][pts[i][0]].y + g));
-  }
-}
+boolean startFadeLine = false;
 
 void initLines() {
+  strokeCap(ROUND);
   snapOutlinesToMask();
   //loadLines();
-  initLineModes();
 }
 
-void moveSelectedLine() {
-  if (selectedP != null) {
-    selectedP.move();
-  }
-}
-
-
-void initLineModes() {
-  int temp = -1;
-  V_NONE = temp++; 
-  V_PULSING = temp++; 
-  //V_ROTATE_ANGLE_COUNT = temp++;
-  //V_ROTATE_ANGLE = temp++; 
-  //V_PULSE_LINE_BACK = temp++;
-  V_PULSE_LINE_RIGHT = temp++;
-  V_PULSE_LINE_LEFT = temp++;
-  V_PULSE_LINE_UP = temp++;
-  V_PULSE_LINE_DOWN = temp++;
-  //V_CYCLE_CONST = temp++; 
-  V_SHOW_ONE = temp++; 
-  V_ROTATE_ANGLE_BEATS = temp++; 
-  V_PULSING_ON_LINE = temp++; 
-  V_SEGMENT_SHIFT = temp++; 
-  V_FADE = temp++;
-  V_TRANSIT = temp++;
-  V_DISPLAY = temp++;
-}
-
-void displayRandomLines(color c) {
-  if ((millis()/100)%2 == 0) {
-    for (Line l : lines) {
-      if (int(random(2)) == 0)  l.lineC = c;
-      else l.lineC = color(0, 0);
-    }
-  }
-  for (Line l : lines) {
-    l.display(l.lineC);
-  }
-}
-
-void displayEditingLines() {
-  displayLines(color(255));
-  if (editingLines) {
-    for (Line l : lines) {
-      l.highlightOver();
-    }
-    if (isDragging) {
-      println(mouseX, mouseY);
-      selectedLineP.set(mouseX, mouseY);
-    }
-  }
-}
-
-void displayLineMode() {
-  changeMode();
-  playMode();
-}
-
-void playMode() {
-  if (visualMode == V_ROTATE_ANGLE_COUNT) rotateAngleCounter(100, 20);
-  else if (visualMode == V_PULSE_LINE_BACK) pulseLineBack(500);
-  else if (visualMode == V_PULSE_LINE_RIGHT) pulseLineRight(90, 80);
-  else if (visualMode == V_PULSE_LINE_LEFT)  pulseLineLeft(90, 80);
-  else if (visualMode == V_PULSE_LINE_UP) pulseLineUp(90, 80);
-  else if (visualMode == V_PULSE_LINE_DOWN) pulseLineDown(90, 80);
-  else if (visualMode == V_CYCLE_CONST) cycleConstellation(150);
-  else if (visualMode == V_PULSING) pulsing(0, 90);
-  else if (visualMode == V_SHOW_ONE) showOne(100);
-  else if (visualMode == V_PULSING_ON_LINE) pulseLinesCenter(1);
-  else if (visualMode == V_SEGMENT_SHIFT) segmentShift(10);
-  else if (visualMode == V_TRANSIT) transit(30);
-  else if (visualMode == V_DISPLAY) displayLines(255);
-}
-
-void changeMode() {
-  if ((millis()/1000)%7 == 0) {
-    //if (int(random(2)) == 0) visualMode = V_DISPLAY;
-    //else visualMode = int(random(15));
-    visualMode++;
-    visualMode%=10;
-  }
-}
-
-void checkLineClick() {
-  for (Line l : lines) {
-    int ptOver = l.mouseOver();
-    if (ptOver > -1) {
-      if (ptOver == 0) selectedLineP = l.p1;
-      else selectedLineP = l.p2;
-      isDragging = true;
-      return;
-    }
-  }
-}
-
-void linesReleaseMouse() {
-  isDragging = false;
-  selectedLineP = null;
-}
-
-//////////////////////////////////////////////////////////////////
-void fftLines() {
-  updateSpectrum();
-  for (Line l : lines) {
-    l.fftLine();
-  }
-}
-void displayLinesCube(int index, color c) {
-  for (int i = index * 4; i < (index+1)*4; index++) {
-    stroke(c);
-    lines.get(i).display();
-  }
-}
-void handLight(float x, float y, int rad, color c) {
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).handLight(x, y, rad, c);
-  }
-}
-void transit(int rate) {
-
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex++;
-    if (pulseIndex > 100) pulseIndex = 0;
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displaySegment(pulseIndex / 100.0, .2);
-  }
-}
-
-void transitHand(float per, color c) {
-  stroke(c);
-  per = constrain(per, 0, 1.0);
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displaySegment(per, .2);
-  }
-}
-
-void loadLines() {
-  lines = new ArrayList<Line>();
-  processing.data.JSONObject linesJson;
-  linesJson = loadJSONObject("data/lines/lines.json");
-
-  processing.data.JSONArray linesArray = linesJson.getJSONArray("lineList");
-  for (int i = 0; i < 16; i++) {
-    processing.data.JSONObject l = linesArray.getJSONObject(i);
-    float x0 = l.getFloat("x0");
-    float y0 = l.getFloat("y0");
-    float x1 = l.getFloat("x1");
-    float y1 = l.getFloat("y1");
-    lines.add(new Line(x0, y0, x1, y1));
-  }
-}
-
-void saveMappedLines() {
-  processing.data.JSONObject json;
-  json = new processing.data.JSONObject();
-  //saveJSONObject(json, "data/lines/lines.json");
-
-  processing.data.JSONArray linesList = new processing.data.JSONArray();    
-
-  for (int i = 0; i < lines.size(); i++) {
-    processing.data.JSONObject lineJSON = new processing.data.JSONObject();
-    Line l = lines.get(i);
-    lineJSON.setFloat("x0", l.p1.x);
-    lineJSON.setFloat("y0", l.p1.y);
-    lineJSON.setFloat("x1", l.p2.x);
-    lineJSON.setFloat("y1", l.p2.y);
-
-    linesList.setJSONObject(i, lineJSON);
-  }
-  json.setJSONArray("lineList", linesList);
-  saveJSONObject(json, "data/lines/lines.json");
-}
-
-void rainbowRandom() {
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayRainbowRandom();
-  }
-}
-
-void rainbowCycle(int amt) {
-  colorMode(HSB, 255);
-  pulseIndex+= amt;
-  if (pulseIndex > 255) pulseIndex = 0;
-  for (int i=0; i< lines.size(); i++) {
-    //color c =  color(((i * 256 / lines.size()) + pulseIndex) % 255, 255, 255);
-    lines.get(i).displayRainbowCycle(pulseIndex);
-  }
-  colorMode(RGB, 255);
-}
-
-void rainbow() {
-  pulseIndex++;
-  if (pulseIndex > 255) pulseIndex = 0;
-  colorMode(HSB, 255);
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).display(color(pulseIndex, 255, 255));
-  }
-  colorMode(RGB, 255);
-}
-
-void segmentShift(int jump) {
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displaySegment(pulseIndex / 100.0, .5);
-  }
-}
-
-void rotateAngle(int rate, int angleGap) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex+= angleGap;
-    if (pulseIndex > -70 ) {
-      pulseIndex = -280;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayAngle(pulseIndex, pulseIndex+angleGap, color(255));
-  }
-}
-
-boolean startFadeLine = false;
-void fadeOutAllLines(int seconds, color c) {
-  if (!startFadeLine) {
-    startFadeTime = millis();
-    startFadeLine = true;
-  } 
-  float timePassed = (millis() - startFadeTime)/1000.0;
-  int brig = constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
-  float h = hue(c);
-  colorMode(HSB, 255);
-  color cr = color(h, 255, brig);
-  colorMode(RGB, 255);
-  displayLines(cr);
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// MODES
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 void displayLines(color c) {
   for (int i = 0; i < lines.size(); i++) {
@@ -310,35 +33,98 @@ void displayLines() {
   popMatrix();
 }
 
-void wipeRight(int amt, int w) {
-  stroke(255);
-  displayLines();
-  fill(0);
-  noStroke();
-  pulseIndex += amt;
-  if (pulseIndex > width) pulseIndex = 0;
-  rect(pulseIndex, 0, w, height);
-}
-
-void rotateAngleCounter(int rate, int angleGap) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex-= angleGap;
-    if (pulseIndex < -280 ) {
-      pulseIndex = -70;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayAngle(pulseIndex, pulseIndex+angleGap, color(255));
+void displayLinesCube(int index, color c) {
+  for (int i = index * 4; i < (index+1)*4; index++) {
+    stroke(c);
+    lines.get(i).display();
   }
 }
 
-void displayYPoints(int y, color c) {
+void displayCubeLines(color c1, color c2) {
+  stroke(c1);
+  for (int i =  0; i < 8; i++) {
+    lines.get(i).display();
+  }
+  stroke(c2);
+  for (int i =  8; i < 16; i++) {
+    lines.get(i).display();
+  }
+}
+
+void displayCubesAlternateColorCycle(color c1, color c2) {
+  if ((currentCycle)%2 == 0) displayCubeLines(c1, c2);
+  else displayCubeLines(c2, c1);
+}
+
+void displayCycle4FaceLines(color c) {
   fill(c);
   stroke(c);
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayPointY(y);
+  display4FaceLines((currentCycle) %4);
+}
+
+void displayCycleSingleFaceLines(color c, int direction) {
+
+  //for (int i = 0; i < 4; i++) {
+  //  displayCycleSingleFace(i, c, direction);
+  //}
+   displayCycleSingleFace(0, c,direction);
+    displayCycleSingleFace(3, c, direction);
+}
+
+void displayCycleSingleFace(int face, color c, int direction) {
+  fill(c);
+  stroke(c);
+  int currentL = (currentCycle) %4;
+  if (direction < 0) currentL = 3 - currentL;
+  lines.get(face*4+currentL).display();
+}
+
+void display4FaceLines(int face) {
+  for (int i =  face * 4; i < face * 4 + 4; i++) {
+    lines.get(i).display();
   }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void fadeOutAllLines(int seconds, color c) {
+  if (!startFadeLine) {
+    startFadeTime = millis();
+    startFadeLine = true;
+  } 
+  float timePassed = (millis() - startFadeTime)/1000.0;
+  int brig = constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
+  float h = hue(c);
+  colorMode(HSB, 255);
+  color cr = color(h, 255, brig);
+  colorMode(RGB, 255);
+  displayLines(cr);
+}
+
+void fftLines() {
+  for (Line l : lines) {
+    l.fftLine();
+  }
+}
+void displayRandomLines(color c) {
+  if ((millis()/100)%2 == 0) {
+    for (Line l : lines) {
+      if (int(random(2)) == 0)  l.lineC = c;
+      else l.lineC = color(0, 0);
+    }
+  }
+  for (Line l : lines) {
+    l.display(l.lineC);
+  }
+}
+
+
+void transit(int startT) {
+  for (int i = 0; i < lines.size(); i++) {
+    lines.get(i).displaySegment(percentToNextMeasure(startT, 4), 0.2);
+  }
+}
+
+void wipeRight(float per) {
 }
 
 void displayXPoints(int x, color c) {
@@ -349,163 +135,31 @@ void displayXPoints(int x, color c) {
   }
 }
 
-void displayYPoints(int rate, int bottom, int top) {
-  pulseIndex += pointDirection * rate;
-  if (pulseIndex > top) {
-    pulseIndex = top;
-    pointDirection = -1;
-  } else if (pulseIndex < bottom) {
-    pulseIndex = bottom;
-    pointDirection = 1;
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayPointY(pulseIndex);
+void displayYPoints(float rate) {
+  for (int i = 1; i < lines.size(); i+= 2) {
+    lines.get(i).displayPointY(rate, false);
   }
 }
 
-void displayXPoints(int rate, int left, int right) {
-  pulseIndex += pointDirection * rate;
-  if (pulseIndex > right) {
-    pulseIndex = right;
-    pointDirection = -1;
-  } else if (pulseIndex < left) {
-    pulseIndex = left;
-    pointDirection = 1;
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayPointX(pulseIndex);
-    lines.get(i).displayPointX(pulseIndex+100);
-  }
-}
+//void randomLines(int rate) {
+//  if (millis() - lastCheckedPulse > rate) {
+//    background(0);
+//    strokeWeight(lineW);
+//    lastCheckedPulse = millis();
+//    for (int i = 0; i < 20; i++) {
+//      line(random(50, width - 100), random(50, height - 100), random(50, width - 100), random(50, height - 100));
+//    }
+//  }
+//}
 
-void randomLines(int rate) {
-  if (millis() - lastCheckedPulse > rate) {
-    background(0);
-    lastCheckedPulse = millis();
-    for (int i = 0; i < 20; i++) {
-      line(random(50, width - 100), random(50, height - 100), random(50, width - 100), random(50, height - 100));
-    }
-  }
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void pulsing(color c, float per) {
+  float b = 0;
+  if (per < 0.5) b = map(per, 0, .5, 255, 0);
+  else b = map(per, 0.5, 1, 0, 255);
 
+  float hue = hue(c);
 
-void pulseLinesCenter(int rate) {
-  pulseIndex += pointDirection * rate;
-  if (pulseIndex > 100) {
-    pulseIndex = 100;
-    pointDirection = -1;
-  } else if (pulseIndex < 0) {
-    pulseIndex = 0;
-    pointDirection = 1;
-  }
-  float per = pulseIndex / 100.0;
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayCenterPulse(per);
-  }
-}
-
-void randomSegments(int rate) {
-}
-
-void twinkleLines() {
-  for (int i = 0; i < lines.size(); i++) {
-    fill(255);
-    lines.get(i).twinkle(50);
-  }
-}
-
-void pulseLineRight(int rate, int bandSize) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex+= bandSize;
-    if (pulseIndex > width) {
-      pulseIndex = -bandSize;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayBandX(pulseIndex, pulseIndex+bandSize);
-  }
-}
-
-void pulseLineLeft(int rate, int bandSize) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex-=bandSize;
-    if (pulseIndex < -bandSize) {
-      pulseIndex = width;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayBandX(pulseIndex, pulseIndex+bandSize);
-  }
-}
-
-void pulseLineUp(int rate, int bandSize) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex-=bandSize;
-    if (pulseIndex < -bandSize) {
-      pulseIndex = height;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayBandY(pulseIndex, pulseIndex+bandSize, color(255));
-  }
-}
-
-
-void pulseLineDown(int rate, int bandSize) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex+=bandSize;
-    if (pulseIndex > height) {
-      pulseIndex = -bandSize;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayBandY(pulseIndex, pulseIndex+bandSize, color(255));
-  }
-}
-
-void pulseLineBack(int rate) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex++;
-    if (pulseIndex > 9) {
-      pulseIndex = -1;
-    }
-    lastCheckedPulse = millis();
-  }
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayBandZ(pulseIndex, color(255));
-  }
-}
-
-void cycleConstellation(int rate) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex++;
-    if (pulseIndex > 9) {
-      pulseIndex = 1;
-    }
-    lastCheckedPulse = millis();
-  }
-  showConstellationLine(pulseIndex);
-}
-
-void showOne(int rate) {
-  if (millis() - lastCheckedPulse > rate) {
-    pulseIndex++;
-    lastCheckedPulse = millis();
-  }
-  if (pulseIndex >= lines.size()) pulseIndex = 0;
-  else if (pulseIndex < 0) pulseIndex = 0;
-  lines.get(pulseIndex).display();
-}
-
-void pulsing(int hue, int rate) {
-  pulseIndex += rate;
-  pulseIndex %= 510;
-  int b = pulseIndex;
-  if (pulseIndex > 255) b = int(map(pulseIndex, 255, 510, 255, 0));
   colorMode(HSB, 255);
   for (int i = 0; i < lines.size(); i++) {
     stroke(hue, 255, b);
@@ -514,44 +168,221 @@ void pulsing(int hue, int rate) {
   }
   colorMode(RGB, 255);
 }
+void pulsingGrad(color c1, color c2, float per) {
+  float b = 0;
+  if (per < 0.5) b = map(per, 0, .5, 0, 1);
+  else b = map(per, 0.5, 1, 1, 0);
 
-void showConstellationLine(int l) {
+  color c = lerpColor(c1, c2, b);
   for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayConstellation(l, color(255));
+    stroke(c);
+    fill(c);
+    lines.get(i).display();
+  }
+}
+void pulseVertLinesCenterBeat(float startT) {
+  float per = percentToNextMeasure(startT, 4)*2;
+  if (per > 1) per = map(per, 1, 2, 1, 0); 
+  for (int i = 1; i < lines.size(); i+=2) {
+    lines.get(i).displayCenterPulse(per);
+  }
+}
+void pulseHorizLinesCenterBeat(float startT) {
+  float per = percentToNextMeasure(startT, 4)*2;
+  if (per > 1) per = map(per, 1, 2, 1, 0); 
+  for (int i = 0; i < lines.size(); i+=2) {
+    lines.get(i).displayCenterPulse(per);
   }
 }
 
-void linePercentW(int per) {
+void pulseVertHorizCenterBeatCycle(float startT) {
+  float per = percentToNextMeasure(startT, 4)*2;
+  if (per > 1) per = map(per, 1, 2, 1, 0); 
+  int j = ((currentCycle-1)/4)%2;
+  for (int i = j; i < lines.size(); i+=2) {
+    lines.get(i).displayCenterPulse(per);
+  }
+}
+
+void pulseCornersBeat(float startT) {
+  float per = percentToNextMeasure(startT, 4)*2;
+  if (per > 1) per = map(per, 1, 2, 1, 0); 
+  for (int i = 0; i < lines.size(); i+=2) {
+    lines.get(i).displayCenterPulse(per);
+  }
+}
+
+void pulseLinesCenterBeat(float startT) {
+  float per = percentToNextMeasure(startT, 4)*2;
+  if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displayPercentWid(per);
+    lines.get(i).displayCenterPulse(per);
+  }
+}
+
+void pulseVertLongCenterBeat(float per) {
+
+  if (per < 0.5) {
+    float p = map(per, 0, 0.5, 0, 2);
+    // lines going out
+    lines.get(4).displayFlipSegment(0, constrain(p, 0, 1));
+    lines.get(8).displaySegment(0, constrain(p, 0, 1)); 
+    lines.get(0).displayFlipSegment(0, constrain(p-1, 0, 1));
+    lines.get(12).displaySegment(0, constrain(p-1, 0, 1));
+
+    lines.get(6).displaySegment(0, constrain(p, 0, 1));
+    lines.get(10).displayFlipSegment(0, constrain(p, 0, 1)); 
+    lines.get(2).displaySegment(0, constrain(p-1, 0, 1));
+    lines.get(14).displayFlipSegment(0, constrain(p-1, 0, 1));
+  } else {
+    // lines coming in
+    float p = map(per, 1, 2, 2, 0);
+    lines.get(4).displayFlipSegment(0, constrain(p, 0, 1));
+    lines.get(8).displaySegment(0, constrain(p, 0, 1)); 
+    lines.get(0).displayFlipSegment(0, constrain(p-1, 0, 1));
+    lines.get(12).displaySegment(0, constrain(p-1, 0, 1));
+
+    lines.get(6).displaySegment(0, constrain(p, 0, 1));
+    lines.get(10).displayFlipSegment(0, constrain(p, 0, 1)); 
+    lines.get(2).displaySegment(0, constrain(p-1, 0, 1));
+    lines.get(14).displayFlipSegment(0, constrain(p-1, 0, 1));
+  }
+}
+
+void sineWaveVert(float per, float phaseStep) {
+  float phase = 0;
+  float period = per * 2 * PI;
+  lines.get(3).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+
+  phase += phaseStep;
+  lines.get(1).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
+  lines.get(7).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+
+  phase += phaseStep;
+  lines.get(5).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
+  lines.get(11).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+
+  phase += phaseStep;
+  lines.get(9).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
+  lines.get(15).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+
+  phase += phaseStep;
+  lines.get(13).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void  sineGradientFaceCycle(color c1, color c2, float per, float phaseStep) {
+  float phase = 0;
+  float period = per * 2 * PI;
+  float newPer = 0.5 + 0.5* sin(period + phase);
+  for (int i = 0; i < 4; i++) {
+    color grad = lerpColor(c1, c2, newPer);
+    phase += phaseStep;
+    newPer = 0.5 + 0.5* sin(period + phase);
+    stroke(grad);
+    fill(grad);
+    display4FaceLines(i);
+  }
+}
+
+void linesGradientFaceCycle(color c1, color c2) {
+  int start = (currentCycle)%4;
+  float phase = 1.0/4;
+  float per = start*phase;
+  for (int i = 0; i < 4; i++) {
+    color grad = lerpColor(c1, c2, per);
+    per += phase;
+    per %= 1.0;
+    stroke(grad);
+    fill(grad);
+    display4FaceLines(i);
+  }
+}
+
+void cycleGrowFace(int face, int speed, int phase) {
+  float snakeLoc = speed * 4;
+  snakeLoc += phase;
+  snakeLoc %= 4;
+
+  // going clockwise starting from top left corner
+  if (snakeLoc < 1) {
+    float sLoc = snakeLoc;
+    lines.get(face).displaySegment(0, sLoc);
+  } else if (snakeLoc < 2) {
+    float sLoc = snakeLoc - 1;
+    lines.get(face+1).displaySegment(0, sLoc);
+  } else if (snakeLoc < 3) {
+    float sLoc = snakeLoc - 2;
+    lines.get(face+2).displaySegment(0, sLoc);
+  } else {
+    float sLoc = snakeLoc - 3;
+    lines.get(face+3).displaySegment(0, sLoc);
+  }
+}
+
+void snakeFaceAll(float speed, int phase) {
+  for (int i = 0; i < 4; i++) {
+    snakeFace(i, speed, i*phase);
+  }
+}
+
+void growBlockEntire(float speed) {
+  int [] order = { 0, 4, 8, 12, 13, 14, 10, 6, 2, 3};
+  float snakeLoc = speed * 11;
+
+  if (floor(snakeLoc) == 0) return;
+  int numFullLines = floor(snakeLoc-1);
+
+  for (int i = 0; i < numFullLines && i < order.length; i++) {
+    lines.get(order[i]).display();
+  }
+  if (numFullLines < order.length) {
+    lines.get(order[numFullLines]).displaySegment(0, (snakeLoc - numFullLines)/2);
+  }
+}
+
+void snakeFace(int face, float speed, int phase) {
+  float snakeLoc = speed * 4;
+  snakeLoc += phase;
+  snakeLoc %= 4;
+  face *= 4;
+  // going clockwise starting from top left corner
+  if (snakeLoc < 1) {
+    float sLoc = snakeLoc;
+    lines.get(face).displaySegment(0, sLoc);
+    lines.get(face+3).displayFlipSegment(0, 1-sLoc);
+  } else if (snakeLoc < 2) {
+    float sLoc = snakeLoc - 1;
+    lines.get(face+1).displaySegment(0, sLoc);
+    lines.get(face).displayFlipSegment(0, 1-sLoc);
+  } else if (snakeLoc < 3) {
+    float sLoc = snakeLoc - 2;
+    lines.get(face+2).displaySegment(0, sLoc);
+    lines.get(face+1).displayFlipSegment(0, 1-sLoc);
+  } else {
+    float sLoc = snakeLoc - 3;
+    lines.get(face+3).displaySegment(0, sLoc);
+    lines.get(face+2).displayFlipSegment(0, 1-sLoc);
   }
 }
 
 
 
-//void cycleModes(int rate) {
-//  if (millis() - stringChecked > rate) {
-//    visualMode = int(random(1, 11));
-//    stringChecked = millis();
-//  }
-//  playMode();
-//}
-
-
-
-void resetZIndex() {
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).setZIndex(0);
-  }
-}
-
-void resetConstellationG() {
-  for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).setConstellationG(0);
-  }
+void showOne(float per) {
+  per = map(per, 0, 1, 0, lines.size());
+  int num = constrain(int(per), 0, lines.size()-1);
+  lines.get(num ).display();
 }
 
 
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// LINE CLASS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Line {
 
   PVector p1;
@@ -573,25 +404,17 @@ class Line {
   Line(float x0, float y0, float x1, float y1) {
     this.p1 = new PVector(x0, y0);
     this.p2 = new PVector(x1, y1);
-    initLine();
   }
 
-  Line(int x0, int y0, int x1, int y1) {
-    this.p1 = new PVector(x0, y0);
-    this.p2 = new PVector(x1, y1);
-    initLine();
-  }
 
-  Line(PVector p1, PVector p2, int id1, int id2) {
+  Line(PVector p1, PVector p2) {
     this.p1 = p1;
     this.p2 = p2;
-    initLine();
   }
 
-  Line(int x1, int y1, int x2, int y2, int id1, int id2) {
+  Line(int x1, int y1, int x2, int y2) {
     this.p1 = new PVector(x1, y1);
     this.p2 = new PVector(x2, y2);
-    initLine();
   }
 
   void initLine() {
@@ -612,6 +435,8 @@ class Line {
     strokeCap(ROUND);
     strokeWeight(lineW);
     line(p1.x, p1.y, p2.x, p2.y);
+    drawEndCaps(p1, p2);
+
     //if (editingLines) {
     //  stroke(255, 0, 0);
     //  ellipse(p1.x, p1.y, 10, 10);
@@ -628,6 +453,7 @@ class Line {
     float x2 = map(per, 0, 1.0, midX, p2.x);
     float y1 = map(per, 0, 1.0, midY, p1.y);
     float y2 = map(per, 0, 1.0, midY, p2.y);
+    strokeWeight(lineW);
     line(x1, y1, x2, y2);
   }
 
@@ -668,7 +494,9 @@ class Line {
     per*= 2;
     float p = constrain(per, 0, 1.0);
     PVector pTemp = PVector.lerp(p1, p2, p);
+    strokeWeight(lineW);
     line(p1.x, p1.y, pTemp.x, pTemp.y);
+    drawEndCaps(p1, pTemp);
   }
 
   void displayPercentWid(float per) {
@@ -676,6 +504,7 @@ class Line {
     int sw = int(map(per, 0, 1.0, 0, 5));
     strokeWeight(sw);
     line(p1.x, p1.y, p2.x, p2.y);
+    drawEndCaps(p1, p2);
   }
 
   void fftLine() {
@@ -808,7 +637,9 @@ class Line {
     }
   }
 
-  void displayPointY(int y) {
+  void displayPointY(float per, boolean flip) {
+    float y = map(per, 0, 1, p1.y, p2.y);
+    if (flip) y = map(per, 0, 1, p2.y, p1.y);
     float xm;
     if ( (y > p1.y && y < p2.y) ) {
       xm = map(y, p1.y, p2.y, p1.x, p2.x);
@@ -868,32 +699,17 @@ class Line {
     return false;
   }
 
-  void setConstellationG(int k) {
-    constellationG = k;
-    println("constellation of " + id1 + "" + id2 + " is now " + k);
-  }
-
   void setZIndex(int k) {
     zIndex = k;
     println("zIndex of " + id1 + "" + id2 + " is now " + k);
   }
 
-  void displayByIDs(int id1, int id2) {
-    if (findByID(id1, id2)) {
-      display();
-    }
-  }
 
   void displayZIndex() {
     colorMode(HSB, 255);
     //display(color(map(zIndex, 0, numRectZ-1, 0, 255), 255, 255));
   }
 
-  void displayByIDsPercent(int id1, int id2, float per) {
-    if (findByID(id1, id2)) {
-      displayPercent(per);
-    }
-  }
 
   void displayRainbowCycle(int pulse) {
     //color c =  color(((i * 256 / lines.size()) + pulseIndex) % 255, 255, 255);
@@ -906,7 +722,9 @@ class Line {
 
         PVector pTemp = PVector.lerp(p1, p2, i/50.0);
         PVector pTempEnd = PVector.lerp(pTemp, p2, (i+1)/50.0);
+        strokeWeight(lineW);
         line(pTemp.x, pTemp.y, pTempEnd.x, pTempEnd.y);
+        drawEndCaps(pTemp, pTempEnd);
       }
     }
     colorMode(RGB, 255);
@@ -920,63 +738,23 @@ class Line {
     colorMode(RGB, 255);
   }
 
-  void handLight(float x, float y, int rad, color c) {
-    float i = 0.0;
-    float startX = p1.x;
-    float startY = p1.y;
-    boolean started = false;
-    while (i < 1.0) {
-      i+= .1;
-      if (!started) {
-        float dx = map(i, 0, 1.0, p1.x, p2.x);
-        float dy = map(i, 0, 1.0, p1.y, p2.y);
-        float dis = dist(x, y, dx, dy);
-        if (dis < rad) {
-          startX = dx;
-          startY = dy;
-          started = true;
-        }
-      } else {
-        float dx = map(i, 0, 1.0, p1.x, p2.x);
-        float dy = map(i, 0, 1.0, p1.y, p2.y);
-        float dis = dist(x, y, dx, dy);
-        if (dis > rad) {
-          stroke(c);
-          line(startX, startY, dx, dy);
-          break;
-        }
-      }
-    }
+  void displayFlipSegment(float startPer, float sizePer) {
+    strokeWeight(lineW);
+    strokeCap(ROUND);
+    PVector pTemp = PVector.lerp(p2, p1, startPer);
+    PVector pTempEnd = PVector.lerp(pTemp, p1, startPer + sizePer);
+    line(pTemp.x, pTemp.y, pTempEnd.x, pTempEnd.y);
+    drawEndCaps(pTemp, pTempEnd);
   }
 
   void displaySegment(float startPer, float sizePer) {
+    strokeWeight(lineW);
+    strokeCap(ROUND);
     PVector pTemp = PVector.lerp(p1, p2, startPer);
     PVector pTempEnd = PVector.lerp(pTemp, p2, startPer + sizePer);
+
     line(pTemp.x, pTemp.y, pTempEnd.x, pTempEnd.y);
-  }
-
-  boolean findByID(int id1, int id2) {
-    return (this.id1 == id1 && this.id2 == id2) || (this.id2 == id1 && this.id1 == id2);
-  }
-
-  boolean findByID(int id) {
-    return (this.id1 == id || this.id2 == id);
-  }
-
-  int getX1() {
-    return int(p1.x);
-  }
-
-  int getX2() {
-    return int(p2.x);
-  }
-
-  int getY1() {
-    return int(p1.y);
-  }
-
-  int getY2() {
-    return int(p2.y);
+    drawEndCaps(pTemp, pTempEnd);
   }
 
   void setGradientZ(color c1, color c2, int jump) {
@@ -994,4 +772,107 @@ class Line {
       display(lerpColor(c2, c1, m));
     }
   }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// UTILITIES
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void drawEndCaps(PVector p1, PVector p2) {
+  if (dist(p1.x, p1.y, p2.x, p2.y) > 1) {
+    ellipse(p1.x, p1.y, lineW/4, lineW/4);
+    ellipse(p2.x, p2.y, lineW/4, lineW/4);
+  }
+}
+
+void moveSelectedLine() {
+  if (selectedP != null) {
+    selectedP.move();
+  }
+}
+
+void snapOutlinesToMask() {
+  lines = new ArrayList<Line>();
+  int[][] pts = {  
+    { 0, 1, 8, 9 }, 
+    { 1, 2, 7, 8 }, 
+    { 2, 3, 6, 7 }, 
+    { 3, 4, 5, 6}
+  };
+  for (int i = 0; i < 4; i++) {
+    int g = 3;
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][0]].x+g, maskPoints[keystoneNum][pts[i][0]].y + g, maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][1]].x-g, maskPoints[keystoneNum][pts[i][1]].y + g, maskPoints[keystoneNum][pts[i][2]].x - g, maskPoints[keystoneNum][pts[i][2]].y - g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][2]].x -g, maskPoints[keystoneNum][pts[i][2]].y - g, maskPoints[keystoneNum][pts[i][3]].x + g, maskPoints[keystoneNum][pts[i][3]].y - g));
+    lines.add(new Line(maskPoints[keystoneNum][pts[i][3]].x +g, maskPoints[keystoneNum][pts[i][3]].y - g, maskPoints[keystoneNum][pts[i][0]].x + g, maskPoints[keystoneNum][pts[i][0]].y + g));
+  }
+}
+
+void displayEditingLines() {
+  displayLines(color(255));
+  if (editingLines) {
+    for (Line l : lines) {
+      l.highlightOver();
+    }
+    if (isDragging) {
+      println(mouseX, mouseY);
+      selectedLineP.set(mouseX, mouseY);
+    }
+  }
+}
+
+void checkLineClick() {
+  for (Line l : lines) {
+    int ptOver = l.mouseOver();
+    if (ptOver > -1) {
+      if (ptOver == 0) selectedLineP = l.p1;
+      else selectedLineP = l.p2;
+      isDragging = true;
+      return;
+    }
+  }
+}
+
+void linesReleaseMouse() {
+  isDragging = false;
+  selectedLineP = null;
+}
+
+void loadLines() {
+  lines = new ArrayList<Line>();
+  processing.data.JSONObject linesJson;
+  linesJson = loadJSONObject("data/lines/lines.json");
+
+  processing.data.JSONArray linesArray = linesJson.getJSONArray("lineList");
+  for (int i = 0; i < 16; i++) {
+    processing.data.JSONObject l = linesArray.getJSONObject(i);
+    float x0 = l.getFloat("x0");
+    float y0 = l.getFloat("y0");
+    float x1 = l.getFloat("x1");
+    float y1 = l.getFloat("y1");
+    lines.add(new Line(x0, y0, x1, y1));
+  }
+}
+
+void saveMappedLines() {
+  processing.data.JSONObject json;
+  json = new processing.data.JSONObject();
+  //saveJSONObject(json, "data/lines/lines.json");
+
+  processing.data.JSONArray linesList = new processing.data.JSONArray();    
+
+  for (int i = 0; i < lines.size(); i++) {
+    processing.data.JSONObject lineJSON = new processing.data.JSONObject();
+    Line l = lines.get(i);
+    lineJSON.setFloat("x0", l.p1.x);
+    lineJSON.setFloat("y0", l.p1.y);
+    lineJSON.setFloat("x1", l.p2.x);
+    lineJSON.setFloat("y1", l.p2.y);
+
+    linesList.setJSONObject(i, lineJSON);
+  }
+  json.setJSONArray("lineList", linesList);
+  saveJSONObject(json, "data/lines/lines.json");
 }

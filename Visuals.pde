@@ -631,13 +631,13 @@ void setSinGrid(float tempo) {
 
 
 void setAudioGrid(float flyingTerrInc) {
-  updateSpectrum();
+  //updateSpectrum();
 
-  beatCycle(300);
-  if (currentCycle > previousCycle) {
-    acceleratingTerr = true;
-    previousCycle = currentCycle;
-  }
+  //beatCycle(300);
+  //if (currentCycle > previousCycle) {
+  //  acceleratingTerr = true;
+  //  previousCycle = currentCycle;
+  //}
 
 
   if (flyingTerrOn) flyingTerr -= flyingTerrInc;
@@ -964,11 +964,11 @@ class Wave {
 }
 
 void cycleWaves() {
-  updateSpectrum();
-  beatCycle(500);
+  //updateSpectrum();
+  //beatCycle(500);
   if (currentCycle > previousCycle) {
     waves.add(new Wave(centerScreen.s.width/2, centerScreen.s.height/2));
-    previousCycle = currentCycle;
+    //previousCycle = currentCycle;
   }
 }
 
@@ -1172,7 +1172,7 @@ void cycleStarsSpaceModes() {
     convergeX = (currentCycle/3)%3;
     convergeY = currentCycle%3;
 
-    previousCycle = currentCycle;
+    //previousCycle = currentCycle;
   }
 }
 
@@ -1450,48 +1450,78 @@ float eFW=0;
 //float x=0;
 float yFW=0;
 float randPerl;
-float countFW=150;
+int startCountFW = 300;
+float countFW=startCountFW;
 float  mapHeightFW;
 int modeFW = 0;
 color startCFW;
 color midCFW;
 color endCFW;
 
+void initAllFlowyWaves() {
+  for (Screen s : screens) {
+    initDisplayFlowyWaves(s.s);
+  }
+}
+
 void initDisplayFlowyWaves(PGraphics s) {
-  mapHeightFW = screenH;
+  mapHeightFW = s.height/2;
   s.beginDraw();
-  s.background(255);
+  s.background(0);
 
   colorMode(HSB);
-  startCFW = color(random(255), 255, 255);
-  midCFW = color((hue(startCFW)+60)%255, 255, 255);
-  endCFW = color((hue(startCFW)+120)%255, 255, 255);
+  //startCFW = color(random(255), 255, 255);
+  //midCFW = color((hue(startCFW)+60)%255, 255, 255);
+  //endCFW = color((hue(startCFW)+120)%255, 255, 255);
+  startCFW = cyan;
+  midCFW = pink;
+  endCFW = blue;
+  countFW = startCountFW;
   colorMode(RGB);
   s.endDraw();
 }
+void displayFlowyWavesAll() {
+  displayFlowyWavesAll(1150, 1200);
+}
 
-void displayFlowyWaves(PGraphics s) {
+void displayFlowyWavesAll(int fadeStart, int fadeEnd) {
+  updateFlowyWaves(fadeStart, fadeEnd, true);
+  int i = 0;
+  for (Screen s : screens) {
+    displayFlowyWaves(s.s, fadeStart, fadeEnd, i++, true);
+  }
+}
+
+void updateFlowyWaves(int fadeStart, int fadeEnd, boolean blackBG) {
+  countFW++;
+  if (countFW > fadeEnd) {
+    if (blackBG) {
+      countFW = startCountFW;
+      mapHeightFW = screenH/2;
+    } else {
+      countFW = 100;
+      mapHeightFW = screenH;
+    }
+  }
+  mapHeightFW=mapHeightFW-1;
+}
+void fadeFWToWhite(PGraphics s, int fadeStart, int fadeEnd) {
+  s.noStroke();
+  color c = getColorFW(0, modeFW);
+  s.fill(hue(c), saturation(c), brightness(c), map(countFW, fadeStart, fadeEnd, 2, 50));
+  s.rect(0, 0, s.width, s.height);
+}
+void displayFlowyWaves(PGraphics s, int fadeStart, int fadeEnd, float phase, boolean blackBG) {
   s.beginDraw();
-  int fadeStart = 1150;
-  int fadeEnd = 1200;
-  if (countFW > fadeStart) {
-    s.noStroke();
-    color c = getColorFW(0, modeFW);
-    s.fill(hue(c), saturation(c), brightness(c), map(countFW, fadeStart, fadeEnd, 2, 50));
-    s.rect(0, 0, s.width, s.height);
+  if (!blackBG) {
+    if (countFW > fadeStart) fadeFWToWhite(s, fadeStart, fadeEnd);
+  } else {
+    if (countFW < startCountFW + 3) s.background(0);
   }
   s.noFill();
   changeColor(s, countFW);
   changePerlin();
-  paintFW(s);
-  countFW++;
-
-  if (countFW > fadeEnd) {
-    //s.background(255);
-    countFW = 100;
-    mapHeightFW = screenH;
-  }
-  mapHeightFW=mapHeightFW-1;
+  paintFW(s, phase, blackBG); 
   s.endDraw();
 }
 
@@ -1501,38 +1531,23 @@ void changeColor(PGraphics s, float cnt) {
 }
 
 color getColorFW(float cnt, int mode) {
-  if (mode == 0) {
-    cFW = sin(radians(cnt))+1;
-    dFW = sin(radians(cnt+30))+1;
-    eFW = sin(radians(cnt+60))+1;
-    cFW = map(cFW, 0, 1, 0, 255);
-    dFW = map(dFW, 0, 1, 0, 255);
-    eFW = map(eFW, 0, 1, 0, 255);
-    return color(cFW, dFW, 220);
-  } else if (mode == 1) {
-    cFW = sin(radians(cnt))+1;
-    return color(cFW);
-  } else {
-    cFW = sin(radians(cnt))+1;
-    dFW = sin(radians(cnt+30))+1;
-    eFW = sin(radians(cnt+60))+1;
-    cFW = map(cFW, 0, 1, 0, 255);
-    dFW = map(dFW, 0, 1, 0, 255);
-    eFW = map(eFW, 0, 1, 0, 255);
+  //if (mode == 0) {
+  cFW = sin(radians(cnt))+1;
+  dFW = sin(radians(cnt+30))+1;
+  eFW = sin(radians(cnt+60))+1;
+  cFW = map(cFW, 0, 1, 0, 255);
+  dFW = map(dFW, 0, 1, 0, 255);
+  eFW = map(eFW, 0, 1, 0, 255);
 
-    float s = sin(radians(cnt));
-    color c;
-    if (s < -0.5) c = lerpColor(startCFW, midCFW, map(s, -1, -0.5, 0, 1));
-    else if (s < 0.5) c = lerpColor(midCFW, endCFW, map(s, -0.5, 0.5, 0, 1));
-    else  c = lerpColor(endCFW, startCFW, map(s, 0.5, 1, 0, 1));
-    return c;
-  }
+  //if (cnt < 355) return 0;
+  return color(cFW, dFW, 220);
 }
 
-void paintFW(PGraphics s) {
+void paintFW(PGraphics s, float phase, boolean blackBG) {
+  float myY=0;
   for (int x=0; x<s.width; x=x+1) {
-    myPerlin = noise(float(x)/200, countFW/200);
-    float myY = map(myPerlin, 0, 1, 0, s.height-mapHeightFW);
+    myPerlin = noise(float(x)/200 + phase*s.width/200, countFW/200);
+    myY = map(myPerlin, 0, 1, 0, s.height-mapHeightFW);
     s.line(x, myY, x, s.height );
   }
 }
@@ -1625,9 +1640,7 @@ void initSpaceRects() {
   for (int r = 0; r < spaceRects.length; r++) {
     spaceRects [r] = new SpaceRect(new PVector(0, 0, endPSpaceRects+rectSpacing*r), new PVector(0, 0, zVel) );
   }
-  blue = color(0, 100, 255);
-  cyan = color(0, 255, 255);
-  pink = color(#FF05C5);
+  
 }
 
 boolean hasResetRects = true;
