@@ -196,6 +196,7 @@ void mousePlayer() {
     int position = int( map( mouseX, x, x+w, 0, songFile.length() ) );
     songFile.cue( position );
     setCurrentCue();
+    setCurrentCycleCueClick();
     println("current cue: " + currentCue);
     if (currentCue != -1) cues[currentCue].initCue();
   } else {
@@ -226,8 +227,8 @@ void drawBreakInfo() {
 
 void drawLines() {
   for (int i = 0; i < songFile.bufferSize() - 1; i++) {
-    line(i, 50  + songFile.left.get(i)*50, i+1, 50  + songFile.left.get(i+1)*50);
-    line(i, 150 + songFile.right.get(i)*50, i+1, 150 + songFile.right.get(i+1)*50);
+    //line(i, 50  + songFile.left.get(i)*50, i+1, 50  + songFile.left.get(i+1)*50);
+    //line(i, 150 + songFile.right.get(i)*50, i+1, 150 + songFile.right.get(i+1)*50);
   }
 }
 

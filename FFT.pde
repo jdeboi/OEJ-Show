@@ -3,6 +3,7 @@ import ddf.minim.analysis.*;
 
 Minim minim;
 AudioPlayer songFile;
+//Song songFile;
 BeatDetect beat;
 BeatListener bl;
 int currentCycle = 0;
@@ -161,7 +162,6 @@ void cycleConstFFT() {
   }
 }
 void initHands() {
-  hands = new PImage[5];
   hands[0] = loadImage("images/hand/hand0.jpg");
   hands[1] = loadImage("images/hand/hand1.jpg");
   hands[2] = loadImage("images/hand/hand2.jpg");
@@ -169,12 +169,11 @@ void initHands() {
   hands[4] = loadImage("images/hand/hand4.jpg");
 }
 void cycleHandsFFT() {
-  //updateSpectrum();
-  //beatCycle(300);
   int j = 0;
   for (Screen sc : screens) {
     sc.s.beginDraw();
     sc.s.stroke(255);
+    sc.s.blendMode(SCREEN);
     sc.s.noFill();
     sc.s.strokeWeight(3);
     sc.s.rectMode(CENTER);
@@ -251,8 +250,8 @@ void drawWaveForm() {
     sc.s.strokeWeight(5);
     int j = 0;
     for (int i = 0; i < screenW; i++) {
-      sc.s.line(i, screenH/2-50  + songFile.left.get(i + j * screenW)*50, (i+1), screenH/2-50  + songFile.left.get(i+1 + j * screenW)*50);
-      sc.s.line(i, screenH/2+50 + songFile.right.get(i + j * screenW)*50, (i+1), screenH/2+50 + songFile.right.get(i+1 + j * screenW)*50);
+      //sc.s.line(i, screenH/2-50  + songFile.left.get(i + j * screenW)*50, (i+1), screenH/2-50  + songFile.left.get(i+1 + j * screenW)*50);
+      //sc.s.line(i, screenH/2+50 + songFile.right.get(i + j * screenW)*50, (i+1), screenH/2+50 + songFile.right.get(i+1 + j * screenW)*50);
     }
     j++;
     sc.s.endDraw();
@@ -378,8 +377,8 @@ void updateSpectrum() {
 }
 
 void displayAmplitudeHoriz() {
-  int lev = int(map((songFile.left.level() + songFile.right.level())/2, 0, 0.5, 0, screenW*4));
-
+  //int lev = int(map((songFile.left.level() + songFile.right.level())/2, 0, 0.5, 0, screenW*4));
+  int lev = 1;
   for (int i = 0; i < screens.length; i++) {
     screens[i].s.beginDraw();
     //screens[i].s.background(color(0));
@@ -433,13 +432,19 @@ float percentToNumBeats(float startT, int numBeats) {
   float bps = tempo / 60.0;
 
   float spb = 1.0 / bps;
-  
+
   int currentGroup = (currentCycle-1) / numBeats;
   if (currentCycle == 0) currentGroup = 0;
   float timePerGroup = numBeats * spb;
   float timeFromLastGroup = timePassed - (currentGroup * timePerGroup);
   float perGroup = map(timeFromLastGroup, 0, timePerGroup, 0, 1);
-  return perGroup; 
+  //if (perGroup < 0 || perGroup > 1) println(currentCycle, timeFromLastGroup, timePassed);
+  return perGroup;
+}
+
+void setCurrentCycleCueClick() {
+  float timePassedMinutes = (songFile.position()/1000.0/60); 
+  currentCycle = int(timePassedMinutes/tempo);
 }
 
 float percentToNextMeasure(float startT, int timeSig) {
@@ -447,7 +452,7 @@ float percentToNextMeasure(float startT, int timeSig) {
 }
 
 float percentToNextBeat(float startT) {
-  return percentToNumBeats(startT, 1); 
+  return percentToNumBeats(startT, 1);
 }
 
 
@@ -459,8 +464,68 @@ void checkBeatReady(float startT) {
   if (currentCycle == 0) {
     if (timePassed > spb)
       currentCycle++;
-  }
-  else if (timePassed > currentCycle * spb) {
+  } else if (timePassed > currentCycle * spb) {
     currentCycle++;
+  }
+}
+
+
+class Song {
+  int duration, position;
+  long startTime;
+  float tempo;
+  boolean isPaused = true;
+  ArrayList left, right;
+
+  Song (int duration, float tempo) {
+    left = new ArrayList<Integer>();
+    right = new ArrayList<Integer>();
+    this.duration = duration;
+    this.tempo = tempo;
+  }
+
+  int length() {
+    return duration;
+  }
+
+  void update() {
+    if (!isPaused) {
+      position += millis() - startTime;
+      startTime = millis();
+      if (position > duration) position = duration;
+    }
+  }
+
+  void pause() {
+    update();
+    isPaused = true;
+  }
+
+  void play() {
+    isPaused = false;
+    startTime = millis();
+  }
+
+  float position() {
+    return position;
+  }
+
+  void cue(int p) {
+    if (p >= 0 && p < duration) {
+      position = p;
+      startTime = millis();
+    }
+  }
+
+  float getTempo() {
+    return tempo;
+  }
+
+  void skip(int mil) {
+    position += mil;
+  }
+
+  int bufferSize () {
+    return 100;
   }
 }

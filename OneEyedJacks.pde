@@ -1,6 +1,15 @@
 boolean showTime = false;
 boolean mappingON = false;
 boolean useMusic = true;
+boolean useTestKeystone = true;
+
+int MOON = 0;
+int DELTA = 8;
+int WIZ = 5;
+int VIOLATE = 6;
+
+int LARGE_CENTER = 0;
+int MID_CENTER = 1;
 //////////
 
 import gifAnimation.*;
@@ -42,10 +51,11 @@ void setup() {
   initScenes();
   initScreens();
 
+  //songFile = new Song(0, 0);
   initFFT();
   initMidi();
 
-  changeScene(5);
+  changeScene(VIOLATE);
 
   if (!showTime) initControls();
 
@@ -53,9 +63,7 @@ void setup() {
   centerScreen.drawSolid(color(0));
   initLines();
   
-  blue = color(0, 100, 255);
-  cyan = color(0, 255, 255);
-  pink = color(#FF05C5);
+  initColors();
   
 }
 
@@ -72,6 +80,9 @@ void draw() {
     playShow();
     renderScreens();
     if (showMask) maskScreens(0);
+    //blackoutScreens();
+    //haromAll(color(255), 3);
+    //renderScreens();
   }
 
   drawControls();
@@ -105,8 +116,8 @@ void keyPressed() {
       else if (key == 'w') changeScene(13);
     } else if (slashDown) {
       if (isPlaying) {
-        if (keyCode == RIGHT) songFile.skip(15000);
-        else if (keyCode == LEFT) songFile.skip(-1000);
+        if (keyCode == RIGHT) songFile.skip(500);
+        else if (keyCode == LEFT) songFile.skip(-500);
       }
     } // && !cp5.get(Textfield.class, "input").isFocus()
     else if (key == ' ') {
@@ -116,18 +127,7 @@ void keyPressed() {
       bracketDown = true;
     } else if (key == '/') {
       slashDown = true;
-    } else if (editingBreaks) {
-      if (selected > -1) {
-        if (keyCode == LEFT) breaks.get(selected).move(50);
-        else if (keyCode == RIGHT) breaks.get(selected).move(-50);
-        else if (key == 'd') {
-          breaks.remove(selected);
-          resetHighlights();
-          selected = -1;
-        } else breaks.get(selected).breakType = key;
-      }
-      breaks.add(new Break(songFile.position(), key));
-    }
+    } 
   }
 }
 

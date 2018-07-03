@@ -7,7 +7,111 @@ boolean betweenSongs = true;
 //////////////////////////////////////////////////////////////////////////////////
 // INITIALIZE CUES
 //////////////////////////////////////////////////////////////////////////////////
+void initViolate() {
+  cues = new Cue[22];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(10.5, 'v', 0.0, 0);
+  cues[2] = new Cue(21.8, 'v', 0.0, 0);
+  cues[3] = new Cue(32.1, 'v', 0.0, 0);  // could be the trick
+  cues[4] = new Cue(43, 'v', 0.0, 0);  // this is the same as 3, could be deleted?
+  cues[5] = new Cue(53.8, 'v', 0.0, 0);
+  cues[6] = new Cue(61.4, 'v', 0.0, 0); // DADADA
+  cues[7] = new Cue(64.5, 'v', 0.0, 0);
+  // could have one at 74
+  cues[8] = new Cue(85.8, 'v', 0.0, 0);  // loww
+  cues[9] = new Cue(91, 'v', 0.0, 0);
+  cues[10] = new Cue(101.8, 'v', 0.0, 0);
+  cues[11] = new Cue(112, 'v', 0.0, 0);
+  cues[12] = new Cue(120.25, 'v', 0.0, 0); // DADADA
+  cues[13] = new Cue(122.6, 'v', 0.0, 0);
+  cues[14] = new Cue(133.4, 'v', 0.0, 0);
+  cues[15] = new Cue(144.5, 'v', 0.0, 0); // striped down
 
+  /////// DONE
+  cues[16] = new Cue(155, 'v', 0.0, 0);  // ENTER AWESOME sound
+  cues[17] = new Cue(176, 'v', 0.0, 0);
+  cues[18] = new Cue(197.5, 'v', 0.0, 0);
+  cues[19] = new Cue(219, 'v', 0.0, 0);
+  cues[20] = new Cue(232, 'v', 0.0, 0);
+  cues[21] = new Cue(235, 'v', 0.0, 0);
+  tempo = 90;
+  initCaveOEJ(screens[1].s);
+
+  //songFile = new Song(234 , 90);
+}
+
+// black as a gradient color
+
+void displayViolate() {
+  displayLines(0);
+  drawCaveScreens();
+  switch(currentCue) {
+  case 0:
+    changeAllColorSettings(0);
+    break;
+  case 1: // something some come in bouncing on the beat
+    displayCaveAllBounce();
+    println(colorSettings[0]);
+    break;
+  case 2: // left, right, left, right
+    displayCaveLeftRightBounce();
+    break;
+  case 3:
+    changeAllColorSettings(0);
+    break;
+  case 4:
+    //changeAllColorSettings(RAINBOW_PULSE);
+    changeAllColorSettings(CAST_LIGHT);
+    break;
+  case 5:
+    //changeMovementSetting(CRISSCROSS);
+    changeAllColorSettings(0);
+    break;
+  case 6:
+    changeMovementSetting(CRISSCROSS);
+    displayCaveLeftRightBounce();
+    break;
+    //case 7:
+    //  changeAllColorSettings(6);
+    //  break;
+    //case 8:
+    //  changeAllColorSettings(0);
+    //  break;
+    //case 9:
+    //  changeAllColorSettings(1);
+    //  break;
+    //case 10:
+    //  changeAllColorSettings(2);
+    //  break;
+    //case 11:
+    //  break;
+    //case 12:
+    //  break;
+
+    ///////////////////////////////// DONE
+  case 16:
+    displayCaveAllBounce();
+    changeMovementSetting(BOUNCE);
+    break;
+  case 17: 
+    changeAllColorSettings(RANDOM);
+    changeMovementSetting(BOUNCE);
+    break;
+  case 18: 
+    changeAllColorSettings(ICE);
+    changeMovementSetting(BOUNCE);
+    break;
+  case 19:
+    changeAllColorSettings(GRAD_ALL);
+    break;
+  case 20:
+    fadeOutAllScreens(cues[currentCue].startT, 1);
+    break;
+  default:
+    displayCaveAllBounce();
+    break;
+  }
+}
 
 
 void initRite() {
@@ -35,12 +139,7 @@ void initCycles() {
 
 
 
-void initViolate() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 void initMood() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -141,6 +240,9 @@ void initDelta() {
   cubesFront();
 }
 
+void deconstructDelta() {
+}
+
 void displayDelta() {
   stroke(255, 0, 255);
 
@@ -151,14 +253,16 @@ void displayDelta() {
     //displayCycleFaceLines(0, color(255, 0, 255));
     break;
   case 1:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
-
+    //drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    cycleHandsFFT();
+    displayFlowyWavesAll();
     break;
   case 2:
+    cycleHandsFFT();
     displayFlowyWavesAll();
     break;
   case 3:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+    //drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
     break;
   case 4:
     displayFlowyWavesAll();
@@ -223,10 +327,10 @@ void initMoon() {
   };
   cues = cuesT;
   drawSolidAll(color(0));
-  loadKeystone(0);
+  //loadKeystone(LARGE_CENTER);
   currentImages.get(0).resize(sphereScreen.s.width, sphereScreen.s.height);
   startFade = false;
-  centerScreenFront();
+  centerScreenFrontAll();
 }
 
 void displayMoon() {
@@ -301,7 +405,7 @@ void displayMoon() {
     break;
   case 11: // fade out end
     displayMoveSpaceCenter(CONVERGE_CENTER, 0.75); 
-    fadeOutAllScreens(cues[11].startT, 8);
+    fadeOutAllScreens(cues[currentCue].startT, 8);
 
     displayLines(color(255, 0, 0));
     startFadeLine = false;
@@ -364,36 +468,40 @@ void initDirty() {
   cues[10] = new Cue(184, 'v', 0.0, 0);  // end
 
   drawSolidAll(color(0));
-  loadKeystone(1);
+  loadKeystone(MID_CENTER);
   initSpaceRects();
 
   resetFade();
   initTerrainCenter();
   initTesseract();
-  centerScreenFront();
+  centerScreenFrontInner();
 
   initZZoom();
   resetAudioAmp();
+  tempo = 87;
 }
 
 void displayDirty() {
   displayStripedMoon(20);
   switch(currentCue) {
   case 0:
-    centerScreenFront();
-    zoomTerrain();
+    centerScreenFrontInner();
+
+    zoomTerrain(cues[currentCue].startT, cues[currentCue + 1].startT);
     setGridTerrain(0, 0.01);
     displayTerrainCenter();
-    fadeInAllScreens(cues[0].startT, 4);
+    //displayCycleSingleFaceLines(white, -1);
+    fadeInAllScreens(cues[currentCue].startT, 4);
     break;
   case 1: // tic toc
     zZoom = endingTerrain;
-    centerScreenFront();
+    centerScreenFrontInner();
     startAudioAmp();
+    displayCycle4FaceLines(white);
     // tempo is bpm; bpm * 60 = bps = 1000 * bpms
     // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
     fadeAudioAmp(cues[1].startT, cues[2].startT, 1, 1);
-    cycleAudioAmp(cues[1].startT, cues[2].startT, 4.5);
+    cycleAudioAmp(percentToNumBeats(4));
 
     setGridTerrain(0, 0.01);
     displayTerrainCenter();
@@ -401,8 +509,8 @@ void displayDirty() {
     break;
   case 2: // tic toc repeat
     zZoom = endingTerrain;
-    centerScreenFront();
-    fadeAudioLev(cues[2].startT, cues[3].startT, 1, 1);
+    centerScreenFrontInner();
+    fadeAudioLev(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
     setGridTerrain(1, 1); // sin
     displayTerrainCenter();
     cycleShapeFFTTop();
@@ -410,19 +518,19 @@ void displayDirty() {
   case 3: // dooo, doo, do
     cubesFront();
     drawSolidTop(color(0));
-    displayDivisionOfIntensity2Screens(sin(millis()/1000.0)*20 + 30, 0, 0);
+    displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
     fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
     //display3DDots2Screens(100, 0, 0.005);
     //displayTesseract2Screens();
     break;
   case 4: // tic toc
     zZoom = endingTerrain;
-    centerScreenFront();
+    centerScreenFrontInner();
     startAudioAmp();
     // tempo is bpm; bpm * 60 = bps = 1000 * bpms
     // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
     fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
-    cycleAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1.5);
+    cycleAudioAmp(percentToNumBeats(4));
 
     setGridTerrain(0, 0.01);
     displayTerrainCenter();
@@ -432,7 +540,7 @@ void displayDirty() {
   case 5:
     cubesFront();
     drawSolidTop(color(0));
-    displayDivisionOfIntensity2Screens(sin(millis()/1000.0)*20 + 30, 0, 0);
+    displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
     fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
     break;
   case 6: 
@@ -444,12 +552,12 @@ void displayDirty() {
     break;
   case 7: // tic toc
     zZoom = endingTerrain;
-    centerScreenFront();
+    centerScreenFrontInner();
     startAudioAmp();
     // tempo is bpm; bpm * 60 = bps = 1000 * bpms
     // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
     fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
-    cycleAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1.5);
+    cycleAudioAmp(percentToNumBeats(4));
 
     setGridTerrain(0, 0.01);
     displayTerrainCenter();
@@ -484,10 +592,12 @@ void initFifty() {
   cues[10] = new Cue(190, 'v', 0.0, 0);
 
   drawSolidAll(color(0));
-  loadKeystone(1);
+  loadKeystone(LARGE_CENTER);
   initSpaceRects();
 
   resetFade();
+
+  tempo = 120;
 }
 
 void displayFifty() {
@@ -517,13 +627,13 @@ void displayFifty() {
 
     paradiseSphere(50, pink, blue, cyan);
     cyclingRects = false;
-    centerScreenFront();
+    centerScreenFrontInner();
     displayTwoWayTunnels();
     fadeInCenter(cues[currentCue].startT, 2);
     break;
   case 3:
     paradiseSphere(50, pink, blue, cyan);
-    centerScreenFront();
+    centerScreenFrontInner();
 
     displayLineBounceCenter(0.01, 50, cyan, pink, 5);
     hasResetRects = false;
@@ -541,7 +651,7 @@ void displayFifty() {
     paradiseSphere(50, 0, blue, cyan);
 
 
-    centerScreenFront();
+    centerScreenFrontInner();
 
     displayCenterSpaceRects(5, -1, blue, cyan, pink);
     break;
@@ -554,7 +664,7 @@ void displayFifty() {
     break;
   case 7:
     paradiseSphere(50, pink, blue, cyan);
-    centerScreenFront();
+    centerScreenFrontInner();
 
     displayLineBounceCenter(0.01, 50, cyan, pink, 5);
     hasResetRects = false;
@@ -566,7 +676,7 @@ void displayFifty() {
 
     paradiseSphere(50, pink, blue, cyan);
     cyclingRects = false;
-    centerScreenFront();
+    centerScreenFrontInner();
     displayTwoWayTunnels();
     fadeInCenter(cues[currentCue].startT, 2);
     break;
@@ -588,75 +698,73 @@ void displayFifty() {
 }
 
 void initWiz() {
-  cues = new Cue[9];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(13, 'v', 0.0, 0);
-  cues[2] = new Cue(25.5, 'v', 0.0, 0);
-  cues[3] = new Cue(39, 'v', 0.0, 0);
-  cues[4] = new Cue(52, 'v', 0.0, 0);
-  cues[5] = new Cue(78, 'v', 0.0, 0);
-  cues[6] = new Cue(90.8, 'v', 0.0, 0);
-  cues[7] = new Cue(104, 'v', 0.0, 0);
-  cues[8] = new Cue(110, 'v', 0.0, 0);
-  
+  cues = new Cue[11];
+  cues[0] = new Cue(0, 'm', 0, 0); // intro
+  cues[1] = new Cue(13, 'v', 0.0, 0);  // same as 1
+  //cues[2] = new Cue(25.5, 'v', 0.0, 0); // 2
+  cues[2] = new Cue(39, 'v', 0.0, 0);  // same as 1
+  //cues[4] = new Cue(52, 'v', 0.0, 0);  // 2
+  cues[3] = new Cue(65, 'v', 0.0, 0);  // "YOUU SUCCESS ..."
+  // cues[6] = new Cue(78, 'v', 0.0, 0);
+  cues[4] = new Cue(90.8, 'v', 0.0, 0);  // "paper cuts"
+  cues[5] = new Cue(104, 'v', 0.0, 0);
+  cues[6] = new Cue(117, 'v', 0.0, 0); // "hero"
+  //cues[10] = new Cue(130, 'v', 0.0, 0);
+  cues[7] = new Cue(143, 'v', 0.0, 0); // "YOUU SUCCESS ..."
+  cues[8] = new Cue(168.9, 'v', 0.0, 0); // "paper cuts"
+  cues[9] = new Cue(194, 'v', 0.0, 0); //
+  cues[9] = new Cue(200, 'v', 0.0, 0); //
+  cues[10] = new Cue(235, 'v', 0.0, 0);
+
   tempo = 148;
 }
 
 void displayWiz() {
-  
+
   switch(currentCue) {
   case 0:
     //drawSolidAll(color(0));
     //drawFFTBarsCubes();
-    stroke(255);
-    fill(255);
-    pulseHorizLinesCenterBeat(percentToNumBeats(16));
+    //pulseHorizLinesCenterBeat(percentToNumBeats(16));
     //snakeFaceAll(percentToNextMeasure(0, 4), 2);
+    displayGradientVertLines(black, white, percentToNumBeats(4));
     break;
   case 1:
-    transit(0);
+    transit(white, red, yellow, blue, percentToNumBeats(4));
     break;
   case 2:
-    sineWaveVert(percentToNextMeasure(0, 4)*2, 0.8);
+    sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
     break;
   case 3:
-    
+    growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
     break;
   case 4:
-    pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
+    pulseVertLongCenterBeat(red, percentToNumBeats(8));
+
+
     break;
   case 5:
-    growBlockEntire(percentToNextMeasure(0, 4));
+    linesGradientFaceCycle(red, black); 
     break;
   case 6: 
-    displayCycleSingleFaceLines(color(0, 255, 255), -1); 
+    displayCycleSingleFaceLines(white, -1); 
     break;
   case 7:
-    pulseVertLongCenterBeat(percentToNextMeasure(0, 4)*2);
+    snakeFaceAll(red, percentToNumBeats(8), 2);
     break;
   case 8:
-    displayCubesAlternateColorCycle(cyan, pink);
+    pulsing(blue, percentToNumBeats(8));
+    break;
+  case 9:
+    transit(white, red, yellow, blue, percentToNumBeats(4));
     break;
   default:
     drawSolidAll(color(0));
     break;
   }
 }
-void displayViolate() {
-  switch(currentCue) {
-  case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
-    break;
-  case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
-    break;
-  default:
-    drawSolidAll(color(0));
-    break;
-  }
-}
+
+
 void displayMood() {
   switch(currentCue) {
   case 0:

@@ -189,6 +189,11 @@ void blackoutScreens() {
   for (int i = 0; i < numScreens; i++) {
     screens[i].blackOut();
   }
+  for (int i = 0; i < 2; i++) {
+    topScreens[i].blackOut();
+  }
+  sphereScreen.blackOut();
+  centerScreen.blackOut();
 }
 
 void drawSolidTop(color c) {
@@ -294,19 +299,27 @@ void initScreens() {
   loadKeystone(0);
 }
 
+void saveKeystone() {
+  if (useTestKeystone) ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
+  else ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
+}
 void loadKeystone(int i) {
   keystoneNum = i;
-  ks.load("data/keystone/keystoneCenter" +  i + ".xml");
+  if (useTestKeystone) ks.load("data/keystone/testEnv/keystoneCenter" +  i + ".xml");
+  else ks.load("data/keystone/keystoneCenter" +  i + ".xml");
 }
 
 void renderScreens() {
   // screens below mask
-  pushMatrix();
-  translate(0, 0, screens[0].zIndex);
+
+
   for (int i = 0; i < numScreens; i++) {
+    pushMatrix();
+    translate(0, 0, screens[i].zIndex);
     surfaces[i].render(screens[i].s);
+    popMatrix();
   }
-  popMatrix();
+
   pushMatrix();
   translate(0, 0, centerScreen.zIndex);
   centerSurface.render(centerScreen.s);
@@ -363,12 +376,22 @@ void drawSolidInner(color c) {
   screens[2].drawSolid(c);
 }
 
-void centerScreenFront() {
+void centerScreenFrontInner() {
+  centerScreen.zIndex = -2;
+  screens[0].zIndex = -1;
+  screens[1].zIndex = -3;
+  screens[2].zIndex = -3;
+  screens[3].zIndex = -1;
+
+  drawSolidAll(color(0));
+}
+
+void centerScreenFrontAll() {
   centerScreen.zIndex = -1;
   for (Screen s : screens) {
     s.zIndex = -2;
   }
-  drawSolidInner(color(0)); 
+  drawSolidInner(color(0));
 }
 
 void cubesFront() {

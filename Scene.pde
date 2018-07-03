@@ -81,6 +81,8 @@ class Scene {
     currentCue = 0;
 
     songFile = minim.loadFile("music/" + shortName + ".mp3", 1024);
+    
+    
     songFile.cue(0);
     songFile.pause();
     initBeat();
@@ -128,6 +130,8 @@ class Scene {
       else if (song.equals("Egrets")) displayEgrets();
 
       previousCycle = currentCycle;
+      
+      //songFile.update();
   
       if (currentCue == cues.length-1) {
         println("next");

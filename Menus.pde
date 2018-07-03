@@ -224,8 +224,7 @@ void songs(int n) {
 public void saveMap(int theValue) {
   if (controlsON) {
     println("map saved " + keystoneNum);
-    if (useCenterScreen) ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
-    else ks.save("data/keystone/keystone" + keystoneNum + ".xml");
+    saveKeystone();
   }
 }
 

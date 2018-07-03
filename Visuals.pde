@@ -4,6 +4,18 @@
 
 float angleStriped = 0;
 float[] stripedAngles;
+color red, yellow, white, gray, black, blue, cyan, pink;
+
+void initColors() {
+  blue = color(0, 100, 255);
+  cyan = color(0, 255, 255);
+  pink = color(#FF05C5);
+  red = color(255, 0, 0);
+  white = color(255);
+  gray = color(150);
+  yellow = color(255, 255, 0);
+  black = 0;
+}
 
 void initStripedSquares(int num) {
   stripedAngles = new float[num];
@@ -570,9 +582,10 @@ boolean beginningTerrain = false;
 boolean addAudioAmp = false;
 float audioAmpLev = 0;
 float audioLev = 0;
+
 void initTerrainCenter() {
-  int w = screenW*2; 
-  int h = int(screenH*1.5); 
+  int w = 800; 
+  int h = 500; 
   int spacing = 20;
   this.colsTerr = w/spacing;
   this.rowsTerr = h/spacing;
@@ -616,9 +629,9 @@ void fadeAudioAmp(float start, float end, float rampStart, float rampEnd) {
   else if (seconds > end - rampEnd) audioAmpLev = constrain(map(seconds, end - rampEnd, end, 1, 0), 0, 1);
 }
 
-void cycleAudioAmp(float start, float end, float numCycles) {
-  float period = (end - start)/numCycles;
-  audioLev = audioAmpLev*sin(period * millis()/1000.0);
+void cycleAudioAmp(float per) {
+   float period = per * 2 * PI;
+  audioLev = audioAmpLev*sin(period);
 }
 
 void setSinGrid(float tempo) {
@@ -631,14 +644,6 @@ void setSinGrid(float tempo) {
 
 
 void setAudioGrid(float flyingTerrInc) {
-  //updateSpectrum();
-
-  //beatCycle(300);
-  //if (currentCycle > previousCycle) {
-  //  acceleratingTerr = true;
-  //  previousCycle = currentCycle;
-  //}
-
 
   if (flyingTerrOn) flyingTerr -= flyingTerrInc;
 
@@ -648,7 +653,7 @@ void setAudioGrid(float flyingTerrInc) {
     float xoff = 0;
     float amp = 0.1;
     for (int x = 0; x < colsTerr; x++) {
-      float f = getFreq(map(x, 0, colsTerr, 0, 100));
+      //float f = getFreq(map(x, 0, colsTerr, 0, 100));
 
 
       terrain[x][y] = map(noise(xoff, yoff), 0, 1, -100, 100);
@@ -681,9 +686,10 @@ void initZZoom() {
   zZoom = startingTerrain;
 }
 
-void zoomTerrain() {
-  float speed = map(zZoom, startingTerrain, endingTerrain, 10, 0);
-  zZoom += speed;
+void zoomTerrain(float startT, float endT) {
+  float currentT = songFile.position()/1000.0;
+  zZoom = int(map(currentT, startT, endT, startingTerrain, endingTerrain));
+  //zZoom += speed;
   zZoom = constrain(zZoom, startingTerrain, endingTerrain);
 }
 
@@ -1700,7 +1706,7 @@ void displayTwoScreenCascade() {
     s.endDraw();
   }
 }
-color blue, cyan, pink;
+
 void displayTwoWayTunnels() {
   PGraphics s = centerScreen.s;
   s.beginDraw();
@@ -2152,13 +2158,14 @@ void displayLACircle(PGraphics s, float radius, float step) {
 // OP ART
 //////////////////////////////////////////////////////////////////////////////////
 // Richard Anuszkiewicz art
-void displayDivisionOfIntensity2Screens(float space, int sqX, int sqY) {
-  displayDivisionOfIntensity(screens[1].s, space, sqX, sqY);
-  displayDivisionOfIntensity(screens[2].s, space, sqX, sqY);
+void displayDivisionOfIntensity2Screens(float per, int sqX, int sqY) {
+  displayDivisionOfIntensity(screens[1].s, per, sqX, sqY);
+  displayDivisionOfIntensity(screens[2].s, per, sqX, sqY);
 }
-void displayDivisionOfIntensity(PGraphics s, float space, int sqX, int sqY) {
-  if (space < 5) space = 5;
-  if (space > 55) space = 55;
+void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY) {
+  float period = per * 2 * PI;
+  float space = sin(period)*20 + 27;
+  space = constrain(space, 5, 55);
   s.beginDraw();
   s.pushMatrix();
   s.background(0);

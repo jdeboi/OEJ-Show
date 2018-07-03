@@ -25,7 +25,8 @@ void saveMaskPoints() {
     }
 
     json.setJSONArray("maskList", maskList);
-    saveJSONObject(json, "data/mask/maskPoints_" + j + ".json");
+    if (useTestKeystone) saveJSONObject(json, "data/mask/testEnv/maskPoints_" + j + ".json");
+    else saveJSONObject(json, "data/mask/maskPoints_" + j + ".json");
   }
 }
 
@@ -37,7 +38,8 @@ void loadMasks() {
 
 void loadMask(int index) {
   processing.data.JSONObject maskJson;
-  maskJson = loadJSONObject("data/mask/maskPoints_"+ index + ".json");
+  if (useTestKeystone) maskJson = loadJSONObject("data/mask/testEnv/maskPoints_"+ index + ".json");
+  else maskJson = loadJSONObject("data/mask/maskPoints_"+ index + ".json");
 
   processing.data.JSONArray maskArray = maskJson.getJSONArray("maskList");
   for (int i = 0; i < 10; i++) {

@@ -7,8 +7,8 @@ boolean startFadeLine = false;
 
 void initLines() {
   strokeCap(ROUND);
-  snapOutlinesToMask();
-  //loadLines();
+  //snapOutlinesToMask();
+  loadLines();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,8 +67,8 @@ void displayCycleSingleFaceLines(color c, int direction) {
   //for (int i = 0; i < 4; i++) {
   //  displayCycleSingleFace(i, c, direction);
   //}
-   displayCycleSingleFace(0, c,direction);
-    displayCycleSingleFace(3, c, direction);
+  displayCycleSingleFace(0, c, direction);
+  displayCycleSingleFace(3, c, direction);
 }
 
 void displayCycleSingleFace(int face, color c, int direction) {
@@ -84,6 +84,8 @@ void display4FaceLines(int face) {
     lines.get(i).display();
   }
 }
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 void fadeOutAllLines(int seconds, color c) {
@@ -116,11 +118,34 @@ void displayRandomLines(color c) {
     l.display(l.lineC);
   }
 }
-
-
-void transit(int startT) {
+void transitLineGradient(color c1, color c2, float per) {
   for (int i = 0; i < lines.size(); i++) {
-    lines.get(i).displaySegment(percentToNextMeasure(startT, 4), 0.2);
+    stroke(lerpColor(c1, c2, per));
+    lines.get(i).displaySegment(per, 0.2);
+  }
+}
+void transit(color c1, float per) {
+  transit(c1, c1, c1, c1, per);
+}
+void transitFaceGradient(color c1, color c2, float per) {
+  transit(c1, lerpColor(c1, c2, .33), lerpColor(c1, c2, .66), c2, per);
+}
+void transit(color c1, color c2, color c3, color c4, float per) {
+  for (int i = 0; i < lines.size(); i++) {
+    if (i < 4) {
+      stroke(c1);
+      fill(c1);
+    } else if (i < 8) {
+      stroke(c2);
+      fill(c2);
+    } else if (i < 12) {
+      stroke(c3);
+      fill(c3);
+    } else {
+      stroke(c4);
+      fill(c4);
+    }
+    lines.get(i).displaySegment(per, 0.2);
   }
 }
 
@@ -141,16 +166,13 @@ void displayYPoints(float rate) {
   }
 }
 
-//void randomLines(int rate) {
-//  if (millis() - lastCheckedPulse > rate) {
-//    background(0);
-//    strokeWeight(lineW);
-//    lastCheckedPulse = millis();
-//    for (int i = 0; i < 20; i++) {
-//      line(random(50, width - 100), random(50, height - 100), random(50, width - 100), random(50, height - 100));
-//    }
-//  }
-//}
+void displayGradientVertLines(color c1, color c2, float per) {
+  int[] vertOrder = {3, 1, 7, 5, 11, 9, 15, 13}; 
+  for (int i = 0; i < vertOrder.length; i++) {
+    if (i%2 == 0) lines.get(vertOrder[i]).displayGradientLine(c1, c2, per, i/2, true);
+    else lines.get(vertOrder[i]).displayGradientLine(c1, c2, per, i/2, false);
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void pulsing(color c, float per) {
@@ -195,8 +217,8 @@ void pulseHorizLinesCenterBeat(float per) {
   }
 }
 
-void pulseVertHorizCenterBeatCycle(float startT) {
-  float per = percentToNextMeasure(startT, 4)*2;
+void pulseVertHorizCenterBeatCycle(float per) {
+  per *= 2;
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   int j = ((currentCycle-1)/4)%2;
   for (int i = j; i < lines.size(); i+=2) {
@@ -204,24 +226,25 @@ void pulseVertHorizCenterBeatCycle(float startT) {
   }
 }
 
-void pulseCornersBeat(float startT) {
-  float per = percentToNextMeasure(startT, 4)*2;
+void pulseCornersBeat(float per) {
+  per *= 2;
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i+=2) {
     lines.get(i).displayCenterPulse(per);
   }
 }
 
-void pulseLinesCenterBeat(float startT) {
-  float per = percentToNextMeasure(startT, 4)*2;
+void pulseLinesCenterBeat(float per) {
+  per *= 2;
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i++) {
     lines.get(i).displayCenterPulse(per);
   }
 }
 
-void pulseVertLongCenterBeat(float per) {
-
+void pulseVertLongCenterBeat(color c1, float per) {
+  stroke(c1);
+  fill(c1);
   if (per < 0.5) {
     float p = map(per, 0, 0.5, 0, 2);
     // lines going out
@@ -236,7 +259,7 @@ void pulseVertLongCenterBeat(float per) {
     lines.get(14).displayFlipSegment(0, constrain(p-1, 0, 1));
   } else {
     // lines coming in
-    float p = map(per, 1, 2, 2, 0);
+    float p = map(per, 0.5, 1, 2, 0);
     lines.get(4).displayFlipSegment(0, constrain(p, 0, 1));
     lines.get(8).displaySegment(0, constrain(p, 0, 1)); 
     lines.get(0).displayFlipSegment(0, constrain(p-1, 0, 1));
@@ -249,25 +272,35 @@ void pulseVertLongCenterBeat(float per) {
   }
 }
 
-void sineWaveVert(float per, float phaseStep) {
+void sineWaveVert(color c1, color c2, float per, float phaseStep) {
   float phase = 0;
   float period = per * 2 * PI;
-  lines.get(3).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+  float h = 0.5 + 0.5* sin(period + phase);
+  stroke(lerpColor(c1, c2, h));
+  lines.get(3).displaySegment(0, h);
 
   phase += phaseStep;
-  lines.get(1).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
-  lines.get(7).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+  h = 0.5 + 0.5* sin(period + phase);
+  stroke(lerpColor(c1, c2, h));
+  lines.get(1).displayFlipSegment(0, h);
+  lines.get(7).displaySegment(0, h);
 
   phase += phaseStep;
-  lines.get(5).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
-  lines.get(11).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+  h = 0.5 + 0.5* sin(period + phase);
+  stroke(lerpColor(c1, c2, h));
+  lines.get(5).displayFlipSegment(0, h);
+  lines.get(11).displaySegment(0, h);
 
   phase += phaseStep;
-  lines.get(9).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
-  lines.get(15).displaySegment(0, 0.5 + 0.5* sin(period + phase));
+  h = 0.5 + 0.5* sin(period + phase);
+  stroke(lerpColor(c1, c2, h));
+  lines.get(9).displayFlipSegment(0, h);
+  lines.get(15).displaySegment(0, h);
 
   phase += phaseStep;
-  lines.get(13).displayFlipSegment(0, 0.5 + 0.5* sin(period + phase));
+  h = 0.5 + 0.5* sin(period + phase);
+  stroke(lerpColor(c1, c2, h));
+  lines.get(13).displayFlipSegment(0, h);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,6 +333,8 @@ void linesGradientFaceCycle(color c1, color c2) {
   }
 }
 
+
+
 void cycleGrowFace(int face, int speed, int phase) {
   float snakeLoc = speed * 4;
   snakeLoc += phase;
@@ -321,23 +356,36 @@ void cycleGrowFace(int face, int speed, int phase) {
   }
 }
 
-void snakeFaceAll(float speed, int phase) {
+void snakeFaceAll(color c, float speed, int phase) {
+  stroke(c);
+  fill(c);
   for (int i = 0; i < 4; i++) {
     snakeFace(i, speed, i*phase);
   }
 }
 
-void growBlockEntire(float speed) {
+void growShrinkBlockEntire(color c1, color c2, color c3, color c4, float per) {
+  int currentC = currentCycle -1;
+  if ((currentC/8)%4 == 0) growShrinkBlockEntire(c1, per);
+  else if ((currentC/8)%4 == 1) growShrinkBlockEntire(c2, per);
+  else if ((currentC/8)%4 == 2) growShrinkBlockEntire(c3, per);
+  else  growShrinkBlockEntire(c4, per);
+}
+void growShrinkBlockEntire(color c, float per) {
+  stroke(c);
+  fill(c);
+  float speed = 0;
+  if (per < 0.5) speed = map(per, 0, 0.5, 0, 1);
+  else speed = map(per, 0.5, 1, 1, 0);
   int [] order = { 0, 4, 8, 12, 13, 14, 10, 6, 2, 3};
   float snakeLoc = speed * 11;
-
   if (floor(snakeLoc) == 0) return;
   int numFullLines = floor(snakeLoc-1);
 
   for (int i = 0; i < numFullLines && i < order.length; i++) {
     lines.get(order[i]).display();
   }
-  if (numFullLines < order.length) {
+  if (numFullLines < order.length && numFullLines >= 0) {
     lines.get(order[numFullLines]).displaySegment(0, (snakeLoc - numFullLines)/2);
   }
 }
@@ -499,6 +547,19 @@ class Line {
     drawEndCaps(p1, pTemp);
   }
 
+  void displayGradientLine(color c1, color c2, float per, float phase, boolean flip) {
+    per += phase;
+    per %= 1;
+
+    float spacing = 1.0/screenH;
+    for (float i = 0; i < 1.0; i+= spacing) {
+      float grad = (i/2 + per)%1;
+      stroke(getCycleColor(c1, c2, grad));
+      if (flip) displayFlipSegment(i, spacing);
+      else displaySegment(i, spacing);
+    }
+  }
+
   void displayPercentWid(float per) {
     per = constrain(per, 0, 1.0);
     int sw = int(map(per, 0, 1.0, 0, 5));
@@ -513,17 +574,6 @@ class Line {
 
     display();
     lineW = origLineW;
-  }
-
-  void fftConstellation(float c, float per) {
-    per = constrain(per, 0, 1.0);
-    int sw = int(map(per, 0, 1.0, 0, 5));
-    sw = constrain(sw, 0, 5);
-    if (sw < 1) noStroke();
-    else {
-      strokeWeight(sw);
-    }
-    if (constellationG == c)line(p1.x, p1.y, p2.x, p2.y);
   }
 
   void twinkle(int wait) {
@@ -548,10 +598,6 @@ class Line {
     if (p1.x > start && p1.x < end) {
       display(c);
     }
-  }
-
-  void randomSegment() {
-    //float len = random(
   }
 
   void displayBandX(int start, int end) {
@@ -590,26 +636,6 @@ class Line {
     //strokeWeight(18);
     display(color(0));
     //strokeWeight(2);
-  }
-
-  void displayConstellation(int num, color c) {
-    if (constellationG == num) {
-      display(c);
-    } else {
-      displayNone();
-    }
-  }
-
-  void displayAngle(int start, int end, color c) {
-    if (end < -360) {
-      if (ang >= radians(start) || ang < end + 360) {
-        display(c);
-      }
-    } else if (ang >= radians(start) && ang < radians(end)) {
-      display(c);
-    } else {
-      displayNone();
-    }
   }
 
 
@@ -740,7 +766,6 @@ class Line {
 
   void displayFlipSegment(float startPer, float sizePer) {
     strokeWeight(lineW);
-    strokeCap(ROUND);
     PVector pTemp = PVector.lerp(p2, p1, startPer);
     PVector pTempEnd = PVector.lerp(pTemp, p1, startPer + sizePer);
     line(pTemp.x, pTemp.y, pTempEnd.x, pTempEnd.y);
@@ -782,8 +807,8 @@ class Line {
 
 void drawEndCaps(PVector p1, PVector p2) {
   if (dist(p1.x, p1.y, p2.x, p2.y) > 1) {
-    ellipse(p1.x, p1.y, lineW/4, lineW/4);
-    ellipse(p2.x, p2.y, lineW/4, lineW/4);
+    ellipse(p1.x, p1.y, lineW/6, lineW/6);
+    ellipse(p2.x, p2.y, lineW/6, lineW/6);
   }
 }
 
@@ -843,7 +868,8 @@ void linesReleaseMouse() {
 void loadLines() {
   lines = new ArrayList<Line>();
   processing.data.JSONObject linesJson;
-  linesJson = loadJSONObject("data/lines/lines.json");
+  if (useTestKeystone) linesJson = loadJSONObject("data/lines/lines_Test.json");
+  else linesJson = loadJSONObject("data/lines/lines.json");
 
   processing.data.JSONArray linesArray = linesJson.getJSONArray("lineList");
   for (int i = 0; i < 16; i++) {
@@ -859,7 +885,6 @@ void loadLines() {
 void saveMappedLines() {
   processing.data.JSONObject json;
   json = new processing.data.JSONObject();
-  //saveJSONObject(json, "data/lines/lines.json");
 
   processing.data.JSONArray linesList = new processing.data.JSONArray();    
 
@@ -874,5 +899,29 @@ void saveMappedLines() {
     linesList.setJSONObject(i, lineJSON);
   }
   json.setJSONArray("lineList", linesList);
-  saveJSONObject(json, "data/lines/lines.json");
+  if (useTestKeystone) saveJSONObject(json, "data/lines/lines_Test.json");
+  else saveJSONObject(json, "data/lines/lines.json");
+}
+
+color getCycleColor(color c1, color c2, float per) {
+  per *= 2;
+  if (per < 1) {
+    return lerpColor(c1, c2, per);
+  } else {
+    per = map(per, 1, 2, 0, 1);
+    return lerpColor(c2, c1, per);
+  }
+}
+
+color getCycleColor(color c1, color c2, color c3, float per) {
+  per *=3;
+  if (per < 1) {
+    return lerpColor(c1, c2, per);
+  } else if (per < 2) {
+    per = map(per, 1, 2, 1, 0);
+    return lerpColor(c2, c3, per);
+  } else {
+    per = map(per, 2, 3, 1, 0);
+    return lerpColor(c3, c1, per);
+  }
 }
