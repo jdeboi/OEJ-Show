@@ -108,6 +108,7 @@ final int GRAD2 = 9;
 //final int GRAD_PAIR2 = 9;
 final int CAST_LIGHT = 10;
 final int CAST_LIGHT_SIDE = 11;
+final int CAST_BLUE = 12;
 //
 final int START =-1;
 final int DARK_PULSE = -2;
@@ -175,7 +176,6 @@ void drawCaveFlatGrid(int screenNum, PGraphics s) {
   s.strokeWeight(1);
   s.stroke(0, 255, 255);
   s.fill(0);
-  //println("screennum in cave flat draw", screenNum);
   drawFlatCaveWalls(screenNum, s);
   s.popMatrix();
   s.endDraw();
@@ -210,7 +210,6 @@ void drawCave(int screenNum, PGraphics s) {
   //s.colorMode(RGB);
   //s.stroke(0, 255, 255);
   //s.fill(0);
-  //println("screennum in cave draw", screenNum);
   drawGrids(screenNum, s);
   s.popMatrix();
 
@@ -282,7 +281,6 @@ void drawFeatures(int index, PGraphics s) {
 }
 
 void drawFlatCaveWalls(int screenNum, PGraphics s) {
-  //println("screennum in flat draw", screenNum);
   grids[0].drawFlatCave(screenNum, s, true);
   grids[1].drawFlatCave(screenNum, s, false);
   grids[0].drawFlatCave(screenNum, s, false);
@@ -471,8 +469,6 @@ void randomizeLerpColorsAllSame() {
   lerpC[1] = color(random(0, 255), 255, 255);
   lerpC[2] = lerpC[0];
   lerpC[3] = lerpC[1];
-
-  //println("lerpc", lerpC[0]);
 }
 
 color getLerpColorAllSame(int screenNum) {
@@ -540,6 +536,7 @@ void lightGridTopBot(PGraphics s, int screenNum, int i, int cols) {
     else if (i > brCol) br = constrain(int(map(i, brCol, brCol+spacing, 255, 0)), 0, 255);
     s.stroke(0, 0, br);
   } else s.stroke(0);
+  s.fill(0);
 }
 
 void lightGridTopBot(PGraphics s, int screenNum, int i, int cols, boolean isFlat) {
@@ -1210,9 +1207,6 @@ public class Grid {
     s.textureMode(NORMAL);
     s.textureWrap(CLAMP);
 
-    if (screenNum != 1) 
-      println("screennum", screenNum);
-
     for (int i = 0; i < rows-1; i++ ) {
       s.colorMode(HSB, 255);
       s.beginShape(QUAD_STRIP);
@@ -1258,7 +1252,7 @@ public class Grid {
       s.beginShape(QUAD_STRIP);
       for (int j = 0; j < cols-1; j++) {
         //if (colorSettings[screenNum] == RANDOM) randomizeSporadicColorGrid();
-        
+
         if (isFlat) drawFlatGrid(screenNum, s, i, j);
         else if (gridMode == ground) drawGround(screenNum, s, i, j);
         else if (gridMode == ceiling) drawCeiling(screenNum, s, i, j);
@@ -1288,11 +1282,7 @@ public class Grid {
     float b = 2;
     float a = 50;
     float xt = map(j, 0, cols-1, 0, 2*PI);
-    // f = map(j, 0, cols-1, 110, 180);
-    // s.stroke(f, 255, 225);
-    int alpha = 255;
-    if (drawImage && isOverImage(i, j)) alpha = 75;
-    //else {
+
     setGridColors(screenNum, s, this, i, j, gridMode);
 
     int startW = int(20*30.0/cellSize);
@@ -1328,140 +1318,13 @@ public class Grid {
   }
 
   public void drawCeiling(int screenNum, PGraphics s, int i, int j) {
-    switch(colorSettings[screenNum]) {
-    case STARTUP_STROKE:
-      int startSat = 255;
-      if (rainbowIndex < 0) startSat += rainbowIndex;
-      if (i < 15) {
-        s.stroke(125, startSat, 255);
-      } else {
-        float f = map(i, 15, rows-1, 125, 180);
-        s.stroke(f, startSat, 225);
-      }
-      break;
-    case RAINBOW_PULSE:
-      float f = map(i, 0, rows-1, 0, 255);
-      if (rainbowIndex < 0) s.stroke(i, 255 + rainbowIndex, 225);
-      else if ((i+rainbowIndex) > 210) s.stroke((i+rainbowIndex)%255, 255 - (rainbowIndex-210), 225);
-      else  s.stroke((i+rainbowIndex)%255, 255, 225);
-      break;
-    case CAST_LIGHT:
-      lightGridTopBot(s, screenNum, i, cols);
-      break;
-    case CAST_LIGHT_SIDE:
-      //lightGridSide(s, screenNum, i, cols);
-      s.noStroke();
-      s.noFill();
-      break;
-    case ICE:
-      s.fill(255, 150);
-      s.stroke(125, 255, 255);
-      break;
-    case RAINBOW_FILL:
-      f = map(i, 0, rows-1, -20, 255);
-      s.stroke(f, 255, 225);
-      break;
-    case GRAD_ALL:
-      s.stroke(getLerpColorAllSame(screenNum));
-      s.fill(0);
-      break; 
-    case GRAD1:
-      s.stroke(getLerpColorSides(screenNum));
-      s.fill(0);
-      break;
-    case GRAD2:
-      s.stroke(getLerpColorSides(screenNum));
-      s.fill(0);
-      break;
-    case START:
-      colorMode(HSB, 255);
-      color lerpC2 = lerpC[screenNum];
-      float h = hue(lerpC2);
-      float br = brightness(lerpC2);
-      float sat = saturation(lerpC2);
-      s.fill(0);
-      s.stroke(h, sat, br-50);
-      break;
-    case RANDOM:
-      s.fill(0);
-      s.stroke(colorGrid[j][i].getColor());
-      break;
-    default:
-      s.stroke(0);
-      s.fill(0);
-    }
+    setGridColors(screenNum, s, this, i, j, gridMode);
     s.vertex(j * cellSize, cellSize*i, noiseGrid[j][i]*1.5);
     s.vertex(j * cellSize, cellSize*(i+1), noiseGrid[j][i+1]*1.5);
   }
 
   public void drawGround(int screenNum, PGraphics s, int i, int j) {
-    switch(colorSettings[screenNum]) {
-    case STARTUP_STROKE: 
-      float startSat;
-      if (rainbowIndex < 0) startSat = 255 + rainbowIndex;
-      else startSat = 255;
-      if (i < 15) s.stroke(125, startSat, 255);
-      else {
-        float f = map(i, 15, rows-1, 125, 180);
-        s.stroke(f, startSat, 225);
-      }
-      break;
-    case RAINBOW_STROKE: 
-      float f = map((i+frameCount)%rows-1, 0, rows-1, 0, 255);
-      s.stroke(rainbowIndex%255, 255, 225);
-      break; 
-    case RAINBOW_PULSE:
-      if (rainbowIndex < 0) s.stroke(i, 255 + rainbowIndex, 225);
-      else if ((i+rainbowIndex) > 210) s.stroke((i+rainbowIndex)%255, 255 - (rainbowIndex-210), 225);
-      else  s.stroke((i+rainbowIndex)%255, 255, 225);
-      break;
-    case CAST_LIGHT:
-      //lightGridTopBot(s, screenNum, i, cols);
-      stroke(0);
-      break;
-    case CAST_LIGHT_SIDE:
-      //lightGridSide(s, screenNum, i, cols);
-      s.noStroke();
-      s.noFill();
-      break;
-    case RAINBOW_FILL:
-      f = map(i, 0, rows-1, -20, 255);
-      s.stroke(f, 255, 225);
-      break;
-    case ICE:
-      s.fill(255, 150);
-      s.stroke(125, 255, 255);
-      break;
-    case GRAD_ALL:
-      s.stroke(getLerpColorAllSame(screenNum));
-      s.fill(0);
-      break; 
-    case GRAD1:
-      s.stroke(getLerpColorSides(screenNum));
-      s.fill(0);
-      break;
-    case GRAD2:
-      s.stroke(getLerpColorSides(screenNum));
-      s.fill(0);
-      break;
-    case START:
-      colorMode(HSB, 255);
-      color lerpC2 = lerpC[screenNum];
-      float h = hue(lerpC2);
-      float br = brightness(lerpC2);
-      float sat = saturation(lerpC2);
-      s.fill(0);
-      s.stroke(h, sat, br-50);
-      break;
-    case RANDOM:
-      s.fill(0);
-      s.stroke(colorGrid[j][i].getColor());
-      break;
-    default:
-      s.fill(0);
-      s.stroke(0);
-      break;
-    }
+  setGridColors(screenNum, s, this, i, j, gridMode);
     s.vertex(j * cellSize, cellSize*i, noiseGrid[j][i]*1.5);
     s.vertex(j * cellSize, cellSize*(i+1), noiseGrid[j][i+1]*1.5);
   }
@@ -1533,15 +1396,34 @@ void setGridColors(int screenNum, PGraphics s, Grid g, int i, int j, int gridMod
 
   switch(colorSettings[screenNum]) {
   case STARTUP_STROKE:
+  
     int startSat = 255;
-    if (rainbowIndex < 0) startSat += rainbowIndex;
-    //  if (rainbowIndex < 0) startSat = rainbowIndex + 255; left
-    int startG = int(35*25.0/g.cellSize);  
-    if (j < startG) {
-      s.stroke(125, startSat, 255, alpha);
+    if (gridMode == ground) {
+      if (rainbowIndex < 0) startSat = 255 + rainbowIndex; // also left
+      else startSat = 255;
+      if (i < 15) s.stroke(125, startSat, 255);
+      else {
+        f = map(i, 15, g.rows-1, 125, 180);
+        s.stroke(f, startSat, 225);
+      }
+   }
+    else if (gridMode == ceiling) {
+      if (rainbowIndex < 0) startSat += rainbowIndex;
+      if (i < 15) {
+        s.stroke(125, startSat, 255);
+      } else {
+        f = map(i, 15, g.rows-1, 125, 180);
+        s.stroke(f, startSat, 225);
+      }
     } else {
-      f = map(j, startG, g.cols-1, 125, 180);
-      s.stroke(f, startSat, 225, alpha);
+      if (rainbowIndex < 0) startSat += rainbowIndex;
+      int startG = int(35*25.0/g.cellSize);  
+      if (j < startG) {
+        s.stroke(125, startSat, 255, alpha);
+      } else {
+        f = map(j, startG, g.cols-1, 125, 180);
+        s.stroke(f, startSat, 225, alpha);
+      }
     }
     break;
   case ICE:
@@ -1549,28 +1431,47 @@ void setGridColors(int screenNum, PGraphics s, Grid g, int i, int j, int gridMod
     s.stroke(125, 255, 255);
     break;
   case RAINBOW_STROKE:
-    f = map(j, 0, g.cols-1, 0, 255);
-    s.stroke((f+rainbowIndex)%255, 255, 225, alpha);
+    if (gridMode == ground) {
+      f = map((i+frameCount)%g.rows-1, 0, g.rows-1, 0, 255);
+      s.stroke(rainbowIndex%255, 255, 225);
+      break;
+    } else {
+      f = map(j, 0, g.cols-1, 0, 255);
+      s.stroke((f+rainbowIndex)%255, 255, 225, alpha);
+    }
 
     break;
 
   case RAINBOW_PULSE: 
-    f  = map(j, 0, g.cols, 0, 255);
-    if (rainbowIndex < 0) s.stroke(j, 255 + rainbowIndex, 225, alpha);
-    else if ((j+rainbowIndex) > 210) {
-      if (fadingToWhite) s.stroke((j+rainbowIndex)%255, 255 - (rainbowIndex-210), 225, alpha);
-      else s.stroke((j+rainbowIndex)%255, 255, 225, alpha);
-    } else  s.stroke((j+rainbowIndex)%255, 255, 225, alpha);
-
+    if (gridMode == ceiling || gridMode == ground) {
+      f = map(i, 0, g.rows-1, 0, 255);
+      if (rainbowIndex < 0) s.stroke(i, 255 + rainbowIndex, 225);
+      else if ((i+rainbowIndex) > 210) s.stroke((i+rainbowIndex)%255, 255 - (rainbowIndex-210), 225);
+      else  s.stroke((i+rainbowIndex)%255, 255, 225);
+    } else {
+      f  = map(j, 0, g.cols, 0, 255);
+      if (rainbowIndex < 0) s.stroke(j, 255 + rainbowIndex, 225, alpha);
+      else if ((j+rainbowIndex) > 210) {
+        if (fadingToWhite) s.stroke((j+rainbowIndex)%255, 255 - (rainbowIndex-210), 225, alpha);
+        else s.stroke((j+rainbowIndex)%255, 255, 225, alpha);
+      } else  s.stroke((j+rainbowIndex)%255, 255, 225, alpha);
+    }
     break;
   case CAST_LIGHT:
     if (gridMode == flatWall) lightGridTopBot(s, screenNum, i, g.cols, true);
+    else if (gridMode == ceiling) lightGridTopBot(s, screenNum, i, g.cols);
+    else if (gridMode == ground)  lightGridTopBot(s, screenNum, i, g.cols);
     else if (gridMode == leftWall) lightGridTopBot(s, screenNum, j-20, g.rows);
     else if (gridMode == rightWall) lightGridTopBot(s, screenNum, j-20, g.rows);
+
     break;
   case CAST_LIGHT_SIDE: 
     if (gridMode == flatWall) lightGridSide(s, screenNum, j, g.rows);
     if (gridMode == rightWall || gridMode == leftWall) lightGridSide(s, screenNum, i, g.cols);
+    if (gridMode == ceiling || gridMode == ground) {
+      s.noStroke();
+      s.noFill();
+    }
     break;
   case RAINBOW_FILL:
     f = map(i, 0, g.rows-1, -20, 255);
