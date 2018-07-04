@@ -630,7 +630,7 @@ void fadeAudioAmp(float start, float end, float rampStart, float rampEnd) {
 }
 
 void cycleAudioAmp(float per) {
-   float period = per * 2 * PI;
+  float period = per * 2 * PI;
   audioLev = audioAmpLev*sin(period);
 }
 
@@ -1646,7 +1646,6 @@ void initSpaceRects() {
   for (int r = 0; r < spaceRects.length; r++) {
     spaceRects [r] = new SpaceRect(new PVector(0, 0, endPSpaceRects+rectSpacing*r), new PVector(0, 0, zVel) );
   }
-  
 }
 
 boolean hasResetRects = true;
@@ -2281,4 +2280,259 @@ void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY) {
   }
   s.popMatrix();
   s.endDraw();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// PARTICLE DRIP
+//////////////////////////////////////////////////////////////////////////////////
+// https://www.openprocessing.org/sketch/566877
+// Justin Chambers
+// 03/2018
+// https://www.openprocessing.org/sketch/524376
+
+
+int particleDensity = 4000;
+int visualMode = 0;
+int numModes = 4;
+boolean invertColors = false;
+ParticleDrip [] particles_a, particles_b, particles_c, particlesDrip;
+
+int nums;
+float maxLife = 10;
+float noiseScale = 200;
+float  simulationSpeed = 0.2;
+int fadeFrame = 0;
+
+int padding_top = 100;
+int padding_side = 100;
+int inner_square = 512;
+
+color backgroundColor;
+color color_from;
+color color_to;
+PGraphics s;
+
+void displaySquiggleParticles(PGraphics s) {
+  //displayDrip();
+  s.beginDraw(); 
+  s.noStroke();
+  s.smooth();
+  displaySquiggle(s);
+  s.endDraw();
+}
+
+void initDrip(PGraphics s) {
+  randomSeed(0);
+  noiseSeed(0);
+  nums = 100;
+
+  backgroundColor = color(20, 20, 20);
+  color_from = color(255, 0, 0);
+  color_to = color(0, 0, 255);
+
+
+  //background(backgroundColor);
+
+
+
+  padding_top = (s.height - inner_square)/2;
+  padding_side = (s.width - inner_square)/2;
+
+  particlesDrip = new ParticleDrip[nums];
+  for (int i = 0; i < nums; i++) {
+    ParticleDrip p = new ParticleDrip(s, false);
+    p.pos.x = random(padding_side, s.width-padding_side);
+    p.pos.y = padding_top;
+    particlesDrip[i] = p;
+  }
+  s.beginDraw();
+  s.background(color(0));
+  s.endDraw();
+}
+
+void displayDrip(PGraphics s) {
+
+  ++fadeFrame;
+  if (fadeFrame % 5 == 0) {
+
+    s.blendMode(DIFFERENCE);
+    s.fill(1, 1, 1);
+    s.rect(0, 0, s.width, s.height);
+
+    s.blendMode(LIGHTEST);
+    //blendMode(DARKEST); //looks terrible. stutters
+    s.fill(backgroundColor);
+    s.rect(0, 0, s.width, s.height);
+  }
+
+  s.blendMode(BLEND);
+
+  for (int i = 0; i < nums; i++) {
+    float iterations = map(i, 0, nums, 5, 1);
+    float radius = map(i, 0, nums, 1, 3);
+
+    particlesDrip[i].move(s, iterations);
+    particlesDrip[i].checkEdge(s);
+
+    int alpha = 255;
+
+    float particle_heading = particlesDrip[i].vel.heading()/PI;
+    if (particle_heading < 0) {
+      particle_heading *= -1;
+    }
+    color particle_color = lerpColor(particlesDrip[i].color1, particlesDrip[i].color2, particle_heading);
+
+    float fade_ratio; //TODO
+    fade_ratio = min(particlesDrip[i].life * 5 / maxLife, 1);
+    fade_ratio = min((maxLife - particlesDrip[i].life) * 5 / maxLife, fade_ratio);
+
+    s.fill(red(particle_color), green(particle_color), blue(particle_color), alpha * fade_ratio);
+    particlesDrip[i].display(s, radius);
+  }
+}
+
+void initSquiggle(PGraphics s) {
+  nums = 200;
+  noiseScale = 800;
+  particles_a = new ParticleDrip[nums];
+  particles_b = new ParticleDrip[nums];
+  particles_c = new ParticleDrip[nums];
+  for (int i = 0; i < nums; i++) {
+    particles_a[i] = new ParticleDrip(s, true);
+    particles_b[i] = new ParticleDrip(s, true);
+    particles_c[i] = new ParticleDrip(s, true);
+  }
+}
+
+void displaySquiggle(PGraphics s) {
+  s.noStroke();
+  s.smooth();
+  for (int i = 0; i < nums; i++) {
+    float radius = map(i, 0, nums, 2, 3);
+    float alpha = map(i, 0, nums, 0, 250);
+
+    s.fill(69, 33, 124, alpha);
+    particles_a[i].move();
+    particles_a[i].display(s, radius);
+    particles_a[i].checkEdge(s);
+
+    s.fill(7, 153, 242, alpha);
+    particles_b[i].move();
+    particles_b[i].display(s, radius);
+    particles_b[i].checkEdge(s);
+
+    s.fill(255, 255, 255, alpha);
+    particles_c[i].move();
+    particles_c[i].display(s, radius);
+    particles_c[i].checkEdge(s);
+  }
+}
+
+
+class ParticleDrip {
+  // member properties and initialization
+  PVector vel, pos, dir;
+  float life;
+  float flip;
+  color color1;
+  color color2;
+  color c;
+  boolean isSquiggle;
+  float speed = 0.4;
+
+  ParticleDrip(PGraphics s, boolean isSquiggle) {
+    this.isSquiggle = isSquiggle;
+    this.vel = new PVector(0, 0);
+    this.dir = new PVector(0, 0);
+    this.pos = new PVector(random(0, s.width), random(0, s.height));
+    this.life = random(0, maxLife);
+    this.flip = int(random(0, 2)) * 2 - 1;
+    this.color1 = this.color2 = color(255, 0, 0);
+
+    if (int(random(3)) == 1) {
+      this.color1 = color_from;
+      this.color2 = color_to;
+    }
+  }
+
+  // member functions
+  void move(PGraphics s, float iterations) {
+    if ((this.life -= 0.01666) < 0)
+      if (!isSquiggle) respawnTop(s);
+      else respawn(s);
+    while (iterations > 0) {
+
+      float transition = map(this.pos.x, padding_side, s.width-padding_side, 0, 1);
+      float angle = noise(this.pos.x/noiseScale, this.pos.y/noiseScale)*transition*TWO_PI*noiseScale;  
+      this.vel.x = cos(angle);
+      this.vel.y = sin(angle);
+      this.vel.mult(simulationSpeed);
+      this.pos.add(this.vel);
+      --iterations;
+    }
+  }
+
+  void move() {
+    float angle = noise(this.pos.x/noiseScale, this.pos.y/noiseScale)*TWO_PI*noiseScale;
+    this.dir.x = cos(angle);
+    this.dir.y = sin(angle);
+    this.vel = this.dir.copy();
+    this.vel.mult(this.speed);
+    this.pos.add(this.vel);
+  }
+
+  void checkEdge(PGraphics s) {
+    if (!isSquiggle) {
+      if (this.pos.x > s.width - padding_side
+        || this.pos.x < padding_side
+        || this.pos.y > s.height - padding_top
+        || this.pos.y < padding_top) {
+        respawnTop(s);
+      }
+    } else {
+      if (this.pos.x > s.width || this.pos.x < 0 || this.pos.y > s.height || this.pos.y < 0) {
+        this.pos.x = random(50, s.width);
+        this.pos.y = random(50, s.height);
+      }
+    }
+  }
+
+  void respawn(PGraphics s) {
+    this.pos.x = random(0, s.width);
+    this.pos.y = random(0, s.height);
+    this.life = maxLife;
+  }
+
+  void respawnTop(PGraphics s) {
+    this.pos.x = random(padding_side, s.width-padding_side);
+    this.pos.y = padding_top;
+    this.life = maxLife;
+  }
+
+  void display(PGraphics s, float r) {
+    s.noStroke();
+    s.ellipse(this.pos.x, this.pos.y, r, r);
+  }
+}
+
+
+
+
+
+
+
+
+void displaySphereBox(PGraphics s) {
+  int SPHERE_RADIUS=200;
+  s.background(0);
+  s.pushMatrix();
+  s.translate(width/2, height/2, 0);
+  s.rotateY(frameCount*0.01);
+  s.noFill();
+  s.stroke(255, 100);
+  s.strokeWeight(1);
+  s.sphere(SPHERE_RADIUS);
+  s.box(s.width/2);//physics.getWorldBounds().getExtent().x*2);
+  s.popMatrix();
 }

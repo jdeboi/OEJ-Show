@@ -5,7 +5,7 @@ ControlP5 cp5;
 
 // start / stop music
 
-Toggle togMap, togEdit, togShow, togP, togEditMask, togMask, togEdit3D, togEditLines;
+Toggle togMap, togEdit, togShow, togP, togEditMask, togEditAll, togMask, togEdit3D, togEditLines;
 Textlabel timeText;
 Textarea myTextarea;
 int ymen = 0;
@@ -42,6 +42,14 @@ void initControls() {
     .setMode(ControlP5.SWITCH)
     ;
 
+  togEditAll = cp5.addToggle("toggleEditAll")
+    .setPosition(50, 150)
+    .setSize(50, 20)
+    .setValue(false)
+    .setLabel("Editing OFF")
+    .setMode(ControlP5.SWITCH)
+    ;
+    
   cp5.addButton("saveMap")
     .setValue(0)
     .setPosition(750, 200)
@@ -333,10 +341,18 @@ void toggleEditBreak(boolean theFlag) {
   }
 }
 
+void toggleEditAll(boolean theFlag) {
+  if (controlsON) {
+    mappingON = theFlag;
+    String o = theFlag?"ON":"OFF";
+    togEditAll.setLabel("editing " + o);
+  }
+}
 
 void toggleMap(boolean theFlag) {
   if (controlsON) {
     editingMapping = theFlag;
+    strokeWeight(1);
     if (theFlag) ks.startCalibration();
     else ks.stopCalibration();
     String o = theFlag?"ON":"OFF";

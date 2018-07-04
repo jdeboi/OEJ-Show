@@ -301,7 +301,7 @@ void initScreens() {
 
 void saveKeystone() {
   if (useTestKeystone) ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
-  else ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
+  else ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
 }
 void loadKeystone(int i) {
   keystoneNum = i;

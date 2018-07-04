@@ -152,12 +152,7 @@ void initSong() {
   cues[1] = new Cue(5, 'v', 0.0, 0);
   cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
-void initEllon() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 void initEgrets() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'm', 0, 0);
@@ -717,20 +712,27 @@ void initWiz() {
   cues[10] = new Cue(235, 'v', 0.0, 0);
 
   tempo = 148;
+
+  loadKeystone(0);
+  initSquiggle(centerScreen.s);
 }
 
+boolean resetSquiggleLines = false;
 void displayWiz() {
-
+  
   switch(currentCue) {
   case 0:
-    //drawSolidAll(color(0));
-    //drawFFTBarsCubes();
-    //pulseHorizLinesCenterBeat(percentToNumBeats(16));
-    //snakeFaceAll(percentToNextMeasure(0, 4), 2);
-    displayGradientVertLines(black, white, percentToNumBeats(4));
+    //centerScreenFrontAll();
+    //displaySquiggleParticles(centerScreen.s);
+    //resetSquiggleLines = true;
     break;
   case 1:
-    transit(white, red, yellow, blue, percentToNumBeats(4));
+    //if (resetSquiggleLines) {
+    //  centerScreen.blackOut();
+    //  resetSquiggleLines = false;
+    //}
+    //centerScreenFrontAll();
+    //displaySquiggleParticles(centerScreen.s);
     break;
   case 2:
     sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
@@ -795,15 +797,26 @@ void displaySong() {
     break;
   }
 }
+
+void initEllon() {
+  cues = new Cue[3];
+  cues[0] = new Cue(0, 'm', 0, 0);
+  cues[1] = new Cue(5, 'v', 0.0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0-1, 'v', 0.0, 0);
+
+  loadKeystone(MID_CENTER);
+}
+
 void displayEllon() {
+  centerScreenFrontAll();
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
+    centerScreen.drawImage(currentImages.get(0), 0, 0);
+    fadeInAllScreens(cues[currentCue].startT, 4);
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    centerScreen.drawImage(currentImages.get(0), 0, 0);
+    fadeOutAllScreens(cues[currentCue].startT, 3);
     break;
   default:
     drawSolidAll(color(0));
@@ -813,12 +826,40 @@ void displayEllon() {
 void displayEgrets() {
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
+    //drawSolidAll(color(0));
+    //drawFFTBarsCubes();
+    //pulseHorizLinesCenterBeat(percentToNumBeats(16));
+    //snakeFaceAll(percentToNextMeasure(0, 4), 2);
+    displayGradientVertLines(black, white, percentToNumBeats(4));
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    transit(white, red, yellow, blue, percentToNumBeats(4));
+    break;
+  case 2:
+    sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
+    break;
+  case 3:
+    growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
+    break;
+  case 4:
+    pulseVertLongCenterBeat(red, percentToNumBeats(8));
+
+
+    break;
+  case 5:
+    linesGradientFaceCycle(red, black); 
+    break;
+  case 6: 
+    displayCycleSingleFaceLines(white, -1); 
+    break;
+  case 7:
+    snakeFaceAll(red, percentToNumBeats(8), 2);
+    break;
+  case 8:
+    pulsing(blue, percentToNumBeats(8));
+    break;
+  case 9:
+    transit(white, red, yellow, blue, percentToNumBeats(4));
     break;
   default:
     drawSolidAll(color(0));

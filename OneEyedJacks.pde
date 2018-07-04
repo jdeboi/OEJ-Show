@@ -7,6 +7,7 @@ int MOON = 0;
 int DELTA = 8;
 int WIZ = 5;
 int VIOLATE = 6;
+int ELLON =10;
 
 int LARGE_CENTER = 0;
 int MID_CENTER = 1;
@@ -55,7 +56,7 @@ void setup() {
   initFFT();
   initMidi();
 
-  changeScene(VIOLATE);
+  changeScene(WIZ);
 
   if (!showTime) initControls();
 
@@ -86,7 +87,9 @@ void draw() {
   }
 
   drawControls();
-  
+  //translate(420, 940);
+  //scale(.4);
+  //image(currentImages.get(0), 0, 0);
   
 }
 
