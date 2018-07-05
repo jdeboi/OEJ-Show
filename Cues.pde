@@ -233,52 +233,57 @@ void initDelta() {
   cues[9] = new Cue(203, 'v', 0.0, 0);
   initAllFlowyWaves();
   cubesFront();
+
+  initHands();
+  initSymbols();
 }
 
 void deconstructDelta() {
 }
 
 void displayDelta() {
-  stroke(255, 0, 255);
-
-
+  displayLinesCenterFocus(color(255));
+  innerScreensOut();
   switch(currentCue) {
   case 0:
-    displayFlowyWavesAll();
-    //displayCycleFaceLines(0, color(255, 0, 255));
+    PImage p = hands[(currentCycle) % hands.length];
+    int w = int(p.width * 1.0 * screens[0].s.height/p.height);
+    screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
+    screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
     break;
   case 1:
-    //drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+
     cycleHandsFFT();
-    displayFlowyWavesAll();
+
     break;
   case 2:
-    cycleHandsFFT();
-    displayFlowyWavesAll();
+    p = symbols[(currentCycle) % symbols.length];
+    w = int(p.width * 1.0 * screens[0].s.height/p.height);
+    screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
+    screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
     break;
   case 3:
-    //drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+  cycleHandsFFT();
     break;
   case 4:
-    displayFlowyWavesAll();
+
     break;
   case 5:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
     break;
   case 6:
-    displayFlowyWavesAll();
+
     break;
   case 7:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+
     break;
   case 8:
-    displayFlowyWavesAll();
+
     break;
   case 9:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+
     break;
   case 10:
-    displayFlowyWavesAll();
+
     break;
   default:
     drawSolidAll(color(0));
@@ -338,7 +343,10 @@ void displayMoon() {
   int DIAG_EXIT_HORIZ = 6;
   int DIVERGE_VERT_LINE = 7;
   int LIGHT_SPEED = 8;
-  drawMoonSphere(currentImages.get(0));
+
+  if (!personOnPlatform) drawMoonSphere(currentImages.get(0));
+  else drawEye();
+
   switch(currentCue) {
   case 0:    
     displayMoveSpaceCenterCycle(0.75);
@@ -417,6 +425,9 @@ void displayMoon() {
 }
 
 void displayLollies() {
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else drawEye();
+
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
@@ -434,6 +445,9 @@ void displayLollies() {
 
 
 void displayCycles() {
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else drawEye();
+
   switch(currentCue) {
   case 0:
     mirrorVidCenter(vid1, -100, 0);
@@ -477,7 +491,9 @@ void initDirty() {
 }
 
 void displayDirty() {
-  displayStripedMoon(20);
+  if (!personOnPlatform) displayStripedMoon(20);
+  else drawEye();
+
   switch(currentCue) {
   case 0:
     centerScreenFrontInner();
@@ -596,6 +612,9 @@ void initFifty() {
 }
 
 void displayFifty() {
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else drawEye();
+
   drawSolidOuter(color(0));
 
   //colorMode(RGB, 255);
@@ -693,9 +712,10 @@ void displayFifty() {
 }
 
 void initWiz() {
+  //initVid("scenes/wizrock/movies/1_540.mp4");
   cues = new Cue[11];
   cues[0] = new Cue(0, 'm', 0, 0); // intro
-  cues[1] = new Cue(13, 'v', 0.0, 0);  // same as 1
+  cues[1] = new Cue(213, 'v', 0.0, 0);  // same as 1
   //cues[2] = new Cue(25.5, 'v', 0.0, 0); // 2
   cues[2] = new Cue(39, 'v', 0.0, 0);  // same as 1
   //cues[4] = new Cue(52, 'v', 0.0, 0);  // 2
@@ -714,58 +734,116 @@ void initWiz() {
   tempo = 148;
 
   loadKeystone(0);
-  initSquiggle(centerScreen.s);
+  //initNodes(screens[0].s);
+  //initTesseract();
+  //initSquiggle(centerScreen.s);
+  initDots(100);
+  initAllFlowyWaves();
+  currentGifs.get(4).loop();
+
+  initNodesMain();
+  initSymbols();
 }
 
 boolean resetSquiggleLines = false;
+
 void displayWiz() {
-  
-  switch(currentCue) {
-  case 0:
-    //centerScreenFrontAll();
-    //displaySquiggleParticles(centerScreen.s);
-    //resetSquiggleLines = true;
-    break;
-  case 1:
-    //if (resetSquiggleLines) {
-    //  centerScreen.blackOut();
-    //  resetSquiggleLines = false;
-    //}
-    //centerScreenFrontAll();
-    //displaySquiggleParticles(centerScreen.s);
-    break;
-  case 2:
-    sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
-    break;
-  case 3:
-    growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
-    break;
-  case 4:
-    pulseVertLongCenterBeat(red, percentToNumBeats(8));
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else {
+    drawEye();
+    //handsHorizFaceLines(cyan);
+    //displayDots();
 
 
-    break;
-  case 5:
-    linesGradientFaceCycle(red, black); 
-    break;
-  case 6: 
-    displayCycleSingleFaceLines(white, -1); 
-    break;
-  case 7:
-    snakeFaceAll(red, percentToNumBeats(8), 2);
-    break;
-  case 8:
-    pulsing(blue, percentToNumBeats(8));
-    break;
-  case 9:
-    transit(white, red, yellow, blue, percentToNumBeats(4));
-    break;
-  default:
-    drawSolidAll(color(0));
-    break;
+    //updateNodeConstellationMainHand();
+    //displayNodeConstellationMain();
   }
+
+  //cubesFront();
+  //tessPink();
+  //wizPinkVidConst();
+  cubesFront();
+
+  //updateNodeConstellationMain();
+  //displayNodeConstellationMain();
+
+  displayFlowyWavesWiz();
+
+  //switch(currentCue) {
+  //case 0:
+  //  break;
+  //case 1:
+  //  //centerScreenFrontAll();
+  //  //displaySquiggleParticles(centerScreen.s);
+  //  //resetSquiggleLines = true;
+  //  break;
+  //  //case 1:
+  //  //if (resetSquiggleLines) {
+  //  //  centerScreen.blackOut();
+  //  //  resetSquiggleLines = false;
+  //  //}
+  //  //centerScreenFrontAll();
+  //  //displaySquiggleParticles(centerScreen.s);
+  //  //break;
+  //case 2:
+  //  sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
+  //  break;
+  //case 3:
+  //  growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
+  //  break;
+  //case 4:
+  //  pulseVertLongCenterBeat(red, percentToNumBeats(8));
+
+
+  //  break;
+  //case 5:
+  //  linesGradientFaceCycle(red, black); 
+  //  break;
+  //case 6: 
+  //  displayCycleSingleFaceLines(white, -1); 
+  //  break;
+  //case 7:
+  //  snakeFaceAll(red, percentToNumBeats(8), 2);
+  //  break;
+  //case 8:
+  //  pulsing(blue, percentToNumBeats(8));
+  //  break;
+  //case 9:
+  //  transit(white, red, yellow, blue, percentToNumBeats(4));
+  //  break;
+  //default:
+  //  drawSolidAll(color(0));
+  //  break;
+  //}
 }
 
+void tessPink() {
+  updateTesseractBeat(0.03);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(pink);
+    displayTesseractNoBack(s);
+    s.endDraw();
+  }
+}
+void wizPinkVidConst() {
+  updateNodeConstellation(screens[0].s);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    //screens[i].s.image(vid1, -i*s.width, -100, s.width*2, s.height*s.width*2/s.width);
+    if (i%2 == 0) s.image(vid1, 0, 0, s.width*vid1.height/s.height, s.height);
+    else {
+      s.pushMatrix();
+      s.scale(-1.0, 1.0);
+      s.image(vid1, -s.width, 0, s.width*vid1.height/s.height, s.height);
+      s.popMatrix();
+    }
+    displayNodeConstellation(s);
+    s.endDraw();
+  }
+}
 
 void displayMood() {
   switch(currentCue) {
@@ -783,6 +861,9 @@ void displayMood() {
   }
 }
 void displaySong() {
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else drawEye();
+
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
@@ -824,6 +905,9 @@ void displayEllon() {
   }
 }
 void displayEgrets() {
+  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  else drawEye();
+
   switch(currentCue) {
   case 0:
     //drawSolidAll(color(0));

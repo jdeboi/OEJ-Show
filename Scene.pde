@@ -30,7 +30,6 @@ void changeScene(int n) {
     currentScene.init();
     isPlaying = false;
     betweenSongs = true;
-    initBreaks();
     println("Current scene: " + currentScene.song);
   }
 }

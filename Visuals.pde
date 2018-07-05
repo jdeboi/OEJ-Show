@@ -121,82 +121,138 @@ void triangleCenterScreen(color c, int sw, int sz) {
   screens[2].drawTriangle(c, sw, 0, screenH/2, sz);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////
-// NETWORK CIRCLE
+// NETWORK CONSTELLATIONS
 //////////////////////////////////////////////////////////////////////////////////
-// https://www.openprocessing.org/sketch/434620
-// Koï Koï
-ArrayList<Star> constellation;
-int n;
-float dd;
+// Network V.0
+Node[] nodes;
 
-void initCurvyNetwork() {
-  n = 50;
-  constellation = new ArrayList<Star>();
-  for (int i = 0; i <= n; i++) {
-    constellation.add(new Star());
+void initNodes(PGraphics s) {
+  nodes = new Node[20];
+  for (int i = 0; i < nodes.length; i++) {
+    nodes[i] = new Node(s);
   }
-  strokeWeight(.75);
-  stroke(255);
 }
 
-void drawCurvyNetwork(PGraphics s) {
-  s.background(0);
-  for (int i = 0; i < constellation.size(); i++) {
-    constellation.get(i).update();
-    for (int j = 0; j < constellation.size(); j++) {
-      if (i > j) { // "if (i > j)" => to check one time distance between two stars
-        dd = constellation.get(i).loc.dist(constellation.get(j).loc); // Distance between two stars
-        if (dd <= width / 10) { // if d is less than width/10 px, we draw a line between the two stars
-          s.line(constellation.get(i).loc.x, constellation.get(i).loc.y, constellation.get(j).loc.x, constellation.get(j).loc.y);
-        }
+void initNodesMain() {
+  nodes = new Node[20];
+  int minY = maskPoints[keystoneNum][0].y;
+  int maxY = maskPoints[keystoneNum][9].y + 50;
+  for (int i = 0; i < nodes.length; i++) {
+    nodes[i] = new Node(minY, maxY);
+  }
+}
+
+void updateNodeConstellation(PGraphics s) {
+  updateNodeConstellation(s, 150);
+}
+
+void updateNodeConstellationMain() {
+  int minY = maskPoints[keystoneNum][0].y;
+  int maxY = maskPoints[keystoneNum][9].y + 50;
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].move(minY, maxY);
+  }
+}
+
+void updateNodeConstellationMainHand() {
+  float per = constrain(map(mouseX, width/2 - 300, width/2 + 300, -1, 1), -1, 1);
+  println(per);
+  int minY = maskPoints[keystoneNum][0].y;
+  int maxY = maskPoints[keystoneNum][9].y + 50;
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveHand(minY, maxY, per);
+  }
+}
+
+void updateNodeConstellation(PGraphics s, int maxY) {
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].move(s, maxY);
+  }
+}
+void displayNodeConstellation(PGraphics s) {
+  int dis = 75;
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].display(s);
+    for (int j = 0; j < nodes.length; j++) {
+      if (i != j && nodes[i].connect(nodes[j], dis)) {
+        s.stroke(255);
+        s.line(nodes[i].pos.x, nodes[i].pos.y, nodes[j].pos.x, nodes[j].pos.y);
       }
     }
   }
 }
 
-class Star {
-  float a, r, m;
-  PVector loc, speed, bam;
-  Star() {
-
-    this.a = random(5 * TAU); // "5*TAU" => render will be more homogeneous
-    this.r = random(screenW * .2, screenW * .25); // first position will looks like a donut
-    this.loc = new PVector(screenW / 2 + sin(this.a) * this.r, screenH / 2 + cos(this.a) * this.r);
-    this.speed = new PVector();
-    this.speed = PVector.random2D();
-    this.bam = new PVector();
-    this.m = 0;
-  }
-
-
-  void update() {
-    bam =  PVector.random2D();// movement of star will be a bit erractic
-    //this.bam.random2D();
-    bam.mult(0.45);
-    speed.add(bam);
-    // speed is done according distance between loc and the mouse :
-    m = constrain(map(dist(this.loc.x, this.loc.y, mouseX, mouseY), 0, screenW, 8, .05), .05, 3); // constrain => avoid returning "not a number"
-    speed.normalize().mult(this.m);
-
-    // No colision detection, instead loc is out of bound
-    // it reappears on the opposite side :
-    if (dist(loc.x, this.loc.y, screenW / 2, screenH / 2) > (screenW / 2) * 0.98) {
-      if (loc.x < screenW / 2) {
-        loc.x = screenW - loc.x - 4; // "-4" => avoid blinking stuff
-      } else if (loc.x > screenW / 2) {
-        loc.x = screenW - loc.x + 4; // "+4"  => avoid blinking stuff
-      }
-      if (loc.y < screenH / 2) {
-        loc.y = screenW - loc.y - 4;
-      } else if (loc.x > screenH / 2) {
-        loc.y = screenW - loc.y + 4;
+void displayNodeConstellationMain() {
+  int dis = 150;
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].display();
+    for (int j = 0; j < nodes.length; j++) {
+      if (i != j && nodes[i].connect(nodes[j], dis)) {
+        stroke(255);
+        line(nodes[i].pos.x, nodes[i].pos.y, nodes[j].pos.x, nodes[j].pos.y);
       }
     }
-    loc = loc.add(speed);
-  } // End of update()
-} // End of class
+  }
+}
+
+
+class Node {
+  PVector pos, vel;
+
+  Node(PGraphics s) {
+    this.pos = new PVector(random(s.width), random(s.height));
+    this.vel = new PVector(random(-3, 3), random(-3, 3));
+  }
+  
+  Node(int minY, int maxY) {
+    this.pos = new PVector(random(width), random(minY, maxY));
+    this.vel = new PVector(random(-3, 3), random(-3, 3));
+  }
+
+  void display(PGraphics s) {
+    s.fill(245);
+    s.ellipse(this.pos.x, this.pos.y, 5, 5);
+  }
+  void display() {
+    fill(245);
+    ellipse(this.pos.x, this.pos.y, 5, 5);
+  }
+  void move(PGraphics s, int maxY) {
+    this.pos.add(vel);
+    if (this.pos.x > s.width) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = s.width;
+
+    if (this.pos.y > maxY) this.pos.y = 0;
+    else if (this.pos.y < 0) this.pos.y = maxY;
+  }
+  void move(int minY, int maxY) {
+    this.pos.add(vel);
+    if (this.pos.x > width) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = width;
+
+    if (this.pos.y > maxY) this.pos.y = minY;
+    else if (this.pos.y < minY) this.pos.y = maxY;
+  }
+  
+  void moveHand(int minY, int maxY, float lr) {
+    PVector veltemp = new PVector(4*lr, this.vel.y);
+    this.pos.add(veltemp);
+    if (this.pos.x > width) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = width;
+
+    if (this.pos.y > maxY) this.pos.y = minY;
+    else if (this.pos.y < minY) this.pos.y = maxY;
+  }
+  boolean connect(Node other, int dis) {
+    float d = pos.dist(other.pos);
+    if (d < dis) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -286,33 +342,37 @@ void initTesseract() {
   tesseract = new Tesseract();
 }
 
-void displayTesseract2Screens() {
-  updateSpectrum();
-  beatCycle(300);
-  updateTesseractBeat();
+void displayTesseract2Screens(float speed) {
+  updateTesseractBeat(speed);
   displayTesseract(screens[1].s);
   displayTesseract(screens[2].s);
 }
 
-void updateTesseractBeat() {
-  if (currentCycle%6 == 0) tesseract.turn(0, 1, .01);
-  else if (currentCycle%6 == 1) tesseract.turn(0, 2, .01);
-  else if (currentCycle%6 == 2) tesseract.turn(1, 2, .01);
-  else if (currentCycle%6 == 3) tesseract.turn(0, 3, .01);
-  else if (currentCycle%6 == 4) tesseract.turn(1, 3, .01);
-  else if (currentCycle%6 == 5) tesseract.turn(2, 3, .01);
+int tessMode = 0;
+void updateTesseractBeat(float speed) {
+  if (currentCycle > previousCycle && currentCycle%8 == 1) tessMode++;
+  if (tessMode%6 == 0) tesseract.turn(0, 1, .01);
+  else if (tessMode%6 == 1) tesseract.turn(0, 2, speed);
+  else if (tessMode%6 == 2) tesseract.turn(1, 2, speed);
+  else if (tessMode%6 == 3) tesseract.turn(0, 3, speed);
+  else if (tessMode%6 == 4) tesseract.turn(1, 3, speed);
+  else if (tessMode%6 == 5) tesseract.turn(2, 3, speed);
 }
 
 void displayTesseract(PGraphics s) {
   s.beginDraw();
   s.background(0);
+  displayTesseractNoBack(s);
+  s.endDraw();
+}
+
+void displayTesseractNoBack(PGraphics s) {
   s.stroke(255);
   s.strokeWeight(2);
   s.pushMatrix();
   s.translate(s.width/2, s.height/2);
   tesseract.display(s);
   s.popMatrix();
-  s.endDraw();
 }
 
 class Tesseract {
@@ -1035,6 +1095,17 @@ void displayLineBounce(PGraphics s, int spacing, color c1, color c2, int sw) {
   s.endDraw();
 }
 
+// https://www.openprocessing.org/sketch/53155
+void displayLinesMouse(PGraphics s) {
+  s.stroke(0);
+  s.strokeWeight(1);
+  s.background(200);
+  for (int y = 0; y < s.height+45; y += 40) {
+    for (int x = 0; x <= s.width; x += 40) {
+      s.line(mouseX, mouseY, x, y);
+    }
+  }
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -1460,50 +1531,76 @@ int startCountFW = 300;
 float countFW=startCountFW;
 float  mapHeightFW;
 int modeFW = 0;
-color startCFW;
-color midCFW;
-color endCFW;
+PGraphics tempImg;
 
 void initAllFlowyWaves() {
-  for (Screen s : screens) {
-    initDisplayFlowyWaves(s.s);
-  }
-}
+  tempImg = createGraphics(screenW*2, screenH);
+  mapHeightFW = screenH/2;
+  tempImg.beginDraw();
+  tempImg.background(0);
+  colorMode(RGB, 255);
 
-void initDisplayFlowyWaves(PGraphics s) {
-  mapHeightFW = s.height/2;
-  s.beginDraw();
-  s.background(0);
-
-  colorMode(HSB);
-  //startCFW = color(random(255), 255, 255);
-  //midCFW = color((hue(startCFW)+60)%255, 255, 255);
-  //endCFW = color((hue(startCFW)+120)%255, 255, 255);
-  startCFW = cyan;
-  midCFW = pink;
-  endCFW = blue;
   countFW = startCountFW;
-  colorMode(RGB);
-  s.endDraw();
-}
-void displayFlowyWavesAll() {
-  displayFlowyWavesAll(1150, 1200);
+  tempImg.endDraw();
 }
 
-void displayFlowyWavesAll(int fadeStart, int fadeEnd) {
-  updateFlowyWaves(fadeStart, fadeEnd, true);
+void displayFlowyWavesWiz() {
+  int fadeStart = 1150;
+  int fadeEnd = 1200;
+  int mh = screenH/2;
+  updateFlowyWaves(fadeEnd, mh, true);
+  displayFlowyWavesTemp(fadeStart, fadeEnd, true);
   int i = 0;
-  for (Screen s : screens) {
-    displayFlowyWaves(s.s, fadeStart, fadeEnd, i++, true);
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    if (i < 2) {
+      int startX = int(screenW*i);
+      s.image(tempImg, -startX, 0);
+    } else {
+      s.pushMatrix();
+      s.scale(-1.0, 1.0);
+      int startX = int(screenW*i);
+      if (i == 3) startX = screenW;
+      s.image(tempImg, -startX, 0);
+      s.popMatrix();
+    }
+    s.blendMode(SCREEN);
+    //s.image(currentGifs.get(4), 0, 0);
+
+    //drawSymbolsLeftRightImageHand(s, i, 250);
+    drawSymbolsLeftRightSmoothImageHand(s, i, 250);
+    //displayNodeConstellation(s);
+    s.endDraw();
+    i++;
   }
 }
 
-void updateFlowyWaves(int fadeStart, int fadeEnd, boolean blackBG) {
+void displayFlowyWavesTemp(int fadeStart, int fadeEnd, boolean blackBG ) {
+  tempImg.beginDraw();
+  if (!blackBG) {
+    if (countFW > fadeStart) fadeFWToWhiteTemp(fadeStart, fadeEnd);
+  } else {
+    if (countFW < startCountFW + 3) tempImg.background(0);
+  }
+  tempImg.noFill();
+  changePerlin();
+  changeColorTemp(countFW);
+  paintFWTemp(); 
+  tempImg.endDraw();
+}
+void updateFlowyWaves() {
+  updateFlowyWaves(1200, screenH/2, true);
+}
+
+void updateFlowyWaves(int fadeEnd, int mh, boolean blackBG) {
   countFW++;
   if (countFW > fadeEnd) {
     if (blackBG) {
       countFW = startCountFW;
-      mapHeightFW = screenH/2;
+      mapHeightFW = mh;
     } else {
       countFW = 100;
       mapHeightFW = screenH;
@@ -1513,48 +1610,53 @@ void updateFlowyWaves(int fadeStart, int fadeEnd, boolean blackBG) {
 }
 void fadeFWToWhite(PGraphics s, int fadeStart, int fadeEnd) {
   s.noStroke();
-  color c = getColorFW(0, modeFW);
+  color c = getColorFW(0);
   s.fill(hue(c), saturation(c), brightness(c), map(countFW, fadeStart, fadeEnd, 2, 50));
   s.rect(0, 0, s.width, s.height);
 }
-void displayFlowyWaves(PGraphics s, int fadeStart, int fadeEnd, float phase, boolean blackBG) {
-  s.beginDraw();
-  if (!blackBG) {
-    if (countFW > fadeStart) fadeFWToWhite(s, fadeStart, fadeEnd);
-  } else {
-    if (countFW < startCountFW + 3) s.background(0);
-  }
-  s.noFill();
-  changeColor(s, countFW);
-  changePerlin();
-  paintFW(s, phase, blackBG); 
-  s.endDraw();
+
+void fadeFWToWhiteTemp(int fadeStart, int fadeEnd) {
+  fadeFWToWhite(tempImg, fadeStart, fadeEnd);
 }
 
 void changeColor(PGraphics s, float cnt) {
   s.colorMode(HSB);
-  s.stroke(getColorFW(cnt, modeFW));
+  s.stroke(getColorFW(cnt));
 }
 
-color getColorFW(float cnt, int mode) {
-  //if (mode == 0) {
-  cFW = sin(radians(cnt))+1;
-  dFW = sin(radians(cnt+30))+1;
-  eFW = sin(radians(cnt+60))+1;
-  cFW = map(cFW, 0, 1, 0, 255);
-  dFW = map(dFW, 0, 1, 0, 255);
-  eFW = map(eFW, 0, 1, 0, 255);
+void changeColorTemp(float cnt) {
+  tempImg.colorMode(HSB);
+  tempImg.stroke(getColorFW(cnt));
+}
+color getColorFW(float cnt) {
+  //cFW = sin(radians(cnt))+1;
+  //dFW = sin(radians(cnt+30))+1;
+  //eFW = sin(radians(cnt+60))+1;
+  //cFW = map(cFW, 0, 1, 0, 255);
+  //dFW = map(dFW, 0, 1, 0, 255);
+  //eFW = map(eFW, 0, 1, 0, 255);
+  //return color(cFW, dFW, 220);
 
-  //if (cnt < 355) return 0;
-  return color(cFW, dFW, 220);
+  float per = map(cnt, 300, 1200, 0, 1);
+  color c = getCycleColor(red, cyan, blue, per);
+  return c;
 }
 
+void paintFWTemp() {
+  float myY=0;
+
+  for (int x=0; x<tempImg.width; x=x+1) {
+    myPerlin = noise(float(x)/200 + tempImg.width/200, countFW/200);
+    myY = map(myPerlin, 0, 1, 0, tempImg.height-mapHeightFW);
+    tempImg.line(x, myY, x, tempImg.height);
+  }
+}
 void paintFW(PGraphics s, float phase, boolean blackBG) {
   float myY=0;
   for (int x=0; x<s.width; x=x+1) {
     myPerlin = noise(float(x)/200 + phase*s.width/200, countFW/200);
     myY = map(myPerlin, 0, 1, 0, s.height-mapHeightFW);
-    s.line(x, myY, x, s.height );
+    tempImg.line(x, myY, x, s.height );
   }
 }
 
@@ -2316,8 +2418,6 @@ PGraphics s;
 void displaySquiggleParticles(PGraphics s) {
   //displayDrip();
   s.beginDraw(); 
-  s.noStroke();
-  s.smooth();
   displaySquiggle(s);
   s.endDraw();
 }
@@ -2518,11 +2618,9 @@ class ParticleDrip {
 
 
 
-
-
-
-
-
+//////////////////////////////////////////////////////////////////////////////////
+// SPHERE BOX
+//////////////////////////////////////////////////////////////////////////////////
 void displaySphereBox(PGraphics s) {
   int SPHERE_RADIUS=200;
   s.background(0);

@@ -138,6 +138,7 @@ void cycleShapeFFT(PGraphics s) {
 
 PImage[] constellations;
 PImage[] hands;
+PImage[] symbols;
 void initConst() {
   constellations = new PImage[5];
   constellations[0] = loadImage("images/constellations/0.png");
@@ -145,6 +146,12 @@ void initConst() {
   constellations[2] = loadImage("images/constellations/2.png");
   constellations[3] = loadImage("images/constellations/3.png");
   constellations[4] = loadImage("images/constellations/4.png");
+}
+void initSymbols() {
+  symbols = new PImage[6];
+  for (int i = 0; i < 6; i++)  {
+    symbols[i] = loadImage("images/symbols/" + i + ".jpg");
+  }
 }
 void cycleConstFFT() {
   //updateSpectrum();
@@ -162,6 +169,7 @@ void cycleConstFFT() {
   }
 }
 void initHands() {
+  hands = new PImage[5];
   hands[0] = loadImage("images/hand/hand0.jpg");
   hands[1] = loadImage("images/hand/hand1.jpg");
   hands[2] = loadImage("images/hand/hand2.jpg");
@@ -173,6 +181,7 @@ void cycleHandsFFT() {
   for (Screen sc : screens) {
     sc.s.beginDraw();
     sc.s.stroke(255);
+    sc.s.background(0);
     sc.s.blendMode(SCREEN);
     sc.s.noFill();
     sc.s.strokeWeight(3);

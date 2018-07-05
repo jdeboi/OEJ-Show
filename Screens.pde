@@ -30,7 +30,7 @@ class Screen {
 
   PGraphics s;
   int snakeLoc;
-  Star[] stars;
+  
   int zIndex = 0;
   //Tesseract tesseract;
 
@@ -49,14 +49,6 @@ class Screen {
   void drawSolid(color c) {
     s.beginDraw();
     s.background(c);
-    s.endDraw();
-  }
-
-  void drawCN() {
-    s.beginDraw();
-    s.strokeWeight(1);
-    s.stroke(255);
-    drawCurvyNetwork(s);
     s.endDraw();
   }
 
@@ -219,11 +211,6 @@ void drawSolidAll(color c) {
   sphereScreen.drawSolid(c);
 }
 
-void drawCNAll() {
-  for (int i = 0; i < numScreens; i++) {
-    screens[i].drawCN();
-  }
-}
 
 void snakeOutlineAll(color c, int sw, int sLen, int speed) {
   for (int i = 0; i < numScreens; i++) {
@@ -400,4 +387,10 @@ void cubesFront() {
     s.zIndex = -1;
   }
   drawSolidCenter(color(0));
+}
+
+void innerScreensOut() {
+  cubesFront();
+  screens[1].blackOut();
+  screens[2].blackOut();
 }

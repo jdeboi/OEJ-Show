@@ -43,7 +43,7 @@ void initControls() {
     ;
 
   togEditAll = cp5.addToggle("toggleEditAll")
-    .setPosition(50, 150)
+    .setPosition(400, 50)
     .setSize(50, 20)
     .setValue(false)
     .setLabel("Editing OFF")
@@ -64,13 +64,13 @@ void initControls() {
     .setLabel("PLAY")
     ;
 
-  togEdit = cp5.addToggle("toggleEditBreak")
-    .setPosition(850, 150)
-    .setSize(50, 20)
-    .setValue(false)
-    .setLabel("Edit Breaks Off")
-    .setMode(ControlP5.SWITCH)
-    ;
+  //togEdit = cp5.addToggle("toggleEditBreak")
+  //  .setPosition(850, 150)
+  //  .setSize(50, 20)
+  //  .setValue(false)
+  //  .setLabel("Edit Breaks Off")
+  //  .setMode(ControlP5.SWITCH)
+  //  ;
 
   togEditMask = cp5.addToggle("toggleEditMask")
     .setPosition(950, 150)
@@ -88,13 +88,13 @@ void initControls() {
     .setMode(ControlP5.SWITCH)
     ;
 
-  togEdit3D = cp5.addToggle("toggleEdit3D")
-    .setPosition(1100, 150)
-    .setSize(50, 20)
-    .setValue(false)
-    .setLabel("Edit 3D Off")
-    .setMode(ControlP5.SWITCH)
-    ;
+  //togEdit3D = cp5.addToggle("toggleEdit3D")
+  //  .setPosition(1100, 150)
+  //  .setSize(50, 20)
+  //  .setValue(false)
+  //  .setLabel("Edit 3D Off")
+  //  .setMode(ControlP5.SWITCH)
+  //  ;
 
   togEditLines =  cp5.addToggle("toggleEditLines")
     .setPosition(1250, 150)
@@ -104,12 +104,12 @@ void initControls() {
     .setMode(ControlP5.SWITCH)
     ;
 
-  cp5.addButton("saveCubes")
-    .setValue(0)
-    .setPosition(1100, 200)
-    .setSize(80, 19)
-    .setLabel("Save Cubes")
-    ;
+  //cp5.addButton("saveCubes")
+  //  .setValue(0)
+  //  .setPosition(1100, 200)
+  //  .setSize(80, 19)
+  //  .setLabel("Save Cubes")
+  //  ;
 
   cp5.addButton("saveMask")
     .setValue(0)
@@ -125,12 +125,6 @@ void initControls() {
     .setLabel("Snap Mask To Lines")
     ;
 
-  cp5.addButton("saveBreaks")
-    .setValue(0)
-    .setPosition(850, 200)
-    .setSize(80, 19)
-    .setLabel("Save Breaks")
-    ;
 
   cp5.addButton("saveLines")
     .setValue(0)
@@ -180,15 +174,15 @@ void initControls() {
     .addItems(l)
     ;
 
-  l = Arrays.asList("moveXY", "moveZ", "rotateX", "rotateY", "rotateZ", "scale");
-  cp5.addScrollableList("cubeEdit")
-    .setPosition(850, ymen)
-    .setColorBackground(color(105, 170, 0))
-    .setSize(100, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
+  //l = Arrays.asList("moveXY", "moveZ", "rotateX", "rotateY", "rotateZ", "scale");
+  //cp5.addScrollableList("cubeEdit")
+  //  .setPosition(850, ymen)
+  //  .setColorBackground(color(105, 170, 0))
+  //  .setSize(100, 100)
+  //  .setBarHeight(20)
+  //  .setItemHeight(20)
+  //  .addItems(l)
+  //  ;
 }
 
 
@@ -209,12 +203,12 @@ void imageList(int n) {
   currentTestImg = loadImage("_testing/images/" + testingImages[n]);
 }
 
-void cubeEdit(int n) {
-  if (controlsON) {
-    cubeMode = n;
-    println("cube mode : " + cubeMode);
-  }
-}
+//void cubeEdit(int n) {
+//  if (controlsON) {
+//    cubeMode = n;
+//    println("cube mode : " + cubeMode);
+//  }
+//}
 
 void keystoneList(int n) {
   loadKeystone(n);
@@ -256,18 +250,13 @@ public void snapMask(int theValue) {
   }
 }
 
-public void saveCubes(int theValue) {
-  if (controlsON) {
-    println("cubes saved");
-    saveMappedCubes();
-  }
-}
+//public void saveCubes(int theValue) {
+//  if (controlsON) {
+//    println("cubes saved");
+//    saveMappedCubes();
+//  }
+//}
 
-public void saveBreaks(int theValue) {
-  println("breaks saved");
-  bubbleSort();
-  saveToFile();
-}
 
 public void saveLines(int theValue) {
   if (controlsON) {
@@ -276,12 +265,6 @@ public void saveLines(int theValue) {
   }
 }
 
-public void input(String theText) {
-  if (editingBreaks && selected > -1) {
-    println(theText + " " + selected);
-    breaks.get(selected).text = theText;
-  }
-}
 
 void toggleP(boolean theFlag) {
   if (controlsON) {
@@ -314,14 +297,14 @@ void toggleMask(boolean theFlag) {
   }
 }
 
-void toggleEdit3D(boolean theFlag) {
-  if (controlsON) {
-    editing3D = theFlag;
-    String o = editing3D?"ON":"OFF";
-    togEdit3D.setLabel("Edit 3D " + o);
-    println("toggling edit 3D");
-  }
-}
+//void toggleEdit3D(boolean theFlag) {
+//  if (controlsON) {
+//    editing3D = theFlag;
+//    String o = editing3D?"ON":"OFF";
+//    togEdit3D.setLabel("Edit 3D " + o);
+//    println("toggling edit 3D");
+//  }
+//}
 
 void toggleEditLines(boolean theFlag) {
   if (controlsON) {

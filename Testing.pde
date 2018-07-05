@@ -1,3 +1,32 @@
+void initTesting() {
+  testingImages = getFileNames("_testing/images/");
+  currentTestImg = loadImage("_testing/images/" + testingImages[0]);
+  testingGifs = getFileNames("_testing/gifs/");
+  currentTestGif = new Gif(this, "_testing/gifs/" + testingGifs[0]);
+
+  testingMovies = getFileNames("_testing/movies/");
+
+  initVid("_testing/movies/" + testingMovies[0]);
+
+  if (MAX_GIF > testingGifs.length) MAX_GIF=testingGifs.length;
+  if (MAX_IMG > testingImages.length) MAX_IMG=testingImages.length;
+  if (MAX_MOV > testingMovies.length) MAX_MOV=testingMovies.length;
+
+  //stage = loadImage("_testing/images/stage.png");
+
+  //initCurvyNetwork();
+  //initConst();
+  //initHands();
+  //initTesseract();
+  //initParticles();
+  //initTerrainCenter();
+  //initCubes();
+
+  //initTreeBranchesAll();
+  //initWaves();
+  //initDisplayFlowyWaves(screenH/2 centerScreen.s);
+}
+
 void testLines() {
   transit(cyan, 0);
   displayCubeLines(color(0, 255, 255), color(255, 0, 255));
@@ -73,10 +102,10 @@ void testShow() {
 
   /////////////////////////////
   // CUBES
-  else if (mode == CUBE_MODE) {
-    display3D();
-    updateCubes();
-  }
+  //else if (mode == CUBE_MODE) {
+  //  display3D();
+  //  updateCubes();
+  //}
 
   /////////////////////////////
   // IMAGE

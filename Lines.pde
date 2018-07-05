@@ -4,6 +4,7 @@ PVector selectedLineP = null;
 int origLineW = 10;
 int lineW = origLineW;
 boolean startFadeLine = false;
+boolean isDragging = false;
 
 void initLines() {
   strokeCap(ROUND);
@@ -60,6 +61,24 @@ void displayCycle4FaceLines(color c) {
   fill(c);
   stroke(c);
   display4FaceLines((currentCycle) %4);
+}
+
+void displayLinesCenterFocus(color c) {
+  displayLinesCenterFocus(c, c);
+}
+
+void displayLinesCenterFocus(color c1, color c2) {
+  fill(c1);
+  stroke(c1);
+  for (int i =  0; i < lines.size(); i++) {
+    if (i != 5 && i != 11) lines.get(i).display();
+  }
+  fill(c2);
+  stroke(c2);
+  int [] getthem = {4, 6, 7, 8, 9, 10}; 
+  for (int i =  0; i < getthem.length; i++) {
+    lines.get(getthem[i]).display();
+  }
 }
 
 void displayCycleSingleFaceLines(color c, int direction) {
@@ -919,9 +938,9 @@ color getCycleColor(color c1, color c2, color c3, float per) {
     return lerpColor(c1, c2, per);
   } else if (per < 2) {
     per = map(per, 1, 2, 1, 0);
-    return lerpColor(c2, c3, per);
+    return lerpColor(c3, c2, per);
   } else {
     per = map(per, 2, 3, 1, 0);
-    return lerpColor(c3, c1, per);
+    return lerpColor(c1, c3, per);
   }
 }
