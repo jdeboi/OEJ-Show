@@ -8,6 +8,9 @@ int DELTA = 8;
 int WIZ = 5;
 int VIOLATE = 6;
 int ELLON =10;
+int EGRETS = 13;
+int LOLLIES = 12;
+int CRUSH = 3;
 
 int LARGE_CENTER = 0;
 int MID_CENTER = 1;
@@ -62,11 +65,10 @@ void setup() {
   
   if (!showTime) initControls();
 
-  changeScene(DELTA);
-
-
   initColors();
   initEye();
+  
+  changeScene(LOLLIES);
 }
 
 void draw() {

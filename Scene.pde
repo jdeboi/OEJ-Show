@@ -1,4 +1,4 @@
-Scene[] scenes = new Scene[14];
+Scene[] scenes = new Scene[15];
 Scene currentScene;
 int currentSceneIndex = 0;
 boolean isPlaying = false;
@@ -19,6 +19,7 @@ void initScenes() {
   scenes[11] = new Scene("Rite of Spring", "rite", 12);
   scenes[12] = new Scene("Lollies", "lollies", 13);
   scenes[13] = new Scene("Egrets", "egrets", 14);
+  scenes[14] = new Scene("Turn To Stone", "elo", 15);
   currentScene = scenes[0];
 }
 

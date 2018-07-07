@@ -37,10 +37,7 @@ void testLines() {
   linesGradientFaceCycle(color(0, 255, 255), color(0, 50, 255)); 
   sineGradientFaceCycle(color(255), color(0), percentToNextMeasure(0, 4)*2, 0.8);
 
-  pulseLinesCenterBeat(0);
-  pulseVertLinesCenterBeat(0);
-  pulseHorizLinesCenterBeat(0);
-  pulseVertHorizCenterBeatCycle(0);
+
   pulseVertLongCenterBeat(cyan, percentToNextMeasure(0, 4)*2);
   pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
   pulsingGrad(pink, cyan, percentToNextMeasure(0, 4));

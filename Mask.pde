@@ -104,12 +104,12 @@ void snapMaskToOutline() {
 
 
   maskPoints[keystoneNum][4] = new MPoint(int(lines.get(12).p2.x)+5, int(lines.get(12).p2.y)-5); 
-  maskPoints[keystoneNum][5] = new MPoint(int(lines.get(14).p2.x)+5, int(lines.get(14).p2.y)+5); 
+  maskPoints[keystoneNum][5] = new MPoint(int(lines.get(14).p1.x)+5, int(lines.get(14).p1.y)+5); 
 
-  maskPoints[keystoneNum][6] = new MPoint(int(lines.get(14).p1.x)-5, int(lines.get(14).p1.y)+5); 
-  maskPoints[keystoneNum][7] = new MPoint(int(lines.get(10).p1.x)-5, int(lines.get(10).p1.y)+5);  
-  maskPoints[keystoneNum][8] = new MPoint(int(lines.get(6).p1.x)-5, int(lines.get(6).p1.y)+5);  
-  maskPoints[keystoneNum][9] = new MPoint(int(lines.get(2).p1.x)-5, int(lines.get(2).p1.y)+5); 
+  maskPoints[keystoneNum][6] = new MPoint(int(lines.get(14).p1.x)-5, int(lines.get(14).p2.y)+5); 
+  maskPoints[keystoneNum][7] = new MPoint(int(lines.get(10).p1.x)-5, int(lines.get(10).p2.y)+5);  
+  maskPoints[keystoneNum][8] = new MPoint(int(lines.get(6).p1.x)-5, int(lines.get(6).p2.y)+5);  
+  maskPoints[keystoneNum][9] = new MPoint(int(lines.get(2).p1.x)-5, int(lines.get(2).p2.y)+5); 
 }
 
 

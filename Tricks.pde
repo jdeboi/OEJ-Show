@@ -2,6 +2,56 @@
 boolean personOnPlatform = false;
 
 //////////////////////////////////////////////////////////////////////////////////
+// CRUSH SPHERE
+//////////////////////////////////////////////////////////////////////////////////
+void updateSphereBoxHand() {
+  float rot = map(mouseX, width/2 - 200, width/2 + 200, -PI, PI);
+  sphereBoxRot.set(0, rot, 0);
+}
+
+void crushSphere() {
+  updateSphereBoxHand();
+  for (int i = 1; i < 3; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    if (i == 1) {
+      s.pushMatrix();
+      s.scale(-1.0, 1.0);
+      s.translate(-screenW, 0, 0);
+      displaySphereBox(s);
+      s.popMatrix();
+    } else {
+      //s.background(pink);
+      displaySphereBox(s);
+    }
+    s.endDraw();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// WAVE HANDS
+//////////////////////////////////////////////////////////////////////////////////
+void drawWaveHands() {
+  //float rot = constrain(map(mouseX, width/2 -200, width/2 + 200, -PI/2, 0), -PI/2, 0);
+  float rot = constrain(map(mouseX, width/2 -200, width/2 + 200, -PI/2, PI/2), -PI/2, PI/2);
+
+  int h = int(hands[currentCycle%4].height*1.0*screenW/hands[currentCycle%4].width);
+  for (int i = 0; i < 2; i++) {
+    PGraphics s = screens[i*3].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    s.pushMatrix();
+    s.translate(screenW/2, screenH/2);
+    s.rotateZ(rot);
+    s.image(hands[currentCycle%4], -screenW/2, -h/2, screenW, h);
+    s.popMatrix();
+    s.endDraw();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 // CONSTELLATION IMAGE
 //////////////////////////////////////////////////////////////////////////////////
 //void drawConstBrightImageHand(PGraphics s, int screenNum, int w) {
@@ -128,6 +178,7 @@ class Param
     this.value2.set(value[0], value[1]);
   }
 }
+
 class GShader
 {
   String path;
@@ -166,11 +217,8 @@ class GShader
 
 ////////////////////////////////////////////////////////////////////////////////
 void handsHorizFaceLines(color c) {
-  stroke(c);
-  fill(c);
   int face = constrain(int(map(mouseX, width/2-300, width/2+300, 0, 4)), 0, 3);
-
-  if (mouseY < height -100) display4FaceLines(face);
+  if (mouseY < height -100) display4FaceLines(c, face);
 }
 
 

@@ -17,6 +17,31 @@ void initLines() {
 // MODES
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+void displayEditingLines() {
+  for (int i = 0; i < lines.size(); i++) {
+    if (editingLines) {
+      colorMode(HSB);
+      stroke(i * 255 / lines.size(), 255, 255);
+      fill(i * 255 / lines.size(), 255, 255);
+      lines.get(i).display();
+      
+      if (lines.get(i).mouseOver() == -1) {
+        noStroke();
+        fill(0, 255, 255);
+        ellipse(lines.get(i).p1.x, lines.get(i).p1.y, 25, 25);
+        fill(60, 255, 255);
+        ellipse(lines.get(i).p2.x, lines.get(i).p2.y, 25, 25);
+      } else {
+        lines.get(i).highlightOver();
+      }
+      if (isDragging) {
+        println(mouseX, mouseY);
+        selectedLineP.set(mouseX, mouseY);
+      }
+    }
+  }
+}
+
 void displayLines(color c) {
   for (int i = 0; i < lines.size(); i++) {
     stroke(c);
@@ -58,34 +83,33 @@ void displayCubesAlternateColorCycle(color c1, color c2) {
 }
 
 void displayCycle4FaceLines(color c) {
-  fill(c);
-  stroke(c);
-  display4FaceLines((currentCycle) %4);
+  display4FaceLines(c, (currentCycle) %4);
 }
 
 void displayLinesCenterFocus(color c) {
   displayLinesCenterFocus(c, c);
 }
 
-void displayLinesCenterFocus(color c1, color c2) {
-  fill(c1);
-  stroke(c1);
-  for (int i =  0; i < lines.size(); i++) {
-    if (i != 5 && i != 11) lines.get(i).display();
-  }
-  fill(c2);
-  stroke(c2);
+void displayLinesInnerFaces(color c) {
+  fill(c);
+  stroke(c);
   int [] getthem = {4, 6, 7, 8, 9, 10}; 
   for (int i =  0; i < getthem.length; i++) {
     lines.get(getthem[i]).display();
   }
 }
 
-void displayCycleSingleFaceLines(color c, int direction) {
+void displayLinesOutsideFaces(color c1, color c2) {
+  display4FaceLines(c1, 0);
+  display4FaceLines(c2, 3);
+}
 
-  //for (int i = 0; i < 4; i++) {
-  //  displayCycleSingleFace(i, c, direction);
-  //}
+void displayLinesCenterFocus(color c1, color c2) {
+  displayLinesInnerFaces(c1);
+  displayLinesOutsideFaces(c2, c2);
+}
+
+void displayCycleSingleFaceLines(color c, int direction) {
   displayCycleSingleFace(0, c, direction);
   displayCycleSingleFace(3, c, direction);
 }
@@ -98,10 +122,20 @@ void displayCycleSingleFace(int face, color c, int direction) {
   lines.get(face*4+currentL).display();
 }
 
-void display4FaceLines(int face) {
+void display4FaceLines(color c, int face) {
+  stroke(c);
+  fill(c);
   for (int i =  face * 4; i < face * 4 + 4; i++) {
     lines.get(i).display();
   }
+}
+
+void displayAllFaceLinesColor(color c1, color c2, color c3, color c4) {
+
+  display4FaceLines(c1, 0);
+  display4FaceLines(c2, 1);
+  display4FaceLines(c3, 2);
+  display4FaceLines(c4, 3);
 }
 
 
@@ -209,6 +243,28 @@ void pulsing(color c, float per) {
   }
   colorMode(RGB, 255);
 }
+
+void pulsingCubes(color c1, color c2, float per) {
+  float b = 0;
+  if (per < 0.5) b = map(per, 0, .5, 255, 0);
+  else b = map(per, 0.5, 1, 0, 255);
+
+  float hue1 = hue(c1);
+  float hue2 = hue(c2);
+  colorMode(HSB, 255);
+  for (int i = 0; i < lines.size()/2; i++) {
+    stroke(hue1, 255, b);
+    fill(hue1, 255, b);
+    lines.get(i).display();
+  }
+  for (int i = lines.size()/2; i < lines.size(); i++) {
+    stroke(hue2, 255, 255-b);
+    fill(hue2, 255, 255-b);
+    lines.get(i).display();
+  }
+  colorMode(RGB, 255);
+}
+
 void pulsingGrad(color c1, color c2, float per) {
   float b = 0;
   if (per < 0.5) b = map(per, 0, .5, 0, 1);
@@ -221,40 +277,55 @@ void pulsingGrad(color c1, color c2, float per) {
     lines.get(i).display();
   }
 }
-void pulseVertLinesCenterBeat(float startT) {
-  float per = percentToNextMeasure(startT, 4)*2;
+void pulseVertLinesCenterBeat(color c, float per) {
+  stroke(c);
+  fill(c);
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 1; i < lines.size(); i+=2) {
     lines.get(i).displayCenterPulse(per);
   }
 }
-void pulseHorizLinesCenterBeat(float per) {
+void pulseHorizLinesCenterBeat(color c, float per) {
   per *= 2;
+  stroke(c);
+  fill(c);
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i+=2) {
     lines.get(i).displayCenterPulse(per);
   }
 }
 
-void pulseVertHorizCenterBeatCycle(float per) {
+void pulseVertHorizCenterBeatCycle(color c1, color c2, float per) {
   per *= 2;
+  stroke(c);
+  fill(c);
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   int j = ((currentCycle-1)/4)%2;
+  if (j == 0) {
+    stroke(c1);
+    fill(c1);
+  }
+  else {
+    stroke(c2);
+    fill(c2);
+  }
   for (int i = j; i < lines.size(); i+=2) {
     lines.get(i).displayCenterPulse(per);
   }
 }
 
-void pulseCornersBeat(float per) {
-  per *= 2;
-  if (per > 1) per = map(per, 1, 2, 1, 0); 
-  for (int i = 0; i < lines.size(); i+=2) {
-    lines.get(i).displayCenterPulse(per);
-  }
-}
+//void pulseCornersBeat(float per) {
+//  per *= 2;
+//  if (per > 1) per = map(per, 1, 2, 1, 0); 
+//  for (int i = 0; i < lines.size(); i+=2) {
+//    lines.get(i).displayCenterPulse(per);
+//  }
+//}
 
-void pulseLinesCenterBeat(float per) {
+void pulseLinesCenterBeat(color c, float per) {
   per *= 2;
+  stroke(c);
+  fill(c);
   if (per > 1) per = map(per, 1, 2, 1, 0); 
   for (int i = 0; i < lines.size(); i++) {
     lines.get(i).displayCenterPulse(per);
@@ -332,9 +403,7 @@ void  sineGradientFaceCycle(color c1, color c2, float per, float phaseStep) {
     color grad = lerpColor(c1, c2, newPer);
     phase += phaseStep;
     newPer = 0.5 + 0.5* sin(period + phase);
-    stroke(grad);
-    fill(grad);
-    display4FaceLines(i);
+    display4FaceLines(grad, i);
   }
 }
 
@@ -346,9 +415,7 @@ void linesGradientFaceCycle(color c1, color c2) {
     color grad = lerpColor(c1, c2, per);
     per += phase;
     per %= 1.0;
-    stroke(grad);
-    fill(grad);
-    display4FaceLines(i);
+    display4FaceLines(grad, i);
   }
 }
 
@@ -854,18 +921,6 @@ void snapOutlinesToMask() {
   }
 }
 
-void displayEditingLines() {
-  displayLines(color(255));
-  if (editingLines) {
-    for (Line l : lines) {
-      l.highlightOver();
-    }
-    if (isDragging) {
-      println(mouseX, mouseY);
-      selectedLineP.set(mouseX, mouseY);
-    }
-  }
-}
 
 void checkLineClick() {
   for (Line l : lines) {

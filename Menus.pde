@@ -10,26 +10,6 @@ Textlabel timeText;
 Textarea myTextarea;
 int ymen = 0;
 
-//void testControls() {
-//  cp5 = new ControlP5(this);
-
-//  // create a toggle and change the default look to a (on/off) switch look
-//  cp5.addToggle("toggleMap")
-//    .setPosition(750, 150)
-//    .setSize(50, 20)
-//    .setValue(false)
-//    .setLabel("Map OFF")
-//    .setMode(ControlP5.SWITCH)
-//    ;
-
-//  cp5.addButton("saveMap")
-//    .setValue(0)
-//    .setPosition(750, 200)
-//    .setSize(80, 19)
-//    .setLabel("Save Mapping")
-//    ;
-//}
-
 void initControls() {
   cp5 = new ControlP5(this);
 
@@ -63,14 +43,6 @@ void initControls() {
     .setValue(false)
     .setLabel("PLAY")
     ;
-
-  //togEdit = cp5.addToggle("toggleEditBreak")
-  //  .setPosition(850, 150)
-  //  .setSize(50, 20)
-  //  .setValue(false)
-  //  .setLabel("Edit Breaks Off")
-  //  .setMode(ControlP5.SWITCH)
-  //  ;
 
   togEditMask = cp5.addToggle("toggleEditMask")
     .setPosition(950, 150)

@@ -114,19 +114,9 @@ void displayViolate() {
 }
 
 
-void initRite() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
 
-void initLollies() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
+
 
 void initCycles() {
   initVid("scenes/cycles/movies/vid1.mp4");
@@ -153,64 +143,179 @@ void initSong() {
   cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
 
-void initEgrets() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
-}
+
 
 //////////////////////////////////////////////////////////////////////////////////
 // DISPLAY CUES
 //////////////////////////////////////////////////////////////////////////////////
+
 void initCrush() {
-  initVid("scenes/crush/movies/crush.mp4");
-  cues = new Cue[11];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  //cues[1] = 5;
-  //cues[2] = 9.7;   // X
-  //cues[3] = 14.4;  // X
-  //cues[4] = 17.0;  // Break happens
-  //cues[5] = 19;    // X
-  cues[1] = new Cue(28.8, 'v', 0.0, 0);   // chords slow
-  cues[2] = new Cue(38, 'g', 0.0, 0);    // chords slow
-  cues[3] = new Cue(47.5, 'g', 0.0, 1);  // guitar
-  cues[4] = new Cue(56, 'g', 0.0, 2);    // guitar
-  cues[5] = new Cue(66, 'm', 20.0, 0);    // X
+  //initVid("scenes/crush/movies/crush.mp4");
+  cues = new Cue[13];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(17, 'v', 0.0, 0);  // X
+  cues[2] = new Cue(18.3, 'v', 0.0, 0);
+  cues[3] = new Cue(19.6, 'v', 0.0, 0);    // X
+  cues[4] = new Cue(28.2, 'g', 0.0, 0);   // chords slow
+  //cues[4] = new Cue(38, 'g', 0.0, 0);    // chords slow
+  cues[5] = new Cue(47.5, 'g', 0.0, 2);  // guitar
+  cues[6] = new Cue(56.7, 'g', 0.0, 2);    // guitar
+  cues[7] = new Cue(66, 'g', 20.0, 4);    // X
   //cues[6] = new Cue('v', 0, 75);   // X
-  cues[6] = new Cue(85, 'g', 0.0, 3);   // xylophone
-  cues[7] = new Cue(94, 'v', 0.0, 0);
-  cues[8] = new Cue(103.8, 'v', 0.0, 0);
-  cues[9] = new Cue(135, 'v', 0.0, 0);
-  cues[10] = new Cue(songFile.length(), 'v', 0.0, 0);
+  cues[8] = new Cue(85, 'g', 0.0, 3);   // xylophone
+  cues[9] = new Cue(94, 'g', 0.0, 5);
+  cues[10] = new Cue(103.8, 'g', 0.0, 6);
+  cues[11] = new Cue(113.2, 'v', 0.0, 0);
+  cues[12] = new Cue(115, 'v', 0.0, 0);
+
+  initSphereBoxRot();
+  tempo = 102;
+}
+
+boolean blackOutPlanet = false;
+void resetRedPlanet() {
+  if (!blackOutPlanet) {
+    sphereScreen.blackOut();
+    blackOutPlanet = true;
+  }
 }
 
 void displayCrush() {
+  if (!personOnPlatform) displayRedPlanetSphere();
+  else {
+    drawEye();
+    drawWaveHands();
+  }
+
   switch(currentCue) {
   case 0:
-    movieAcrossAll(vid1, -350);
-    haromCenter(color(255), 3, 180);
-    //displayNervous();
-    //displayWavyCircle();
+
+    displayLinesInnerFaces(white);
+    drawSolidOuter(0);
+    displaySphereBoxCrush();
+
+
+    fadeInCubes(cues[currentCue].startT, 4);
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    drawSolidAll(black);
+    displayAllFaceLinesColor(0, 0, white, color(150));
     break;
   case 2:
+    displayAllFaceLinesColor(white, color(150), 0, 0);
+    drawSolidAll(black);
+    break;
+  case 3: // oscillate
+    if (((currentCycle-1)/8)%2 == 0) {
+      displayLinesOutsideFaces(color(255), color(255));
+      drawSolidInner(0);
+      for (int i = 0; i < screens.length; i+=3) {
+        PGraphics s = screens[i].s;
+        s.beginDraw();
+        s.background(0);
+        haromS(s, white, 3);
+        s.endDraw();
+      }
+    } else {
+      drawSolidOuter(0);
+      displayLinesInnerFaces(white);
+      for (int i = 1; i < 3; i++) {
+        PGraphics s = screens[i].s;
+        s.beginDraw();
+        s.background(0);
+        haromS(s, white, 3);
+        s.endDraw();
+      }
+    }
+    break;
+
+  case 4: // all chill
+
+    for (int i = 0; i < 4; i++) {
+      PGraphics s = screens[i].s;
+      s.beginDraw();
+      s.blendMode(BLEND);
+      //s.background(color(180, 0, 80));
+      s.image(currentGifs.get(currentGif), 0, 0, screenW, screenW);
+      //s.filter(THRESHOLD, .01);
+      s.filter(GRAY);
+      //s.blendMode(BLEND);
+      s.endDraw();
+    }
+    //drawGifAll(currentGifs.get(0), 0, 0, screenW, screenH);
+    break;
+  case 5: // inner
+    displayLinesInnerFaces(white);
+    drawSolidOuter(0);
+
+    for (int i = 1; i < 3; i++) {
+      PGraphics s = screens[i].s;
+      s.beginDraw();
+      s.blendMode(BLEND);
+      //s.background(color(180, 0, 80));
+      //int hg = (currentGifs.get(7).height - screenH)/2;
+      s.background(0);
+      if (i == 1) {
+        s.pushMatrix();
+        s.scale(-1.0, 1.0);
+
+        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-hg, screenW, currentGifs.get(7).height * currentGifs.get(7).width/screenW);
+        s.popMatrix();
+      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-hg, screenW, currentGifs.get(7).height * currentGifs.get(7).width/screenW);
+      //s.filter(THRESHOLD, .2);
+      //s.filter(GRAY);
+      //s.blendMode(BLEND);
+      s.endDraw();
+    }
+    break;
+  case 6:// puter
+    displayLinesOutsideFaces(color(255), color(255));
+    drawSolidInner(0);
+    for (int i = 0; i < screens.length; i+=3) {
+      PGraphics s = screens[i].s;
+      s.beginDraw();
+      s.background(0);
+      if (i == 3) {
+        s.pushMatrix();
+        s.scale(-1.0, 1.0);
+        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);
+        s.popMatrix();
+      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+      //s.filter(THRESHOLD, .2);
+      s.endDraw();
+    }
+    break;
+  case 7:
+    display4FaceLines(white, 1);
+    display4FaceLines(white, 2);
+    drawSolidOuter(0);
+
+
+    for (int i = 1; i < 3; i++) {
+      PGraphics s = screens[i].s;
+      s.beginDraw();
+      s.blendMode(BLEND);
+      //s.background(color(180, 0, 80));
+      if (i == 1) {
+        s.pushMatrix();
+        s.scale(-1.0, 1.0);
+
+        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+        s.popMatrix();
+      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+      //s.filter(THRESHOLD);
+      //s.blendMode(BLEND);
+      s.endDraw();
+    }
+    break;
+  case 8:
     drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
     break;
-  case 3:
+  case 9:
     drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
     break;
-  case 4:
+  case 10:
     drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
-    break;
-  case 5:
-    movieAcrossAll(vid1, -370);
-    break;
-  case 6:
-    drawSolidAll(color(0));
     break;
   default:
     drawSolidAll(color(0));
@@ -218,20 +323,46 @@ void displayCrush() {
   }
 }
 
+void displayIntenseSphereCrush() {
+  //for (int i = 1; i < 3; i++) {
+  //  PGraphics s = screens[i].s;
+  //  s.beginDraw();
+  //  s.blendMode(BLEND);
+  //  //s.background(color(180, 0, 80));
+  //  if (i == 1) {
+  //    s.pushMatrix();
+  //    s.scale(-1.0, 1.0);
+
+  //    s.image(currentGifs.get(4), -screenW, -300, screenW, currentGifs.get(1).height * currentGifs.get(2).width/screenW);
+  //    s.popMatrix();
+  //  } else s.image(currentGifs.get(4), 0, -300, screenW, currentGifs.get(1).height * currentGifs.get(2).width/screenW);
+  //  //s.filter(THRESHOLD);
+  //  //s.blendMode(BLEND);
+  //  s.endDraw();
+  //}
+}
+
 void initDelta() {
+  //initVid("scenes/wizrock/movies/1_540.mp4");
+
   tempo = 133;
-  cues = new Cue[10];
+  cues = new Cue[13];
   cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(36, 'g', 0.0, 0); // derrr neener derrr
-  cues[2] = new Cue(50.6, 'v', 0.0, 0); // "help meee coffee"
-  cues[3] = new Cue(72.2, 'v', 0.0, 0);  // wooo
-  cues[4] = new Cue(101, 'v', 0.0, 0);  // "delta waves"
-  cues[5] = new Cue(115, 'v', 0.0, 0);
-  cues[6] = new Cue(137, 'v', 0.0, 0);// woo
-  cues[7] = new Cue(166, 'v', 0.0, 0);
-  cues[8] = new Cue(199, 'v', 0.0, 0);
-  cues[9] = new Cue(203, 'v', 0.0, 0);
-  initAllFlowyWaves();
+  cues[1] = new Cue(7, 'v', 0.0, 0); // bass beat
+  cues[2] = new Cue(14.95, 'v', 0.0, 0); //xylophone
+  //cues[3] = new Cue(29, 'v', 0.0, 0); // kinda2
+  cues[3] = new Cue(36, 'g', 0.0, 0); // derrr neener derrr
+  cues[4] = new Cue(51, 'v', 0.0, 0); // "help meee coffee", big base beat
+  cues[5] = new Cue(72.2, 'v', 0.0, 0);  // wooo
+  cues[6] = new Cue(102, 'v', 0.0, 0);  // "delta waves"
+  cues[7] = new Cue(115, 'v', 0.0, 0);
+  cues[8] = new Cue(137, 'v', 0.0, 0);// woo
+  cues[9] = new Cue(166, 'v', 0.0, 0);
+  cues[10] = new Cue(181, 'v', 0.0, 0);
+  cues[11] = new Cue(199, 'v', 0.0, 0);
+  cues[12] = new Cue(203, 'v', 0.0, 0);
+
+
   cubesFront();
 
   initHands();
@@ -241,34 +372,88 @@ void initDelta() {
 void deconstructDelta() {
 }
 
+int previousBeatIndex = 0;
+int currentBeatIndex = 0;
+int numBeatsIndex = 0;
 void displayDelta() {
+
+  if (!personOnPlatform) sphereScreen.blackOut();
+  else {
+    drawEye();
+    drawWaveHands();
+  }
+  //float[] deltaBeats2 = {1, 1, 1, 1}; // -1, 1, .5, .5, -1, -1};
+  // index = getMoveOnBeats(deltaBeats2, 4);
+
+
+  // if (index > 0) {
+  //   p = hands[index%4];
+  //   println(index);
+  //   h = p.height*screenW/p.width;
+  //   screens[0].drawImage(p, 0, screenH/2 -h/2, screenW, h);
+  // }
+
   displayLinesCenterFocus(color(255));
   innerScreensOut();
+
+  int h = int(hands[0].height*1.0*screenW/hands[0].width);
   switch(currentCue) {
   case 0:
-    PImage p = hands[(currentCycle) % hands.length];
-    int w = int(p.width * 1.0 * screens[0].s.height/p.height);
-    screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
-    screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
+    if (!personOnPlatform) {
+      PImage p = hands[(currentCycle) % hands.length];
+      screens[0].drawImage(p, 0, screenH/2 -h/2, screenW, h);
+      screens[3].drawImage(p, 0, screenH/2 -h/2, screenW, h);
+    }
     break;
   case 1:
-
-    cycleHandsFFT();
-
+    // alternate left, right open
+    if (!personOnPlatform) {
+      if (currentCycle%2 == 0) {
+        screens[0].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+        screens[3].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+      } else {
+        screens[0].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+        screens[3].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+      }
+    }
     break;
   case 2:
-    p = symbols[(currentCycle) % symbols.length];
-    w = int(p.width * 1.0 * screens[0].s.height/p.height);
-    screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
-    screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
+    if (!personOnPlatform) {
+      PImage p = symbols[((currentCycle+2)/4) % symbols.length];
+      int w = int(p.width * 1.0 * screens[0].s.height/p.height);
+      screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
+      screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
+    }
     break;
   case 3:
-  cycleHandsFFT();
+    cycleHandsFFT();
     break;
   case 4:
+    if (!personOnPlatform) {
+      float[] deltaBeats2 = {1, 1, 1, -1, 1, .5, .5, -1, -1};
+      currentBeatIndex = getMoveOnBeats(deltaBeats2, 8);
 
-    break;
-  case 5:
+
+      if (currentBeatIndex >= 0) {
+        if (currentBeatIndex != previousBeatIndex) {
+          previousBeatIndex = currentBeatIndex;
+          numBeatsIndex++;
+        }
+        float rot = PI/2 * numBeatsIndex;
+        for (int i = 0; i < 2; i++) {
+          PGraphics s = screens[i*3].s;
+          s.beginDraw();
+          s.background(0);
+          s.blendMode(BLEND);
+          s.pushMatrix();
+          s.translate(screenW/2, screenH/2);
+          s.rotateZ(rot);
+          s.image(hands[currentCycle%4], -screenW/2, -h/2, screenW, h);
+          s.popMatrix();
+          s.endDraw();
+        }
+      }
+    }
     break;
   case 6:
 
@@ -289,6 +474,23 @@ void displayDelta() {
     drawSolidAll(color(0));
     break;
   }
+}
+
+
+void initRite() {
+  cues = new Cue[3];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(8.4, 'v', 0.0, 0);
+  cues[2] = new Cue(16.4, 'v', 0.0, 0);
+  cues[3] = new Cue(24.37, 'v', 0.0, 0);
+  cues[4] = new Cue(40.23, 'v', 0.0, 0);
+  cues[5] = new Cue(48.13, 'v', 0.0, 0);
+  cues[6] = new Cue(56.09, 'v', 0.0, 0);
+  cues[7] = new Cue(64.00, 'v', 0.0, 0);
+  
+  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
+  
+  initConst();
 }
 
 void displayRite() {
@@ -424,6 +626,28 @@ void displayMoon() {
   }
 }
 
+void initLollies() {
+  cues = new Cue[18];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(7.5, 'v', 0.0, 0);
+  cues[2] = new Cue(21.8, 'v', 0.0, 0);
+  cues[3] = new Cue(36, 'v', 0.0, 0);
+  cues[4] = new Cue(50, 'v', 0.0, 0);
+  cues[5] = new Cue(64, 'v', 0.0, 0);
+  cues[6] = new Cue(78.8, 'v', 0.0, 0);
+  cues[7] = new Cue(92.8, 'v', 0.0, 0);
+  cues[8] = new Cue(107, 'v', 0.0, 0);
+  cues[9] = new Cue(121, 'v', 0.0, 0);
+  cues[10] = new Cue(135, 'v', 0.0, 0);
+  cues[11] = new Cue(149.8, 'v', 0.0, 0);
+  cues[12] = new Cue(164, 'v', 0.0, 0);
+  cues[13] = new Cue(178, 'v', 0.0, 0);
+  cues[14] = new Cue(192.5, 'v', 0.0, 0);
+  cues[15] = new Cue(206.7, 'v', 0.0, 0);
+  cues[16] = new Cue(213.8, 'v', 0.0, 0);
+  cues[17] = new Cue(216, 'v', 0.0, 0);
+}
+
 void displayLollies() {
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
@@ -436,6 +660,48 @@ void displayLollies() {
   case 1:
     drawSolidAll(color(0));
     haromAll(color(255), 3);
+    break;
+  case 2:
+    drawSolidAll(color(0, 0, 255));
+    break;
+  case 3:
+    drawSolidAll(color(0, 255, 0));
+    break;
+  case 4:
+    drawSolidAll(color(255, 255, 0));
+    break;
+  case 5:
+    drawSolidAll(color(255, 0, 0));
+    break;
+  case 6:
+    drawSolidAll(color(255));
+    break;
+  case 7:
+    drawSolidAll(color(0, 0, 0));
+    break;
+  case 8:
+    drawSolidAll(color(0, 255, 255));
+    break;
+  case 9:
+    drawSolidAll(color(0, 0, 255));
+    break;
+  case 10:
+    drawSolidAll(color(255, 0, 255));
+    break;
+  case 11:
+    drawSolidAll(color(255, 0, 0));
+    break;
+  case 12:
+    drawSolidAll(color(255, 255, 0));
+    break;
+  case 13:
+    drawSolidAll(color(0, 255, 0));
+    break;
+  case 14:
+    drawSolidAll(color(255, 0, 255));
+    break;
+  case 15:
+    drawSolidAll(color(255, 255, 0));
     break;
   default:
     drawSolidAll(color(0));
@@ -491,6 +757,7 @@ void initDirty() {
 }
 
 void displayDirty() {
+  displayLinesCenterFocus(color(255));
   if (!personOnPlatform) displayStripedMoon(20);
   else drawEye();
 
@@ -612,6 +879,8 @@ void initFifty() {
 }
 
 void displayFifty() {
+  displayLinesCenterFocus(pink);
+
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
 
@@ -712,7 +981,7 @@ void displayFifty() {
 }
 
 void initWiz() {
-  //initVid("scenes/wizrock/movies/1_540.mp4");
+  initVid("scenes/wizrock/movies/1.mp4");
   cues = new Cue[11];
   cues[0] = new Cue(0, 'm', 0, 0); // intro
   cues[1] = new Cue(213, 'v', 0.0, 0);  // same as 1
@@ -737,6 +1006,7 @@ void initWiz() {
   //initNodes(screens[0].s);
   //initTesseract();
   //initSquiggle(centerScreen.s);
+  //initDrip(centerScreen.s);
   initDots(100);
   initAllFlowyWaves();
   currentGifs.get(4).loop();
@@ -755,35 +1025,32 @@ void displayWiz() {
     //displayDots();
 
 
-    //updateNodeConstellationMainHand();
-    //displayNodeConstellationMain();
+    updateNodeConstellationMainHand();
+    displayNodeConstellationMain();
   }
 
-  //cubesFront();
+  cubesFront();
   //tessPink();
   //wizPinkVidConst();
-  cubesFront();
+  //cubesFront();
 
   //updateNodeConstellationMain();
   //displayNodeConstellationMain();
 
   displayFlowyWavesWiz();
 
+
   //switch(currentCue) {
   //case 0:
   //  break;
   //case 1:
-  //  //centerScreenFrontAll();
-  //  //displaySquiggleParticles(centerScreen.s);
+    //centerScreenFrontAll();
+    //displaySquiggleParticles(centerScreen.s);
+    //displayDripParticles(centerScreen.s);
   //  //resetSquiggleLines = true;
   //  break;
   //  //case 1:
-  //  //if (resetSquiggleLines) {
-  //  //  centerScreen.blackOut();
-  //  //  resetSquiggleLines = false;
-  //  //}
-  //  //centerScreenFrontAll();
-  //  //displaySquiggleParticles(centerScreen.s);
+  // 
   //  //break;
   //case 2:
   //  sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
@@ -904,47 +1171,94 @@ void displayEllon() {
     break;
   }
 }
+
+void initEgrets() {
+  cues = new Cue[20];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(2, 'v', 0.0, 0); // sax
+  //cues[2] = new Cue(9.5, 'v', 0.0, 0);
+  cues[2] = new Cue(25.7, 'v', 0.0, 0); // cowbell
+  cues[3] = new Cue(41, 'v', 0.0, 0); // do deedle do do da da doo 
+  cues[4] = new Cue(57, 'v', 0.0, 0);  // sax
+  cues[5] = new Cue(73, 'v', 0.0, 0);  // high sax
+  cues[6] = new Cue(88.5, 'v', 0.0, 0); // doodle
+  cues[7] = new Cue(104, 'v', 0.0, 0); // do deedle do do da da doo 
+  cues[8] = new Cue(120, 'v', 0.0, 0); // sax
+  cues[9] = new Cue(136, 'v', 0.0, 0); // sax
+  cues[10] = new Cue(151.6, 'v', 0.0, 0);  // do deedle do do da da doo 
+  cues[11] = new Cue(167, 'v', 0.0, 0);  // doodle
+  cues[12] = new Cue(183, 'v', 0.0, 0); // doodle
+  cues[13] = new Cue(191, 'v', 0.0, 0); // doodle
+  cues[14] = new Cue(206, 'v', 0.0, 0); // doodle
+  cues[15] = new Cue(222.5, 'v', 0.0, 0); // doodle shrink
+  cues[16] = new Cue(238, 'v', 0.0, 0); // doodle shrink
+  cues[17] = new Cue(254, 'v', 0.0, 0);
+  cues[18] = new Cue(261, 'v', 0.0, 0); // done
+  cues[19] = new Cue(264, 'v', 0.0, 0); // done
+
+  tempo = 122;
+}
 void displayEgrets() {
+  cycleShapeFFTTop();
+  cycleShapeFFTCubes();
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
+  stroke(255);
+  fill(255);
 
   switch(currentCue) {
   case 0:
-    //drawSolidAll(color(0));
-    //drawFFTBarsCubes();
-    //pulseHorizLinesCenterBeat(percentToNumBeats(16));
-    //snakeFaceAll(percentToNextMeasure(0, 4), 2);
-    displayGradientVertLines(black, white, percentToNumBeats(4));
     break;
   case 1:
     transit(white, red, yellow, blue, percentToNumBeats(4));
     break;
   case 2:
-    sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
-    break;
-  case 3:
-    growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
-    break;
-  case 4:
-    pulseVertLongCenterBeat(red, percentToNumBeats(8));
-
-
-    break;
-  case 5:
     linesGradientFaceCycle(red, black); 
     break;
+  case 3:
+    snakeFaceAll(blue, percentToNumBeats(8), 2);
+    break;
+  case 4:
+    pulseLinesCenterBeat(white, percentToNumBeats(4));
+    break;
+  case 5:
+    pulseVertHorizCenterBeatCycle(red, blue, percentToNumBeats(4));
+    break;
   case 6: 
-    displayCycleSingleFaceLines(white, -1); 
+    snakeFaceAll(yellow, percentToNumBeats(8), 2);
     break;
   case 7:
-    snakeFaceAll(red, percentToNumBeats(8), 2);
+    sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
     break;
   case 8:
     pulsing(blue, percentToNumBeats(8));
     break;
   case 9:
+    pulsingCubes(white, white, percentToNumBeats(8));
+    break;
+  case 10:
     transit(white, red, yellow, blue, percentToNumBeats(4));
     break;
+  case 11:
+    growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
+    break;
+  case 12:
+    displayCycleSingleFaceLines(white, -1); 
+    break;
+  case 13:
+    pulseHorizLinesCenterBeat(red, percentToNumBeats(8));
+    break;
+  case 14:
+    sineWaveVert(yellow, blue, percentToNumBeats(8), 0.8);
+    break;
+  case 15: 
+    pulseLinesCenterBeat(white, percentToNumBeats(8));
+    break;
+  case 16:
+    pulseVertLongCenterBeat(red, percentToNumBeats(8));
+    break;
+  case 17:
+    pulsing(white, percentToNumBeats(8));
   default:
     drawSolidAll(color(0));
     break;

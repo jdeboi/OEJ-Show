@@ -91,16 +91,29 @@ void haromAll(color c, int sw) {
   float bx = 30;
   float ay = screenH-50;
   float by = ay;
-  for (Screen s : screens) {
-    s.s.beginDraw();
-    s.s.strokeWeight(sw);
-    s.s.stroke(255);
+  for (Screen sc : screens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.strokeWeight(sw);
+    s.stroke(c);
     haromScreen(s, ax, ay, bx, by, 6, (sin(0.0005*millis()%(2*PI))+1)/2);
-    s.s.endDraw();
+    s.endDraw();
   }
 }
 
-void haromScreen(Screen s, float ax, float ay, float bx, float by, int level, float ratio) {
+void haromS(PGraphics s, color c, int sw) {
+  float ax = s.width-30;
+  float bx = 30;
+  float ay = s.height-50;
+  float by = ay;
+  s.strokeWeight(sw);
+  s.stroke(c);
+  haromScreen(s, ax, ay, bx, by, 6, (sin(0.0005*millis()%(2*PI))+1)/2);
+  s.endDraw();
+}
+
+void haromScreen(PGraphics s, float ax, float ay, float bx, float by, int level, float ratio) {
   if (level!=0) {
     float vx, vy, nx, ny, cx, cy;
     vx=bx-ax;
@@ -109,9 +122,9 @@ void haromScreen(Screen s, float ax, float ay, float bx, float by, int level, fl
     ny=sin(PI/3)*vx+cos(PI/3)*vy; 
     cx=ax+nx;
     cy=ay+ny;
-    s.s.line(ax, ay, bx, by);
-    s.s.line(ax, ay, cx, cy);
-    s.s.line(cx, cy, bx, by);
+    s.line(ax, ay, bx, by);
+    s.line(ax, ay, cx, cy);
+    s.line(cx, cy, bx, by);
     haromScreen(s, ax*ratio+cx*(1-ratio), ay*ratio+cy*(1-ratio), ax*(1-ratio)+bx*ratio, ay*(1-ratio)+by*ratio, level-1, ratio);
   }
 }
@@ -204,7 +217,7 @@ class Node {
     this.pos = new PVector(random(s.width), random(s.height));
     this.vel = new PVector(random(-3, 3), random(-3, 3));
   }
-  
+
   Node(int minY, int maxY) {
     this.pos = new PVector(random(width), random(minY, maxY));
     this.vel = new PVector(random(-3, 3), random(-3, 3));
@@ -234,7 +247,7 @@ class Node {
     if (this.pos.y > maxY) this.pos.y = minY;
     else if (this.pos.y < minY) this.pos.y = maxY;
   }
-  
+
   void moveHand(int minY, int maxY, float lr) {
     PVector veltemp = new PVector(4*lr, this.vel.y);
     this.pos.add(veltemp);
@@ -988,7 +1001,7 @@ void branch(PGraphics s, float h) {
 //////////////////////////////////////////////////////////////////////////////////
 // https://www.openprocessing.org/sketch/546665
 void displayWavesCenter() {
-  cycleWaves();
+  cycleWaves(centerScreen.s);
   PGraphics s = centerScreen.s;
   s.beginDraw();
   s.background(0);  
@@ -1029,11 +1042,12 @@ class Wave {
   }
 }
 
-void cycleWaves() {
+
+void cycleWaves(PGraphics s) {
   //updateSpectrum();
   //beatCycle(500);
   if (currentCycle > previousCycle) {
-    waves.add(new Wave(centerScreen.s.width/2, centerScreen.s.height/2));
+    waves.add(new Wave(s.width/2, s.height/2));
     //previousCycle = currentCycle;
   }
 }
@@ -1263,6 +1277,9 @@ void displayRedPlanetAll() {
     displayRedPlanet(s.s);
   }
 }
+void displayRedPlanetSphere() {
+  displayRedPlanet(sphereScreen.s);
+}
 void displayRedPlanet(PGraphics s) {
   s.beginDraw();
   //create the path
@@ -1273,7 +1290,8 @@ void displayRedPlanet(PGraphics s) {
   }
 
   //draw the path
-  s.stroke(random(100, 255), 20, 15, random(10, 55));
+
+  s.stroke(random(100, 255), 20, 120, random(10, 55));
   //filter(BLUR,0.571) ;
   for (int i=0; i<pathPoints.size() -1; i++) {
     PVector v1 = pathPoints.get(i);
@@ -1307,14 +1325,14 @@ ArrayList<PVector>   complexifyPath(ArrayList<PVector> pathPoints) {
 
 ArrayList<PVector> circlePoints(PGraphics s) {
   //two points somewhere on a circle
-  float r = s.height/2;
+  float r = s.height/2.1;
   int x = s.width/2;
   int y = s.height/2;
   //float theta1 = random(TWO_PI);
   float theta1 = (randomGaussian()-0.5)*PI/4;
   float theta2 = theta1 + (randomGaussian()-0.5)*PI/3;
-  PVector v1 = new PVector(x + r*cos(theta1), y+ r*sin(theta1)*.7 );
-  PVector v2 = new PVector(x + r*cos(theta2), y + r*sin(theta2)*.7);
+  PVector v1 = new PVector(x + r*cos(theta1), x+ r*sin(theta1) );
+  PVector v2 = new PVector(x + r*cos(theta2), x + r*sin(theta2));
   ArrayList<PVector> vecs = new ArrayList<PVector>();
   vecs.add(v1);
   vecs.add(v2);
@@ -2422,22 +2440,29 @@ void displaySquiggleParticles(PGraphics s) {
   s.endDraw();
 }
 
+void displayDripParticles(PGraphics s) {
+  //displayDrip();
+  s.beginDraw(); 
+  displayDrip(s);
+  s.endDraw();
+}
+
 void initDrip(PGraphics s) {
   randomSeed(0);
   noiseSeed(0);
   nums = 100;
 
-  backgroundColor = color(20, 20, 20);
-  color_from = color(255, 0, 0);
-  color_to = color(0, 0, 255);
+  backgroundColor = 0; //color(20, 20, 20);
+  color_from = color(255);
+  color_to = color(255);
 
 
   //background(backgroundColor);
 
 
 
-  padding_top = (s.height - inner_square)/2;
-  padding_side = (s.width - inner_square)/2;
+  padding_top = 0;
+  padding_side = 0;
 
   particlesDrip = new ParticleDrip[nums];
   for (int i = 0; i < nums; i++) {
@@ -2456,7 +2481,7 @@ void displayDrip(PGraphics s) {
   ++fadeFrame;
   if (fadeFrame % 5 == 0) {
 
-    s.blendMode(DIFFERENCE);
+    s.blendMode(SUBTRACT);
     s.fill(1, 1, 1);
     s.rect(0, 0, s.width, s.height);
 
@@ -2621,16 +2646,49 @@ class ParticleDrip {
 //////////////////////////////////////////////////////////////////////////////////
 // SPHERE BOX
 //////////////////////////////////////////////////////////////////////////////////
+PVector sphereBoxRot;
+void initSphereBoxRot() {
+  sphereBoxRot = new PVector(0, 0, 0);
+}
+void updateSphereBoxCrush() {
+  int index = (currentCycle/2)%4;
+  if (index == 0) sphereBoxRot.set(0, percentToNumBeats(2)*PI, 0);
+  else if (index == 1) sphereBoxRot.set(0, (1-percentToNumBeats(2))*PI, 0);
+  else if (index == 2) sphereBoxRot.set(percentToNumBeats(2)*PI, 0, 0);
+  else if (index == 3) sphereBoxRot.set((1-percentToNumBeats(2))*PI, 0, 0);
+}
 void displaySphereBox(PGraphics s) {
-  int SPHERE_RADIUS=200;
-  s.background(0);
+  int SPHERE_RADIUS=s.width/4;
   s.pushMatrix();
-  s.translate(width/2, height/2, 0);
-  s.rotateY(frameCount*0.01);
+  s.translate(s.width/2, s.height/2, 0);
+  s.rotateX(sphereBoxRot.x);
+  s.rotateY(sphereBoxRot.y);
+  s.rotateZ(sphereBoxRot.z);
   s.noFill();
   s.stroke(255, 100);
   s.strokeWeight(1);
   s.sphere(SPHERE_RADIUS);
-  s.box(s.width/2);//physics.getWorldBounds().getExtent().x*2);
+  s.strokeWeight(3);
+  s.box(s.width/2);
   s.popMatrix();
+}
+
+void displaySphereBoxCrush() {
+  updateSphereBoxCrush();
+  for (int i = 1; i < 3; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    if (i == 1) {
+      s.pushMatrix();
+      s.scale(-1.0, 1.0);
+      s.translate(-screenW, 0, 0);
+      displaySphereBox(s);
+      s.popMatrix();
+    } else {
+      //s.background(pink);
+      displaySphereBox(s);
+    }
+    s.endDraw();
+  }
 }
