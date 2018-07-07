@@ -11,6 +11,7 @@ int ELLON =10;
 int EGRETS = 13;
 int LOLLIES = 12;
 int CRUSH = 3;
+int RITE = 11;
 
 int LARGE_CENTER = 0;
 int MID_CENTER = 1;
@@ -68,7 +69,7 @@ void setup() {
   initColors();
   initEye();
   
-  changeScene(LOLLIES);
+  changeScene(RITE);
 }
 
 void draw() {

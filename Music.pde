@@ -164,11 +164,11 @@ PImage[] hands;
 PImage[] symbols;
 void initConst() {
   constellations = new PImage[5];
-  constellations[0] = loadImage("images/constellations/0.png");
-  constellations[1] = loadImage("images/constellations/1.png");
-  constellations[2] = loadImage("images/constellations/2.png");
-  constellations[3] = loadImage("images/constellations/3.png");
-  constellations[4] = loadImage("images/constellations/4.png");
+  constellations[0] = loadImage("images/constellations/0.jpg");
+  constellations[1] = loadImage("images/constellations/1.jpg");
+  constellations[2] = loadImage("images/constellations/2.jpg");
+  constellations[3] = loadImage("images/constellations/3.jpg");
+  constellations[4] = loadImage("images/constellations/4.jpg");
 }
 void initSymbols() {
   symbols = new PImage[6];

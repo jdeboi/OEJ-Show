@@ -139,6 +139,7 @@ void triangleCenterScreen(color c, int sw, int sz) {
 //////////////////////////////////////////////////////////////////////////////////
 // Network V.0
 Node[] nodes;
+Node[] nodesMain;
 
 void initNodes(PGraphics s) {
   nodes = new Node[20];
@@ -148,7 +149,7 @@ void initNodes(PGraphics s) {
 }
 
 void initNodesMain() {
-  nodes = new Node[20];
+  nodesMain = new Node[20];
   int minY = maskPoints[keystoneNum][0].y;
   int maxY = maskPoints[keystoneNum][9].y + 50;
   for (int i = 0; i < nodes.length; i++) {

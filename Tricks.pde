@@ -1,6 +1,109 @@
 
 boolean personOnPlatform = false;
 
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// MOTH FLAP
+//////////////////////////////////////////////////////////////////////////////////
+PImage body, left, right;
+void initMoth() {
+  body = loadImage("images/constellations/mothbody.png");
+  left = loadImage("images/constellations/mothleft.png");
+  right = loadImage("images/constellations/mothright.png");
+  body.resize(screenW, screenW);
+  left.resize(screenW, screenW);
+  right.resize(screenW, screenW);
+}
+
+void displaySwimWhaleAcrossAll(float per) {
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    displaySwimWhale(s, i, per);
+    s.endDraw();
+  }
+}
+
+void displaySwimWhale(PGraphics s, int screenNum, float per) {
+  PImage whale = constellations[4];
+  int h = s.height/2;
+  float w = h *1.0/ s.height * whale.width;
+  float totalW = screenW*4 + w;
+  float pixelsPastGo = totalW*per;
+  int pixelsOnScreen = int(pixelsPastGo - screenNum*screenW -screenW);
+  s.pushMatrix();
+  s.scale(-1, 1.0);
+  s.image(whale, -pixelsOnScreen, s.height/2 + s.height/4*sin(millis()/700.0), w, h);
+  s.popMatrix();
+}
+
+void displaySarahMothFlap() {
+  float per = constrain(map(mouseY, height*3.0/4, height, .5, 0), 0, .5);
+  PGraphics s = screens[1].s;
+  s.beginDraw();
+  s.background(0);
+  displayMothFlap(s, s.width/2, 0, per);
+  s.endDraw();
+
+  s = screens[2].s;
+  s.beginDraw();
+  s.background(0);
+  displayMothFlap(s, -s.width/2, 0, per);
+  s.endDraw();
+}
+
+void displayMothFlap(PGraphics s, int x, int y, float per) {
+  per *= 2;
+  int maxAngle = 50;
+  if (per < 1) per = map(per, 0, 1, 0, radians(maxAngle));
+  else per = map(per, 1, 2, radians(maxAngle), 0);
+
+  s.pushMatrix();
+  s.translate(x, y);
+  s.blendMode(LIGHTEST);
+  s.image(body, 0, 0);
+  s.textureMode(NORMAL);
+
+  s.pushMatrix();
+  s.translate(s.width/2, 0);
+  s.rotateY(per);
+  s.translate(-s.width/2, 0);
+  s.beginShape();
+  s.texture(left);
+  s.vertex(0, 0, 0, 0);
+  s.vertex(s.width, 0, 1, 0);
+  s.vertex(s.width, s.height, 1, 1);
+  s.vertex(0, s.height, 0, 1);
+  s.endShape();
+  s.popMatrix();
+
+  s.pushMatrix();
+  s.translate(s.width/2, 0);
+  s.rotateY(-per);
+  s.translate(-s.width/2, 0);
+  s.beginShape();
+  s.texture(right);
+  s.vertex(0, 0, 0, 0);
+  s.vertex(s.width, 0, 1, 0);
+  s.vertex(s.width, s.height, 1, 1);
+  s.vertex(0, s.height, 0, 1);
+  s.endShape();
+  s.popMatrix();
+  s.popMatrix();
+}
+
+//void displayMothFlapHand(PGraphics s) {
+//  float per = constrain(map(mouseY, height/2 - 200, height/2 + 200, .5, 0), 0, .5);
+//  s.beginDraw();
+//  s.background(0);
+//  displayMothFlap(s, per);
+//  s.endDraw();
+//}
+
+
 //////////////////////////////////////////////////////////////////////////////////
 // CRUSH SPHERE
 //////////////////////////////////////////////////////////////////////////////////

@@ -406,3 +406,19 @@ void innerScreensOut() {
   screens[1].blackOut();
   screens[2].blackOut();
 }
+
+
+void drawImageCenteredMaxFit(PGraphics s, PImage p) {
+  int imgw = p.width;
+  int imgh = p.height;
+  if (imgw > imgh) {
+    int h = int(1.0*s.width/imgw*imgh);
+    int y = (s.height - h)/2;
+    s.image(p, 0, y, s.width, h);
+  }
+  else {
+    int w = int(1.0* s.height/imgh*imgw);
+    int x = (s.width - w)/2;
+    s.image(p, x, 0, w, s.height);
+  }
+}
