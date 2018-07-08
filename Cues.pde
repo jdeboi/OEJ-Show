@@ -479,19 +479,19 @@ void displayDelta() {
 
 void initRite() {
   cues = new Cue[24];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(8.4, 'v', 0.0, 0); // Y
-  cues[2] = new Cue(16.4, 'v', 0.0, 0); // Y
-  cues[3] = new Cue(24.3 , 'v', 0.0, 0);  // X
-  cues[4] = new Cue(32.3, 'v', 0.0, 0);  // X
-  cues[5] = new Cue(40.23, 'v', 0.0, 0); // Woooo
-  cues[6] = new Cue(48.13, 'v', 0.0, 0); // Z
+  cues[0] = new Cue(0, 'v', 0, 0); // stars and constellations
+  cues[1] = new Cue(8.4, 'v', 0.0, 0); // Y whale
+  cues[2] = new Cue(16.4, 'v', 0.0, 0); // Y whale
+  cues[3] = new Cue(24.3, 'v', 0.0, 0);  // X whale
+  cues[4] = new Cue(32.3, 'v', 0.0, 0);  // X whale
+  cues[5] = new Cue(40, 'v', 0.0, 0); // Woooo - sarah pumping wings
+  cues[6] = new Cue(48.13, 'v', 0.0, 0); // Z - sarah pumping wings
   cues[7] = new Cue(56.09, 'v', 0.0, 0); // Z
   cues[8] = new Cue(64.00, 'v', 0.0, 0); // Z
   cues[9] = new Cue(71.9, 'v', 0.0, 0); // Z
-  cues[10] = new Cue(79.8, 'v', 0.0, 0); // A
+  cues[10] = new Cue(79.6, 'v', 0.0, 0); // A
   cues[11] = new Cue(87.7, 'v', 0.0, 0); // A
-  cues[12] = new Cue(95.7, 'v', 0.0, 0); /// BALLAD
+  cues[12] = new Cue(95.5, 'v', 0.0, 0); /// BALLAD
   cues[13] = new Cue(103.6, 'v', 0.0, 0);/// BALLAD
   cues[14] = new Cue(111.5, 'v', 0.0, 0);/// BALLAD
   cues[15] = new Cue(119.5, 'v', 0.0, 0); /// BALLAD
@@ -507,7 +507,9 @@ void initRite() {
   initConst();
   initMoth();
   initNodes(screens[0].s);
-  initNodesMain();
+  //initNodesMain();
+  initConstellationLines();
+
   cubesFront();
   tempo = 120;
 }
@@ -516,124 +518,129 @@ void displayRite() {
   if (!personOnPlatform) sphereScreen.blackOut();
   else {
     drawEye();
-    
+
     updateNodeConstellationMainHand();
     displayNodeConstellationMain();
   }
-  displaySwimWhaleAcrossAll(percentToNumBeats(32));
- //displaySarahMothFlap();
-  
-  //updateNodeConstellation(screens[0].s);
-  //for (int i = 0; i < 4; i++) {
-  //  PGraphics s = screens[i].s;
-  //  s.beginDraw();
-  //  s.background(0);
-  //  s.image(constellations[currentCycle/2%constellations.length], 0, 0);
- 
-  //  drawImageCenteredMaxFit(screens[currentCycle/4%4].s,constellations[currentCycle/4%constellations.length]);
-  //   displayNodeConstellation(s);
-  //  s.endDraw();
-  //}
-  
-  //switch(currentCue) {
-  //case 0:
-  //  drawSolidAll(color(0));
-  //  drawImageCenteredMaxFit(screen[currentCycle/4%4].s, currentImages.get(0));
-  //  break;
-  //case 1:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 2:
-  //  drawSolidAll(color(255, 00));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 3:
-  //  drawSolidAll(color(0, 255, 9));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 4:
-  //  drawSolidAll(color(255, 0, 0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 5:
-  //  drawSolidAll(color(0, 255, 0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 6:
-  //  drawSolidAll(color(0, 255, 255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 7:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 8:
-  //  drawSolidAll(color(0, 255, 255));
-  //  haromAll(color(255), 3);
-  //  break; 
-  //case 9:
-  //  drawSolidAll(color(0, 255, 0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 10:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 11:
-  //  drawSolidAll(color(0, 255,0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 12:
-  //  drawSolidAll(color(0, 255, 5));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 13:
-  //  drawSolidAll(color(0,0,255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 14:
-  //  drawSolidAll(color(255, 0,0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 15:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 16:
-  //  drawSolidAll(color(0, 255, 255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 17:
-  //  drawSolidAll(color(0, 255, 255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 18:
-  //  drawSolidAll(color(0, 255, 255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 19:
-  //  drawSolidAll(color(0, 0, 255));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 20:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 21:
-  //  drawSolidAll(color(0));
-  //  haromAll(color(255), 3);
-  //  break;
-  //case 22:
-  //  fadeOutAllScreens(cues[currentCue].startT, 2);
-  //  break;
-  //default:
-  //  drawSolidAll(color(0));
-  //  break;
-  //}
-  
-   
+
+  //displayMothFlyAcross(percentToNumBeats(64));
+  //displayHandEyeAcrossAll(percentToNumBeats(64));
+  //drawConstellationLines();
+
+
+  switch(currentCue) {
+  case 0:
+    updateNodeConstellation(screens[0].s, screenH);
+    for (int i = 0; i < 4; i++) {
+      PGraphics s = screens[i].s;
+      s.beginDraw();
+      s.background(0);
+      //s.image(constellations[currentCycle/2%constellations.length], 0, 0);
+      //drawImageCenteredMaxFit(screens[currentCycle/4%4].s, constellations[currentCycle/4%constellations.length]);
+      displayNodeConstellation(s);
+      s.endDraw();
+    }
+    break;
+  case 1:
+    nodesWhale();
+    break;
+  case 2:
+    nodesWhale();
+    break;
+  case 3:
+    nodesWhale();
+    break;
+  case 4:
+    nodesWhale();
+    break;
+  case 5:
+    displaySarahMothFlap();
+    break;
+  case 6:
+    displaySarahMothFlap();
+    break;
+  case 7:
+    displaySarahMothFlap();
+    break;
+  case 8:
+    displaySarahMothFlap();
+    break; 
+  case 9:
+    displaySarahMothFlap();
+    break;
+  case 10:
+    cycleConst();
+    break;
+  case 11:
+    cycleConst();
+    break;
+  case 12:
+    displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
+    break;
+  case 13:
+    displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
+    break;
+  case 14:
+    displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
+    break;
+  case 15:
+    displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
+    break;
+    case 16: // push const
+      drawConstellationLinesHand();
+      break;
+    case 17:// push const
+      drawConstellationLinesHand();
+      break;
+    case 18:
+      drawConstBright();
+      break;
+    case 19:
+      drawConstBright();
+      break;
+    case 20:
+      drawConstBright();
+      break;
+    case 21:
+      drawConstBright();
+      break;
+    case 22:
+      fadeOutAllScreens(cues[currentCue].startT, 2);
+      break;
+  default:
+    drawSolidAll(color(0));
+    break;
+  }
 }
+
+void cycleConst() {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    //s.image(constellations[currentCycle/2%constellations.length], 0, 0);
+    drawImageCenteredMaxFit(screens[currentCycle%4].s, constellations[currentCycle%constellations.length]);
+    displayNodeConstellation(s);
+    s.endDraw();
+  }
+}
+
+void nodesWhale() {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    //s.image(constellations[currentCycle/2%constellations.length], 0, 0);
+    //drawImageCenteredMaxFit(screens[currentCycle/4%4].s, constellations[currentCycle/4%constellations.length]);
+    displayNodeConstellation(s);
+    displaySwimWhale(s, i, percentToNumBeats(8, 64));
+
+    s.endDraw();
+  }
+}
+
 
 
 void initMoon() {
@@ -1149,8 +1156,6 @@ void displayWiz() {
     drawEye();
     //handsHorizFaceLines(cyan);
     //displayDots();
-
-
   }
 
   cubesFront();
@@ -1323,8 +1328,8 @@ void initEgrets() {
   tempo = 122;
 }
 void displayEgrets() {
-  cycleShapeFFTTop();
-  cycleShapeFFTCubes();
+  //cycleShapeFFTTop();
+  //cycleShapeFFTCubes();
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
   stroke(255);
@@ -1384,6 +1389,31 @@ void displayEgrets() {
   case 17:
     pulsing(white, percentToNumBeats(8));
   default:
+    drawSolidAll(color(0));
+    break;
+  }
+}
+
+void initELO() {
+  cues = new Cue[3];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(2, 'v', 0.0, 0);
+  cues[2] = new Cue(240, 'v', 0.0, 0); 
+  
+  centerScreenFrontAll();
+  tempo = 141;
+}
+
+void displayELO() {
+  if (!personOnPlatform) sphereScreen.blackOut();
+  else drawEye();
+
+  switch(currentCue) {
+  case 0:    
+    pulsing(0, 1);
+    break;
+  default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }

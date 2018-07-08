@@ -1,13 +1,14 @@
 
 boolean personOnPlatform = false;
 
-
+int mxW = 100;
 
 
 //////////////////////////////////////////////////////////////////////////////////
 // MOTH FLAP
 //////////////////////////////////////////////////////////////////////////////////
 PImage body, left, right;
+PImage [] handEyeClosing;
 void initMoth() {
   body = loadImage("images/constellations/mothbody.png");
   left = loadImage("images/constellations/mothleft.png");
@@ -15,6 +16,64 @@ void initMoth() {
   body.resize(screenW, screenW);
   left.resize(screenW, screenW);
   right.resize(screenW, screenW);
+  constellations[4].resize(int(constellations[4].width * .5), int(constellations[4].height*.5));
+
+  handEyeClosing = new PImage[3];
+  handEyeClosing[0] = loadImage("images/constellations/closing1.png");
+  handEyeClosing[1] = loadImage("images/constellations/closing2.png");
+  handEyeClosing[2] = loadImage("images/constellations/closing3.png");
+
+  constellations[0].resize(int(constellations[0].width * .25), int(constellations[0].height*.25));
+  handEyeClosing[0].resize(int(handEyeClosing[0].width * .25), int(handEyeClosing[0].height*.25));
+  handEyeClosing[1].resize(int(handEyeClosing[1].width * .25), int(handEyeClosing[1].height*.25));
+  handEyeClosing[2].resize(int(handEyeClosing[2].width * .25), int(handEyeClosing[2].height*.25));
+}
+
+void displayHandEyeAcrossAll(float per) {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    displayNodeConstellation(s);
+    displayHandEye(s, i, per);
+    s.endDraw();
+  }
+}
+
+boolean eyeBlinking = false;
+int eyeMode = -1;
+int lastEyeCheck = 0;
+void displayHandEye(PGraphics s, int screenNum, float per) {
+  float totalW = screenW*4 + constellations[0].width;
+  float pixelsPastGo = totalW*per;
+  int pixelsOnScreen = int(pixelsPastGo - screenNum*screenW);
+  s.pushMatrix();
+  int y = int(s.height/2 - constellations[0].height/2 + 30*sin(millis()/1000.0));
+  s.image(constellations[0], pixelsOnScreen, y); 
+
+  if (millis()/1000%4 == 0) {
+    eyeBlinking = true;
+    eyeMode = -1;
+    lastEyeCheck = millis();
+  }
+  if (eyeBlinking) {
+    if (eyeMode > -1) {
+      if (eyeMode <= 2) {
+        s.image(handEyeClosing[eyeMode], pixelsOnScreen, y);
+      } else {
+        s.image(handEyeClosing[4-eyeMode], pixelsOnScreen, y);
+      }
+    }
+    if (millis() - lastEyeCheck > 50) {
+      lastEyeCheck = millis();
+      eyeMode++;
+      if (eyeMode > 4) {
+        eyeBlinking = false;
+      }
+    }
+  }
+  s.popMatrix();
 }
 
 void displaySwimWhaleAcrossAll(float per) {
@@ -28,44 +87,85 @@ void displaySwimWhaleAcrossAll(float per) {
 }
 
 void displaySwimWhale(PGraphics s, int screenNum, float per) {
+
   PImage whale = constellations[4];
-  int h = s.height/2;
-  float w = h *1.0/ s.height * whale.width;
-  float totalW = screenW*4 + w;
+  //int h = s.height/2;
+  //float w = (1.0* s.height/h*s.width);
+  float totalW = screenW*4 + whale.width;
   float pixelsPastGo = totalW*per;
-  int pixelsOnScreen = int(pixelsPastGo - screenNum*screenW -screenW);
+  int pixelsOnScreen = int(pixelsPastGo - screenNum*screenW);
   s.pushMatrix();
   s.scale(-1, 1.0);
-  s.image(whale, -pixelsOnScreen, s.height/2 + s.height/4*sin(millis()/700.0), w, h);
+  int y = int(s.height/2 - whale.height/2 + 50*sin(millis()/700.0));
+  s.image(whale, -pixelsOnScreen, y); //, w, h);
   s.popMatrix();
 }
 
 void displaySarahMothFlap() {
-  float per = constrain(map(mouseY, height*3.0/4, height, .5, 0), 0, .5);
+  updateNodeConstellation(screens[0].s, screenH);
+  float per = constrain(map(mouseY, height*3.0/4, height, 0, 0.5), 0, .5);
   PGraphics s = screens[1].s;
   s.beginDraw();
   s.background(0);
+  displayNodeConstellation(s);
   displayMothFlap(s, s.width/2, 0, per);
   s.endDraw();
 
   s = screens[2].s;
   s.beginDraw();
   s.background(0);
+  displayNodeConstellation(s);
   displayMothFlap(s, -s.width/2, 0, per);
   s.endDraw();
+
+  for (int i = 0; i < 4; i+=3) {
+    s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    displayNodeConstellation(s);
+    s.endDraw();
+  }
+}
+
+void displayMothFlyAcross(float per) {
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    displayMothFly(s, i, per);
+    s.endDraw();
+  }
+}
+
+void displayMothFly(PGraphics s, int screenNum, float per) {
+  //int h = s.height/2;
+  //float w = (1.0* s.height/h*s.width);
+  float totalW = screenW*4 + body.width;
+  float pixelsPastGo = totalW*per;
+  int pixelsOnScreen = int(pixelsPastGo - screenNum*screenW);
+
+  s.pushMatrix();
+  //s.translate(s.width/2, s.height/2);
+  //s.rotateZ(radians(30));
+  //s.translate(-s.width/2, -s.height/2);
+  //s.scale(-1, 1.0);
+  displayMothFlap(s, pixelsOnScreen, 0, 0.5+0.5*sin(millis()/300.0));
+  s.popMatrix();
 }
 
 void displayMothFlap(PGraphics s, int x, int y, float per) {
   per *= 2;
-  int maxAngle = 50;
+  int maxAngle = 55;
   if (per < 1) per = map(per, 0, 1, 0, radians(maxAngle));
-  else per = map(per, 1, 2, radians(maxAngle), 0);
+  else per = constrain(map(per, 1, 2, radians(maxAngle), 0), 0, maxAngle) ;
 
   s.pushMatrix();
   s.translate(x, y);
   s.blendMode(LIGHTEST);
   s.image(body, 0, 0);
+  s.noStroke();
   s.textureMode(NORMAL);
+
 
   s.pushMatrix();
   s.translate(s.width/2, 0);
@@ -108,7 +208,7 @@ void displayMothFlap(PGraphics s, int x, int y, float per) {
 // CRUSH SPHERE
 //////////////////////////////////////////////////////////////////////////////////
 void updateSphereBoxHand() {
-  float rot = map(mouseX, width/2 - 200, width/2 + 200, -PI, PI);
+  float rot = map(mouseX, width/2 - mxW, width/2 + mxW, -PI, PI);
   sphereBoxRot.set(0, rot, 0);
 }
 
@@ -136,8 +236,8 @@ void crushSphere() {
 // WAVE HANDS
 //////////////////////////////////////////////////////////////////////////////////
 void drawWaveHands() {
-  //float rot = constrain(map(mouseX, width/2 -200, width/2 + 200, -PI/2, 0), -PI/2, 0);
-  float rot = constrain(map(mouseX, width/2 -200, width/2 + 200, -PI/2, PI/2), -PI/2, PI/2);
+  //float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, 0), -PI/2, 0);
+  float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, PI/2), -PI/2, PI/2);
 
   int h = int(hands[currentCycle%4].height*1.0*screenW/hands[currentCycle%4].width);
   for (int i = 0; i < 2; i++) {
@@ -154,37 +254,73 @@ void drawWaveHands() {
   }
 }
 
+void drawConstBright() {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    displayNodeConstellation(s);
+    drawConstBrightImageHand(s, i, screenW);
+
+
+    s.blendMode(BLEND);
+    s.endDraw();
+  }
+}
+
+void drawConstBrightImageHand(PGraphics s, int screenNum, int w) {
+  updateNodeConstellation(screens[0].s, screenH);
+  float lr = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+  s.noStroke();
+  drawImageCenteredMaxFit(s, constellations[screenNum]);
+  s.blendMode(SUBTRACT);
+  float dis = 0;
+  if (screenNum == 0) dis = abs(lr + 1);
+  else if (screenNum == 1) dis = abs(lr + .5);
+  else if (screenNum == 2) dis = abs(lr - .5);
+  else if (screenNum == 3) dis = abs(lr - 1);
+  s.fill(map(dis, 0, .5, 0, 255));
+  s.rect(0, 0, s.width, s.height);
+}
+
+void drawConstLRHand() {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    displayNodeConstellation(s);
+    drawConstLeftRightSmoothImageHand(s, i, screenW);
+    s.endDraw();
+  }
+}
+
+void drawConstLeftRightSmoothImageHand(PGraphics s, int screenNum, int w) {
+  int padding = 50;
+  int lr = constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
+  drawImageMaxFit(s, constellations[currentCycle/4%4], lr - screenW * screenNum);
+}
+
+void updateNodeConstellationMainHand() {
+  float per = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+  int minY = maskPoints[keystoneNum][0].y;
+  int maxY = maskPoints[keystoneNum][9].y + 50;
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveHand(minY, maxY, per);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////////
-// CONSTELLATION IMAGE
+// SYMBOLS IMAGE
 //////////////////////////////////////////////////////////////////////////////////
-//void drawConstBrightImageHand(PGraphics s, int screenNum, int w) {
-//  if (personOnPlatform) {
-//    float lr = constrain(map(mouseX, width/2 - 200, width/2 + 200, -1, 1), -1, 1);
-//    // maskPoints[keystoneNum][0].x + 50;
 
-//    if (lr < 0) {
-//      if (screenNum == 0) {
-//        int h = int(w * 1.0 /symbols[screenNum].width * symbols[screenNum].height);
-//        s.image(symbols[screenNum], s.width/2 - w/2, s.height/2 - h/2, w, h);
-//        s.fill(0, -lr * 255);
-//        s.rect(0, 0, s.width, s.height);
-//      }
-//    } else {
-//      if (screenNum == 3) {
-//        int h = int(w * 1.0 /symbols[screenNum].width * symbols[screenNum].height);
-
-//        s.image(symbols[screenNum], s.width/2 - w/2, s.height/2 - h/2, w, h);
-
-//        s.fill(0, lr * 255);
-//        s.rect(0, 0, s.width, s.height);
-//      }
-//    }
-//  }
-//}
 
 void drawSymbolsLeftRightImageHand(PGraphics s, int screenNum, int w) {
   if (personOnPlatform) {
-    int lr = constrain(int((map(mouseX, width/2 - 200, width/2 + 200, 0, 4))), 0, 3);
+    int lr = constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, 0, 4))), 0, 3);
     // maskPoints[keystoneNum][0].x + 50;
 
     if (lr == screenNum) {
@@ -198,11 +334,30 @@ void drawSymbolsLeftRightImageHand(PGraphics s, int screenNum, int w) {
 void drawSymbolsLeftRightSmoothImageHand(PGraphics s, int screenNum, int w) {
   int padding = 50;
   if (personOnPlatform) {
-    int lr = constrain(int((map(mouseX, width/2 - 200, width/2 + 200, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
+    int lr = constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
     // maskPoints[keystoneNum][0].x + 50;
 
     int h = int(w * 1.0 /symbols[screenNum].width * symbols[screenNum].height);
     s.image(symbols[currentCycle%4], lr - screenW * screenNum, s.height/2 - h/2, w, h);
+  }
+}
+
+
+void moveConstellationLinesHand() {
+  float per = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+  for (int i = 0; i < constellationLines.length; i++) {
+    constellationLines[i].move(per*7);
+  }
+}
+
+void drawConstellationLinesHand() {
+  moveConstellationLinesHand();
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    drawConstellationLines(s, i);
+    s.endDraw();
   }
 }
 
@@ -218,7 +373,7 @@ void initEye() {
 }
 
 void drawEye() { 
-  int x = constrain(int(map(mouseX, width/2-200, width/2+200, 0, 600)), 0, 500);
+  int x = constrain(int(map(mouseX, width/2-mxW, width/2+mxW, 0, 600)), 0, 500);
   int y = constrain(int(map(mouseY, height/2, height, 0, height/2)), 0, 500);
   setEyePos(x, y);
   shader.setShaderParameters();
@@ -320,7 +475,7 @@ class GShader
 
 ////////////////////////////////////////////////////////////////////////////////
 void handsHorizFaceLines(color c) {
-  int face = constrain(int(map(mouseX, width/2-300, width/2+300, 0, 4)), 0, 3);
+  int face = constrain(int(map(mouseX, width/2-mxW, width/2+mxW, 0, 4)), 0, 3);
   if (mouseY < height -100) display4FaceLines(c, face);
 }
 

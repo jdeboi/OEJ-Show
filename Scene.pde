@@ -19,7 +19,7 @@ void initScenes() {
   scenes[11] = new Scene("Rite of Spring", "rite", 12);
   scenes[12] = new Scene("Lollies", "lollies", 13);
   scenes[13] = new Scene("Egrets", "egrets", 14);
-  scenes[14] = new Scene("Turn To Stone", "elo", 15);
+  scenes[14] = new Scene("Turn to Stone", "elo", 15);
   currentScene = scenes[0];
 }
 
@@ -104,6 +104,7 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
+    else if (song.equals("Turn to Stone")) initELO();
   }
 
 
@@ -128,7 +129,7 @@ class Scene {
       else if (song.equals("Song for M")) displaySong();
       else if (song.equals("Ellon")) displayEllon();
       else if (song.equals("Egrets")) displayEgrets();
-
+      else if (song.equals("Turn to Stone")) displayELO();
       previousCycle = currentCycle;
       
       //songFile.update();

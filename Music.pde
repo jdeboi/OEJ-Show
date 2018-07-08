@@ -461,17 +461,28 @@ float percentToNumBeats(int numBeats) {
 float percentToNumBeats(float startT, int numBeats) {
   float timePassed = songFile.position()/1000.0 - startT;
   float bps = tempo / 60.0;
-
   float spb = 1.0 / bps;
-
-  int currentGroup = (currentCycle-1) / numBeats;
-  if (currentCycle == 0) currentGroup = 0;
+  int cyclesSinceStartT = floor(timePassed / spb);
+  int currentGroup = (cyclesSinceStartT-1) / numBeats;
+  if (cyclesSinceStartT == 0) currentGroup = 0;
   float timePerGroup = numBeats * spb;
   float timeFromLastGroup = timePassed - (currentGroup * timePerGroup);
   float perGroup = map(timeFromLastGroup, 0, timePerGroup, 0, 1);
   //if (perGroup < 0 || perGroup > 1) println(currentCycle, timeFromLastGroup, timePassed);
   return perGroup;
 }
+//float percentToNumBeats(float startT, int numBeats) {
+//  float timePassed = songFile.position()/1000.0 - startT;
+//  float bps = tempo / 60.0;
+//  float spb = 1.0 / bps;
+//  int currentGroup = (currentCycle-1) / numBeats;
+//  if (currentCycle == 0) currentGroup = 0;
+//  float timePerGroup = numBeats * spb;
+//  float timeFromLastGroup = timePassed - (currentGroup * timePerGroup);
+//  float perGroup = map(timeFromLastGroup, 0, timePerGroup, 0, 1);
+//  //if (perGroup < 0 || perGroup > 1) println(currentCycle, timeFromLastGroup, timePassed);
+//  return perGroup;
+//}
 
 void setCurrentCycleCueClick() {
   float timePassedMinutes = (songFile.position()/1000.0/60); 

@@ -169,15 +169,7 @@ void updateNodeConstellationMain() {
   }
 }
 
-void updateNodeConstellationMainHand() {
-  float per = constrain(map(mouseX, width/2 - 300, width/2 + 300, -1, 1), -1, 1);
-  println(per);
-  int minY = maskPoints[keystoneNum][0].y;
-  int maxY = maskPoints[keystoneNum][9].y + 50;
-  for (int i=0; i<nodes.length; i++) {
-    nodes[i].moveHand(minY, maxY, per);
-  }
-}
+
 
 void updateNodeConstellation(PGraphics s, int maxY) {
   for (int i=0; i<nodes.length; i++) {
@@ -2691,5 +2683,102 @@ void displaySphereBoxCrush() {
       displaySphereBox(s);
     }
     s.endDraw();
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// CONSTELLATION LINES from Luna
+//////////////////////////////////////////////////////////////////////////////////
+ConstellationLine[] constellationLines;
+
+void initConstellationLines() {
+  constellationLines = new ConstellationLine[10];
+  for (int i = 0; i < constellationLines.length; i++) {
+    constellationLines[i] = new ConstellationLine(i*200, screenH/2);//int(random(100, 300)));
+  }
+}
+
+void drawConstellationLines(PGraphics s, int screenNum) {
+  for (int i = 0; i < constellationLines.length; i++) {
+    constellationLines[i].display(s, screenNum);
+  }
+}
+
+void moveConstellationLines(int speed) {
+  for (int i = 0; i < constellationLines.length; i++) {
+    constellationLines[i].move(speed);
+  }
+}
+
+class ConstellationLine {
+
+  ArrayList<PVector> points;
+  int x, y;
+  float angle;
+
+  ConstellationLine(int x, int y) {
+    this.x = x;
+    this.y = y;
+    this.angle = random(2 * PI);
+    points = new ArrayList<PVector>();
+    points.add(new PVector(0, 0));
+    randomPoints();
+  }
+
+  void display(PGraphics o, int screenNum) {
+    int dotS = 10;
+    o.pushMatrix();
+    o.stroke(255);
+    o.strokeWeight(3);
+    o.fill(255);
+    o.translate(x-screenW*screenNum, y);
+    o.rotateZ(this.angle);
+    angle += .001;
+    for (int i = 0; i < points.size()-1; i++) {
+      o.ellipse(points.get(i).x, points.get(i).y, dotS, dotS);
+      o.line(points.get(i).x, points.get(i).y, points.get(i+1).x, points.get(i+1).y);
+    }
+    o.ellipse(points.get(points.size()-1).x, points.get(points.size()-1).y, dotS, dotS);
+    o.popMatrix();
+  }
+
+  void move(float speed) {
+    this.x += speed;
+    if (this.x > screenW*4 + 300) this.x = -300;
+    else if (this.x < -300) this.x = screenW*4 + 300;
+  }
+
+  void randomPoints() {
+    int numPoints = int(random(3, 5));
+    int p = 1;
+    float xp = 0;
+    float yp = 0;
+    float ang = 0;
+    while (p <= numPoints) {
+      p++;
+      float len = random(100, 200);
+      if (p == 3) {
+        int join = millis()%3;
+        if (join == 0) {
+          xp = points.get(1).x;
+          yp = points.get(1).y;
+        } else if (join == 1) {
+          xp = points.get(0).x;
+          yp = points.get(0).y;
+        } else {
+          int num = int(random(1, 8));
+          float newAng = num * (2 * PI) / 8;
+          xp += len * cos(newAng);
+          yp += len * sin(newAng);
+        }
+      } else {
+        int num = int(random(1, 8));
+        float newAng = num * (2 * PI) / 8;
+        xp += len * cos(newAng);
+        yp += len * sin(newAng);
+      }
+      points.add(new PVector(xp, yp));
+    }
   }
 }
