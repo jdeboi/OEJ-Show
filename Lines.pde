@@ -90,7 +90,7 @@ void displayLinesCenterFocus(color c) {
   displayLinesCenterFocus(c, c);
 }
 
-void displayLinesInnerFaces(color c) {
+void displayLinesInnerOutline(color c) {
   fill(c);
   stroke(c);
   int [] getthem = {4, 6, 7, 8, 9, 10}; 
@@ -99,13 +99,18 @@ void displayLinesInnerFaces(color c) {
   }
 }
 
+void displayLinesInnerFaces(color c) {
+   display4FaceLines(c, 1);
+  display4FaceLines(c, 2);
+}
+
 void displayLinesOutsideFaces(color c1, color c2) {
   display4FaceLines(c1, 0);
   display4FaceLines(c2, 3);
 }
 
 void displayLinesCenterFocus(color c1, color c2) {
-  displayLinesInnerFaces(c1);
+  displayLinesInnerOutline(c1);
   displayLinesOutsideFaces(c2, c2);
 }
 
@@ -199,6 +204,7 @@ void transit(color c1, color c2, color c3, color c4, float per) {
       fill(c4);
     }
     lines.get(i).displaySegment(per, 0.2);
+
   }
 }
 

@@ -137,13 +137,161 @@ void initMood() {
   cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
 }
 void initSong() {
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length(), 'v', 0.0, 0);
+  cues = new Cue[16];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(10.5, 'v', 0.0, 0);
+  cues[2] = new Cue(18.5, 'v', 0.0, 0);
+  cues[3] = new Cue(34.5, 'v', 0.0, 0);
+  cues[4] = new Cue(50.5, 'g', 0.0, 0);
+  cues[5] = new Cue(66.5, 'g', 0.0, 0);
+  cues[6] = new Cue(74.5, 'v', 0.0, 0);
+  cues[7] = new Cue(82.4, 'g', 0.0, 1);
+  cues[8] = new Cue(98.4, 'g', 0.0, 1);
+  cues[9] = new Cue(114.4, 'g', 0.0, 2);
+  cues[10] = new Cue(130.4, 'g', 0.0, 2);
+  //cues[10] = new Cue(138.5, 'v', 0.0, 0);
+  cues[11] = new Cue(146.5, 'v', 0.0, 0);
+  cues[12] = new Cue(162.5, 'v', 0.0, 0);
+  cues[13] = new Cue(178.5, 'v', 0.0, 0);
+  cues[14] = new Cue(186.6, 'v', 0.0, 0); // fade out
+  cues[15] = new Cue(192, 'v', 0.0, 0);
+
+  tempo = 60;
+  currentGifs.get(3).loop();
+  currentGifs.get(4).loop();
+  currentGifs.get(currentGifs.size()-1).loop();
+  initTreeBranchesAll();
 }
 
+void displaySong() {
+  if (!personOnPlatform) sphereScreen.drawGif(currentGifs.get(currentGifs.size()-1), 0, 0, sphereScreen.s.width, sphereScreen.s.height);
+  else drawEye();
 
+  switch(currentCue) {
+  case 0:
+    branchAll();
+
+    break;
+  case 1:
+    branchAll();
+    break;
+  case 2:
+    branchAll();
+    break;
+  case 3:
+    branchAll();
+    break;
+  case 4: 
+
+    treeRun(4);
+    drawSolidOuter(color(0));
+    break;
+  case 5: 
+    drawSolidOuter(color(0));
+    treeRun(4);
+    break;
+  case 6: 
+    drawSolidAllCubes(color(0));
+    transit(white, color(55), color(55), white, percentToNumBeats(8));
+    break;
+  case 7: 
+    updateTreeBranches();
+    displayTreeBranchesOuter();
+    displayTreeBranchesTop();
+    //drawSolidOuter(color(0));
+    treeRun(3);
+    break;
+  case 8: 
+    updateTreeBranches();
+    displayTreeBranchesOuter();
+    displayTreeBranchesTop();
+    //drawSolidOuter(color(0));
+    treeRun(3);
+    break;
+  case 9: 
+    //drawSolidOuter(color(0));
+    updateTreeBranches();
+    displayTreeBranchesOuter();
+    displayTreeBranchesTop();
+    treeRun(-1);
+    break;
+  case 10: 
+    updateTreeBranches();
+    displayTreeBranchesOuter();
+    displayTreeBranchesTop();
+    treeRun(-1);
+    break;
+  case 11: 
+    drawSolidAllCubes(color(0));
+    displayFractalTreeSong();
+    break;
+  case 12: 
+    displayFractalTreeSong();
+    break;
+  case 13: 
+    displayFractalTreeSong();
+    break;
+  case 14: 
+    displayFractalTreeSong();
+    fadeOutAllScreens(cues[currentCue].startT, 5);
+    break;
+  default:
+    drawSolidAll(color(0));
+    break;
+  }
+}
+
+void branchAll() {
+  updateTreeBranches();
+  displayTreeBranchesOuter();
+  displayTreeBranchesInner();
+  displayTreeBranchesTop();
+  displayLinesOutsideFaces(color(255), color(255));
+  displayLinesInnerFaces(color(55));
+}
+
+int treez = 0;
+void treeRun(int addonGif) {
+
+  //treez += 1;
+  //if (currentCycle%4 == 0) treez = 0;
+
+  for (int i = 1; i < 3; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(ADD);
+
+    //s.pushMatrix();
+    //s.translate(0, 0, treez);
+    //s.ellipse(s.width/2, s.height/2-25, treez*treez*.1, treez*treez*.1);
+    //s.popMatrix();
+
+
+    if (i == 2) {
+      s.pushMatrix();
+      s.scale(-1, 1);
+      s.noStroke();
+      s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenW);
+      if (addonGif > -1) s.image(currentGifs.get(addonGif), -screenW, 0, screenW, screenW);
+
+      s.ellipseMode(CENTER);
+      s.fill(255);
+      s.noStroke();
+      s.popMatrix();
+    } else {
+      s.image(currentGifs.get(currentGif), 0, 0, screenW, screenW);
+      if (addonGif > -1) s.image(currentGifs.get(addonGif), 0, 0, screenW, screenW);
+    }
+    s.stroke(255);
+    s.strokeWeight(3);
+    s.noFill();
+
+
+    s.endDraw();
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // DISPLAY CUES
@@ -495,14 +643,14 @@ void initRite() {
   cues[13] = new Cue(103.6, 'v', 0.0, 0);/// BALLAD
   cues[14] = new Cue(111.5, 'v', 0.0, 0);/// BALLAD
   cues[15] = new Cue(119.5, 'v', 0.0, 0); /// BALLAD
-  cues[16] = new Cue(127.5, 'v', 0.0, 0);// Woooo
+  cues[16] = new Cue(127.35, 'v', 0.0, 0);// Woooo
   cues[17] = new Cue(135.4, 'v', 0.0, 0); // Woooo
   cues[18] = new Cue(143.3, 'v', 0.0, 0); // Z
   cues[19] = new Cue(151, 'v', 0.0, 0); // Z
   cues[20] = new Cue(159, 'v', 0.0, 0); // sax
   cues[21] = new Cue(167, 'v', 0.0, 0); // sax
-  cues[22] = new Cue(174, 'v', 0.0, 0); // fade out
-  cues[23] = new Cue(179, 'v', 0.0, 0);
+  cues[22] = new Cue(174.5, 'v', 0.0, 0); // fade out
+  cues[23] = new Cue(180, 'v', 0.0, 0);
 
   initConst();
   initMoth();
@@ -586,27 +734,28 @@ void displayRite() {
   case 15:
     displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
     break;
-    case 16: // push const
-      drawConstellationLinesHand();
-      break;
-    case 17:// push const
-      drawConstellationLinesHand();
-      break;
-    case 18:
-      drawConstBright();
-      break;
-    case 19:
-      drawConstBright();
-      break;
-    case 20:
-      drawConstBright();
-      break;
-    case 21:
-      drawConstBright();
-      break;
-    case 22:
-      fadeOutAllScreens(cues[currentCue].startT, 2);
-      break;
+  case 16: // push const
+    drawConstellationLinesHand();
+    break;
+  case 17:// push const
+    drawConstellationLinesHand();
+    break;
+  case 18:
+    drawConstellationLinesHand();
+    break;
+  case 19:
+    drawConstellationLinesHand();
+    break;
+  case 20:
+    cycleConst();
+    break;
+  case 21:
+    cycleConst();
+    break;
+  case 22:
+    cycleConst();
+    fadeOutAllScreens(cues[currentCue].startT, 5);
+    break;
   default:
     drawSolidAll(color(0));
     break;
@@ -761,7 +910,7 @@ void displayMoon() {
 
 void initLollies() {
   cues = new Cue[18];
-  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[0] = new Cue(0, 'g', 0, 0);
   cues[1] = new Cue(7.5, 'v', 0.0, 0);
   cues[2] = new Cue(21.8, 'v', 0.0, 0);
   cues[3] = new Cue(36, 'v', 0.0, 0);
@@ -779,32 +928,53 @@ void initLollies() {
   cues[15] = new Cue(206.7, 'v', 0.0, 0);
   cues[16] = new Cue(213.8, 'v', 0.0, 0);
   cues[17] = new Cue(216, 'v', 0.0, 0);
+
+  initSymbols();
+  tempo = 128;
+  //currentGifs.get(4).loop();
+  temp = createGraphics(screenW, screenH);
+  initializeTriangulation(-1);
 }
+
+PGraphics temp;
+int lastCueDelaunay = -2;
 
 void displayLollies() {
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
 
+
   switch(currentCue) {
   case 0:
-    drawSolidAll(color(0));
-    //drawFFTBarsCubes();
+    initializeTriangulation(0);
+    drawDelaunayTriAll();
+    //cycleCubeLight(black, white, pink, pink);
+
     break;
   case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
+    initializeTriangulation(1);
+    drawDelaunayTriAll();
+
+    //if (songFile.position()/1000.0 < 10.8)  drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 0);
+    //else if (songFile.position()/1000.0 < 14.4) drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 1);
+    //else if (songFile.position()/1000.0 < 18) drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 2);
+    //else drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 3);
     break;
   case 2:
-    drawSolidAll(color(0, 0, 255));
+    initializeTriangulation(2);
+    drawDelaunayTriAll();
+    //color [] colors = {lime, white, lime, white};
+    //drawVertLinesAcrossAll(30, int(60 + 50*sin(percentToNumBeats(8)*2*PI)), percentToNumBeats(16), colors, 0); // int(30*15*percentToNumBeats(8))
     break;
   case 3:
-    drawSolidAll(color(0, 255, 0));
+    drawVertLinesGradientAcrossAll(30, int(60 + 40*sin(percentToNumBeats(8)*2*PI)), percentToNumBeats(16), lime, pink, cyan);
     break;
   case 4:
-    drawSolidAll(color(255, 255, 0));
+
+    drawDelaunayTriAll();
     break;
   case 5:
-    drawSolidAll(color(255, 0, 0));
+    drawDelaunayTriAll();
     break;
   case 6:
     drawSolidAll(color(255));
@@ -842,6 +1012,209 @@ void displayLollies() {
   }
 }
 
+void lineEllipse() {
+}
+
+void testthestuff() {
+  //screens[0].s.beginDraw();
+  //screens[0].s.background(0);
+  //screens[0].s.blendMode(SCREEN);
+  ////splitRect(screens[0].s, pink, lime);
+  //drawVertLinesGradientScreen(screens[0].s, 30, int(60 + 50*sin(percentToNumBeats(8)*2*PI)), percentToNumBeats(16), lime, pink);
+  //drawHorizLinesGradientScreen(screens[0].s, 30, int(60 + 50*sin((1-percentToNumBeats(8))*2*PI)), percentToNumBeats(16), lime, pink);
+  ////ellipseRun(screens[0].s, 30, 10, percentToNumBeats(16), lime, pink);
+  //screens[0].s.endDraw();
+}
+
+void ellipseRun(PGraphics s, float w, float sp, float per, color c1, color c2) {
+  s.noStroke();
+  for (int i = s.width*2; i > 0; i-= (sp+w)) {
+    s.noFill();
+    s.strokeWeight(w/2);
+
+
+    float newW = map(per, 0, 1, 0, s.width*2);
+    newW += i;
+    newW %= s.width*2;
+    s.stroke(lerpColor(c1, c2, newW/ s.width));
+    s.ellipse(s.width/2, s.height/2, newW, newW);
+  }
+}
+void splitRect(PGraphics s, color c1, color c2) {
+  int mode = (currentCycle-1)/4%4;
+  s.fill(c2);
+  s.noStroke();
+  if (mode > 0) {
+    for (int x = 0; x <= pow(2, mode); x++) {
+      s.pushMatrix();
+      //s.translate(10*sin(percentToNumBeats(8)*2*PI), 0);
+      for (int y = 0; y <= pow(2, mode); y++) {
+        if (y%2 ==0) s.rect(x*s.width/pow(2, mode)*2, y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
+        else s.rect(x*s.width/pow(2, mode)*2 + s.width/pow(2, mode), y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
+      }
+      s.popMatrix();
+    }
+  }
+}
+
+void cycleCubeMovingStripes(int lw, int lsp, float per, color c1, color c2, color l1, color l2) {
+  if ((currentCycle-1)/4 % 2 == 0) {
+    drawVertLinesScreen(screens[0].s, lw, lsp, per, c1, 0);
+    colorMode(HSB);
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
+    drawVertLinesScreen(screens[1].s, lw, lsp, per, c, 0);
+    colorMode(RGB);
+    screens[2].blackOut();
+    screens[3].blackOut();
+    displayCubeLines(l1, 0);
+  } else {
+    drawVertLinesScreen(screens[2].s, lw, lsp, per, c2, 0);
+    colorMode(HSB);
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
+    drawVertLinesScreen(screens[3].s, lw, lsp, per, c, 0);
+    colorMode(RGB);
+    screens[0].blackOut();
+    screens[1].blackOut();
+    displayCubeLines(0, l2);
+  }
+}
+
+void cycleCubeLight(color c1, color c2, color l1, color l2) {
+  if ((currentCycle-1)/4 % 2 == 0) {
+    PGraphics s = screens[0].s;
+    s.beginDraw();
+    s.background(c1);
+    s.noStroke();
+    s.fill(c2);
+    s.rect(0, 0, s.width, s.height/2);
+    s.fill(c1);
+    s.ellipse(s.width/2, s.height/2, s.width/2, s.width/2);
+    s.fill(c2);
+    s.arc(s.width/2, s.height/2, s.width/2, s.width/2, 0, PI);
+    s.endDraw();
+    colorMode(HSB);
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
+    screens[1].drawSolid(c);
+    colorMode(RGB);
+    screens[2].blackOut();
+    screens[3].blackOut();
+    displayCubeLines(l1, 0);
+  } else {
+    screens[2].drawSolid(c2);
+    colorMode(HSB);
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
+    screens[3].drawSolid(c);
+    colorMode(RGB);
+    screens[0].blackOut();
+    screens[1].blackOut();
+    displayCubeLines(0, l2);
+  }
+}
+
+void drawHorizLinesGradientScreen(PGraphics s, int lh, int lsp, float per, color c1, color c2) {
+  s.noStroke();
+  int extra = (lh + 2*lsp);
+  for (int i = 0; i < s.height + extra; i += (lh + lsp)) {
+
+    float y = map(per, 0, 1, -extra, s.height);
+
+    y += i;
+    if (y >= s.height) y -= (extra + s.height);
+    s.fill(lerpColor(c1, c2, y/s.height));
+    s.rect(0, y, s.width, lh);
+  }
+}
+
+void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenNum, float per, color c1, color c2, color c3) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+
+    float x = map(per, 0, 1, -extra, s.width);
+
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.fill(getCycleColor(c1, c2, c3, (x+screenNum * screenW)/(screenW*4)));
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+
+    float x = map(per, 0, 1, -extra, s.width);
+
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.fill(lerpColor(c1, c2, x/s.width));
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int direction) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+    s.fill(c);
+    //s.fill(255);
+    float x = 0;
+    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
+    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2);
+    screens[j].s.endDraw();
+  }
+}
+
+void drawVertLinesGradientAcrossAll(int lw, int lsp, float per, color c1, color c2, color c3) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    drawVertLinesGradientScreenAcross(screens[j].s, lw, lsp, j, per, c1, c2, c3);
+    screens[j].s.endDraw();
+  }
+}
+
+void drawVertLinesAcrossAll(int lw, int lsp, float per, color c, int mode) {
+  color [] colors = {c, c, c, c};
+  drawVertLinesAcrossAll(lw, lsp, per, colors, mode);
+}
+
+void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    screens[j].s.blendMode(SCREEN);
+    int direction = 0;
+    if (mode == 0) direction = 1;
+    else if (mode == 1) direction = -1;
+    else if (mode == 2) {
+      if (j == 0 || j == 1) direction = 1;
+      else direction = -1;
+    } else if (mode == 3) {
+      if (j == 0 || j == 1) direction = -1;
+      else direction = 1;
+    }
+    //temp.beginDraw();
+    //temp.background(0);
+    drawVertLinesScreen(screens[j].s, lw, lsp, per, colors[j], direction);
+    //temp.endDraw();
+    //screens[j].s.image(currentImages.get(0), -screenW * j, 0);
+    //screens[j].s.mask(temp);
+    screens[j].s.endDraw();
+  }
+}
 
 void displayCycles() {
   if (!personOnPlatform) sphereScreen.drawSolid(0);
@@ -1256,29 +1629,12 @@ void displayMood() {
     break;
   }
 }
-void displaySong() {
-  if (!personOnPlatform) sphereScreen.drawSolid(0);
-  else drawEye();
 
-  switch(currentCue) {
-  case 0:
-    drawSolidAll(color(0));
-    drawFFTBarsCubes();
-    break;
-  case 1:
-    drawSolidAll(color(0));
-    haromAll(color(255), 3);
-    break;
-  default:
-    drawSolidAll(color(0));
-    break;
-  }
-}
 
 void initEllon() {
   cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(songFile.length()/1000.0-4, 'v', 0.0, 0);
   cues[2] = new Cue(songFile.length()/1000.0-1, 'v', 0.0, 0);
 
   loadKeystone(MID_CENTER);
@@ -1399,7 +1755,7 @@ void initELO() {
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(2, 'v', 0.0, 0);
   cues[2] = new Cue(240, 'v', 0.0, 0); 
-  
+
   centerScreenFrontAll();
   tempo = 141;
 }

@@ -4,7 +4,7 @@
 
 float angleStriped = 0;
 float[] stripedAngles;
-color red, yellow, white, gray, black, blue, cyan, pink;
+color red, yellow, white, gray, black, blue, cyan, pink, lime;
 
 void initColors() {
   blue = color(0, 100, 255);
@@ -15,6 +15,7 @@ void initColors() {
   gray = color(150);
   yellow = color(255, 255, 0);
   black = 0;
+  lime = color(#6BFF03);
 }
 
 void initStripedSquares(int num) {
@@ -183,6 +184,7 @@ void displayNodeConstellation(PGraphics s) {
     for (int j = 0; j < nodes.length; j++) {
       if (i != j && nodes[i].connect(nodes[j], dis)) {
         s.stroke(255);
+        s.strokeWeight(2);
         s.line(nodes[i].pos.x, nodes[i].pos.y, nodes[j].pos.x, nodes[j].pos.y);
       }
     }
@@ -889,7 +891,8 @@ class pathfinder {
       if (random(0, 1)<0.02) {
         paths = (pathfinder[]) append(paths, new pathfinder(this));
       }
-    } else if (location.x < -400) resetTreeBranchesAll();
+      //} else if (location.x < -400) resetTreeBranchesAll();
+    }
   }
 }
 pathfinder[] paths;
@@ -904,18 +907,65 @@ void initTreeBranchesAll() {
     s.endDraw();
   }
 }
-void displayTreeBranchesAll() {
-  for (Screen sc : screens) {
-    PGraphics s = sc.s;
+
+void updateTreeBranches() {
+  //resetTreeBranchesAll();
+  for (int i=0; i<paths.length; i++) {
+    paths[i].update();
+  }
+  if (currentCycle > previousCycle && currentCycle%12 == 0) resetTreeBranchesAll();
+}
+void displayTreeBranchesOuter() {
+  for (int j = 0; j < 4; j +=3) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    displayTreeBranches(s, j);
+    s.endDraw();
+  }
+}
+
+void displayTreeBranchesTop() {
+  for (int j = 0; j < 2; j++) {
+    PGraphics s = topScreens[j].s;
+    s.beginDraw();
+    displayTreeBranches(s, j+4);
+    s.endDraw();
+  }
+}
+
+void displayTreeBranches() {
+  for (int j = 0; j < 4; j +=3) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    displayTreeBranches(s, j);
+    s.endDraw();
+  }
+}
+
+void displayTreeBranches(PGraphics s, int screenNum) {
+  s.ellipseMode(CENTER);
+  s.fill(255);
+  s.noStroke();
+  for (int i=0; i<paths.length; i++) {
+    PVector loc = paths[i].location;
+    float diam = paths[i].diameter;
+    if (screenNum == 3)  s.ellipse(screenW-loc.x, loc.y, diam, diam);
+    else s.ellipse(loc.x, loc.y, diam, diam);
+  }
+}
+void displayTreeBranchesInner() {
+  for (int j = 1; j < 3; j++) {
+    PGraphics s = screens[j].s;
     s.beginDraw();
     s.ellipseMode(CENTER);
-    s.fill(255);
+    s.fill(55);
     s.noStroke();
     for (int i=0; i<paths.length; i++) {
       PVector loc = paths[i].location;
       float diam = paths[i].diameter;
-      s.ellipse(loc.x, loc.y, diam, diam);
-      paths[i].update();
+      if (j == 1)  s.ellipse(screenW-loc.x, loc.y, diam, diam);
+      else s.ellipse(loc.x, loc.y, diam, diam);
+      //paths[i].update();
     }
     s.endDraw();
   }
@@ -925,6 +975,11 @@ void resetTreeBranchesAll() {
   paths = new pathfinder[1];
   paths[0] = new pathfinder(s);
   for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.background(0);
+    sc.s.endDraw();
+  }
+  for (Screen sc : topScreens) {
     sc.s.beginDraw();
     sc.s.background(0);
     sc.s.endDraw();
@@ -941,7 +996,7 @@ void displayFractalTreeAll(int mode) {
     PGraphics s = sc.s;
     s.beginDraw();
     s.background(0);
-    s.stroke(255);
+    s.stroke(c);
     s.strokeWeight(2);
     s.pushMatrix();
     // Let's pick an angle 0 to 90 degrees based on the mouse position
@@ -964,6 +1019,38 @@ void displayFractalTreeAll(int mode) {
   }
 }
 
+void displayFractalTreeSong() {
+  for (int j = 0; j < 6; j++) {
+    if (j == 0 || j == 3) displayFractalTree(screens[j].s, color(255));
+    else if (j == 1 || j == 2) displayFractalTree(screens[j].s, color(55));
+    else  displayFractalTree(topScreens[j-4].s, color(255));
+  }
+}
+
+void displayFractalTree(PGraphics s, color c) {
+  s.beginDraw();
+  s.background(0);
+  s.stroke(c);
+  s.blendMode(BLEND);
+  s.strokeWeight(2);
+  s.pushMatrix();
+  // Let's pick an angle 0 to 90 degrees based on the mouse position
+  float a = (mouseX / (float) s.width) * 90f;
+  //if (mode == 1) a = 40*sin(frameCount/100.0 + j * 0.35); // (mouseX / (float) s.width) * 90f 
+  // Convert it to radians
+  thetaFTree = radians(a);
+  // Start the tree from the bottom of the screen
+  s.translate(s.width/2, s.height);
+  // Draw a line 120 pixels
+  s.line(0, 0, 0, -120);
+  // Move to the end of that line
+  s.translate(0, -120);
+  // Start the recursive branching!
+  //s.scale(3);
+  branch(s, 120);
+  s.popMatrix();
+  s.endDraw();
+}
 void branch(PGraphics s, float h) {
   // Each branch will be 2/3rds the size of the previous one
   h *= 0.66;
@@ -2779,6 +2866,477 @@ class ConstellationLine {
         yp += len * sin(newAng);
       }
       points.add(new PVector(xp, yp));
+    }
+  }
+}
+
+void displaySymbolLines() {
+  for (int j = 1; j < 3; j++) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(LIGHTEST);
+    if (millis()/3000%3 == 0) {
+      for (int i = 0; i < 4; i++) {
+        displaySymbolLine(s, random(s.width/3, s.width/4*3), 30 + random(50)); //s.width/2 + s.width/5 * sin(millis()/500.0 + i), 30 + random(50));
+      }
+    } else {
+      for (int i = 0; i < 4; i++) {
+        displaySymbolLine(s, s.width/2, 20);
+      }
+    }
+    s.endDraw();
+  }
+}
+
+
+void displaySymbolLine(PGraphics s, float x, float y) {
+  int sz = 30;
+  int padding = 5;
+  for (int i = 0; i < symbols.length; i++) {
+    s.image(symbols[i], x, y + i*( sz + padding), sz, sz);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// TRIANGULATION
+//////////////////////////////////////////////////////////////////////////////////
+//https://github.com/robu3/delaunay
+// https://www.openprocessing.org/sketch/385808
+ArrayList<PVector> pts;
+DelaunayTriangulator dt;
+
+void Triangulate() {
+  dt = new DelaunayTriangulator();
+  dt.points = pts.toArray(new PVector[pts.size()]);
+  dt.triangles = dt.Calculate();
+}
+
+void initializeTriangulation(int cuenum) {
+  if (cuenum != lastCueDelaunay) {
+    lastCueDelaunay = cuenum;
+    pts = new ArrayList<PVector>();
+    pts.add( new PVector( 0, 0 ) );
+    pts.add( new PVector( screenW, 0 ) );
+    pts.add( new PVector( screenW, screenH ) );
+    pts.add( new PVector( 0, screenH ) );
+    // add a certain nb of pts proportionally to the size of the canvas
+    // ~~ truncates a floating point number and keeps the integer part, like floor()
+    int n = int ( screenW / 300.0 * screenH / 300.0 );
+    for ( int i = 0; i < n; i ++ ) {
+      pts.add( new PVector( int(random( screenW )), int(random( screenH )) ) );
+    }
+  
+    Triangulate();
+  }
+}
+
+public class DelaunayTriangulator {
+  PVector[] points;
+  ArrayList<Triangle> triangles;
+
+  // sort points in clockwise order (in place)
+  // insertion sort
+  // NOTE: not currently in use
+  private PVector[] SortClockwise(PVector[] pts, PVector center) {
+    // sort in clockwise order
+    // left -> right
+    for (int i = 1; i < pts.length; i++) {
+      PVector p = pts[i];
+      int pos = i;
+
+      while (pos > 0 && IsCcw(p, pts[pos - 1], center)) {
+        // larger value shifts up
+        pts[pos] = pts[pos - 1];
+        // insert position moves down
+        pos = pos - 1;
+      }
+
+      // correct position determined
+      pts[pos] = p;
+    }
+    return pts;
+  }
+
+  // returns true if A is CCW in relation to B
+  // reference: http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
+  // NOTE: not currently in use
+  private boolean IsCcw(PVector a, PVector b, PVector center) {
+    PVector diffA = PVector.sub(center, a);
+    PVector diffB = PVector.sub(center, b);
+
+    if (diffA.x >= 0 && diffB.x < 0) {
+      return true;
+    }
+    if (diffA.x == 0 && diffB.x == 0) {
+      return diffA.y > diffB.y;
+    }
+
+    // (0, 0, 1) is the perpendicular vector
+    // it is the vector perpendicular to the xy plane
+    float dot = PVector.dot(diffA.cross(diffB), new PVector(0, 0, 1));
+    if (dot < 0) {
+      return true;
+    } else if (dot > 0) {
+      return false;
+    }
+
+    // a & b are on the same line from the center point
+    // use distance; further is CCW
+    return diffA.mag() > diffB.mag();
+  }  
+
+  // find a triangle that contains all the points
+  // this used as a starting reference for the algorithm
+  public Triangle GetSuperTriangle() {
+    // find min & max x and y values
+    float xMin = points[0].x;
+    float yMin = points[0].y;
+    float xMax = xMin;
+    float yMax = yMin;
+
+    for (int i = 0; i < points.length; i++) {
+      PVector p = points[i];
+      if (p.x < xMin) {
+        xMin = p.x;
+      }
+      if (p.x > xMax) {
+        xMax = p.x;
+      }
+      if (p.y < xMin) {
+        xMin = p.y;
+      }
+      if (p.y > xMax) {
+        xMax = p.y;
+      }
+    }
+
+    // build triangle that contains the min and max values
+    float dx = xMax - xMin;
+    float dy = yMax - yMin;
+    float dMax = dx > dy ? dx : dy;
+    float xMid = (xMin + xMax) / 2f;
+    float yMid = (yMin + yMax) / 2f;
+
+    Triangle superTri = new Triangle(
+      new PVector(xMid - 2f * dMax, yMid - dMax), 
+      new PVector(xMid, yMid + 2f * dMax), 
+      new PVector(xMid + 2f * dMax, yMid - dMax)
+      );
+
+    return superTri;
+  }
+
+  // Calculates / creates delaunay triangles for the
+  // current set of points
+  public ArrayList<Triangle> Calculate()
+  {
+    // the buffer of current triangles
+    ArrayList<Triangle> triangleBuffer = new ArrayList<Triangle>();
+
+    // final collection of completed triangles
+    ArrayList<Triangle> completed = new ArrayList<Triangle>();
+
+    // add the super triangle
+    Triangle superTriangle = GetSuperTriangle();
+    triangleBuffer.add(superTriangle);
+
+    // add each point
+    PVector point;
+    ArrayList<Edge> edgeBuffer = new ArrayList<Edge>();
+    for (int i = 0; i < points.length; i++) {
+      point = points[i];
+      edgeBuffer.clear();
+
+      // iterate over all current triangles (in reverse)
+      // checking to see if the current point is included
+      // in a triangles circumcircle
+      for (int j = triangleBuffer.size() - 1; j >= 0; j--) {
+        Triangle tri = triangleBuffer.get(j);
+
+        PVector circumcenter = tri.GetCircumcenter();
+        float rad = circumcenter.dist(tri.points[0]);
+
+        if (circumcenter.x + rad < point.x) {
+          // triangle is complete
+          // TODO can we end evaluation for current point here?
+          completed.add(tri);
+        }
+
+        if (circumcenter.dist(point) < rad) {
+          // inside
+          // add edges to buffer and remove the triangle
+          edgeBuffer.add(new Edge(tri.points[0], tri.points[1]));
+          edgeBuffer.add(new Edge(tri.points[1], tri.points[2]));
+          edgeBuffer.add(new Edge(tri.points[2], tri.points[0]));
+          triangleBuffer.remove(j);
+        }
+      }
+
+      // edge buffer time
+      // check for duplicate edges
+      // if found, remove them
+      for (int j = 0; j < edgeBuffer.size() - 1; j++) {
+        Edge edgeA = edgeBuffer.get(j);
+        if (edgeA != null) {
+          for (int k = j + 1; k < edgeBuffer.size(); k++) {
+            Edge edgeB = edgeBuffer.get(k);
+            if (edgeA.IsEqual(edgeB)) {
+              edgeBuffer.set(j, null);
+              edgeBuffer.set(k, null);
+            }
+          }
+        }
+      }
+
+      // build new triangles from
+      // the remaining edges
+      for (int j = 0; j < edgeBuffer.size(); j++) {
+        Edge edge = edgeBuffer.get(j);
+        if (edge == null) {
+          continue;
+        }
+
+        // make sure to order points in a clockwise fashion
+        Triangle tri = new Triangle(edge.p1, edge.p2, point);
+        triangleBuffer.add(tri);
+      }
+    }
+
+    // remove triangles with
+    // the super triangle vertices
+    for (int i = triangleBuffer.size() - 1; i >= 0; i--) {
+      if (triangleBuffer.get(i).SharesVertex(superTriangle)) {
+        triangleBuffer.remove(i);
+      }
+    }
+
+    // set local triangles collection
+    triangles = triangleBuffer;
+
+    return triangleBuffer;
+  }
+
+  public DelaunayTriangulator() {
+    triangles = new ArrayList<Triangle>();
+  }
+}
+
+class Edge {
+  public PVector p1;  
+  public PVector p2;  
+
+  public boolean IsEqual(Edge other) {
+    if (other == null) {
+      return false;
+    } else {
+      return (p1 == other.p1 && p2 == other.p2) || (p2 == other.p1 && p1 == other.p2);
+    }
+  }
+
+  public Edge(PVector a, PVector b) {
+    p1 = a;
+    p2 = b;
+  }
+}
+
+void drawDelaunayTriAll() {
+  int j = 0;
+  for (Screen s : screens) {
+    s.s.beginDraw();
+    if (dt != null)
+      if (j == 1 || j == 3) {
+        s.s.pushMatrix();
+        s.s.scale(-1, 1);
+        s.s.translate(-screenW, 0);
+        for (Triangle t : dt.triangles) t.display(s.s);
+        s.s.popMatrix();
+      } else {
+        for (Triangle t : dt.triangles) t.display(s.s);
+        
+      }
+    j++;
+    s.s.endDraw();
+  }
+}
+
+class Triangle {
+  PVector[] points;
+  // used for fill using lerpColor
+  float r = random(0.8);
+  color col = color(255);
+  // used for drawing lines on triangles
+  // number of lines to draw proportionnally to the triangle size
+  float n;    // direction point for the lines
+  int drawTo = (int)(Math.random()*3);
+
+  // returns the circumcenter for the specified triangle
+  // the circumcenter is the intersection of two perpendicular bisectors
+  // for any given triangle
+  public PVector GetCircumcenter(PVector a, PVector b, PVector c) {
+    // determine midpoints (average of x & y coordinates)
+    PVector midAB = Midpoint(a, b);
+    PVector midBC = Midpoint(b, c);
+
+    // determine slope
+    // we need the negative reciprocal of the slope to get the slope of the perpendicular bisector
+    float slopeAB = -1 / Slope(a, b);
+    float slopeBC = -1 / Slope(b, c);
+
+    // y = mx + b
+    // solve for b
+    float bAB = midAB.y - slopeAB * midAB.x;
+    float bBC = midBC.y - slopeBC * midBC.x;
+
+    // solve for x & y
+    // x = (b1 - b2) / (m2 - m1)
+    float x = (bAB - bBC) / (slopeBC - slopeAB);
+    PVector circumcenter = new PVector(
+      x, 
+      (slopeAB * x) + bAB
+      );
+
+    return circumcenter;
+  }
+
+  // Returns the circumcenter of this triangle
+  public PVector GetCircumcenter() {
+    return GetCircumcenter(points[0], points[1], points[2]);
+  }
+
+  // Returns true if p is in the circumcircle of this triangle
+  public boolean CircumcircleContains(PVector p) {
+    PVector center = GetCircumcenter();
+    float rad = center.dist(points[0]);
+    return center.dist(p) <= rad;
+  }
+
+  // Returns the points in points contained in the circumcircle
+  public ArrayList<PVector> GetContainedPoints(PVector[] points) {
+    ArrayList<PVector> contained = new ArrayList<PVector>();
+    for (int i = 0; i < points.length; i++) {
+      if (CircumcircleContains(points[i])) {
+        contained.add(points[i]);
+      }
+    }
+
+    return contained;
+  }
+
+  // returns the midpoint between two points
+  public PVector Midpoint(PVector a, PVector b) {
+    // midpoint is the average of x & y coordinates
+    return new PVector(
+      (a.x + b.x) / 2, 
+      (a.y + b.y) / 2
+      );
+  }
+
+  // returns the slope of the line between two points
+  public float Slope(PVector from, PVector to) {
+    return (to.y - from.y) / (to.x - from.x);
+  }
+
+  // returns true if point is in the circle located at center with the specified radius
+  public boolean IsInCircle(PVector point, PVector center, float radius) {
+    // could also use the pythagorean theorem for this
+    return point.dist(center) < radius;
+  }
+
+  // returns true if we share a vertex with another triangle
+  public boolean SharesVertex(Triangle other) {
+    for (int i = 0; i < points.length; i++) {
+      for (int j = 0; j < other.points.length; j++) {
+        if (points[i] == other.points[j]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+
+  public Triangle() {
+    points = new PVector[3];
+  }
+
+  public Triangle(PVector[] pts) {
+    points = pts;
+  }
+
+  // constructor using vectors
+  public Triangle(PVector a, PVector b, PVector c) {
+    color cyan = color(0, 255, 255);
+    color blue = color(0, 0, 255);
+    color lime = color(70, 255, 0);
+    color pink = color(255, 0, 155);
+    points = new PVector[3];
+    points[0] = a;
+    points[1] = b;
+    points[2] = c;
+    n = getD(points[0], points[1], points[2]);
+    color[] colors = {cyan, pink, blue, lime};
+    col = colors[int(random(4))];
+  }
+
+  public void display(PGraphics s) {
+
+
+    s.noStroke();
+    //s.fill( lerpColor( color(255), color(0), this.r ) );
+    s.fill(col);
+
+    s.triangle( points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y );
+
+    switch( this.drawTo ) {
+    case 0:
+      drawLines(s, points[0], points[1], points[2] );
+      break;
+    case 1:
+      drawLines(s, points[2], points[0], points[1] );
+      break;
+    case 2:
+      drawLines(s, points[1], points[0], points[2] );
+      break;
+    }
+
+    s.stroke( color(0) );
+    s.strokeJoin( BEVEL );
+    s.strokeWeight( 15 );
+    s.noFill();
+    s.triangle( points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y );
+  };
+  float getD(PVector p1, PVector p2, PVector p3) {
+    return (dist( p1.x, p1.y, ( p2.x + p2.x )*1.0 / 2, ( p3.y + p3.y )*1.0 / 2 ) / random( 25, 50 ) ) + 1 ;
+  }
+  void drawLines(PGraphics s, PVector from, PVector to1, PVector to2 ) {
+    float c =  -.05 + .7*cos( frameCount *1.0 / 360 * TWO_PI ) / 2;
+
+    for ( int i = 1; i <= this.n; i++ ) {
+      PVector p1 = new PVector( 
+        lerp( from.x, to1.x, ( i - 1 )*1.0 / this.n ), 
+        lerp( from.y, to1.y, ( i - 1 )*1.0 / this.n )
+        );
+      PVector  p2 = new PVector(
+        lerp( from.x, to2.x, ( i - 1 )*1.0 / this.n ), 
+        lerp( from.y, to2.y, ( i - 1 )*1.0 / this.n )
+        );
+      PVector  p3 = new PVector(
+        lerp( from.x, to2.x, ( i - 0.5 + c )*1.0 / this.n ), 
+        lerp( from.y, to2.y, ( i - 0.5 + c )*1.0 / this.n )
+        );
+      PVector  p4 = new PVector( 
+        lerp( from.x, to1.x, ( i - 0.5 + c )*1.0 / this.n ), 
+        lerp( from.y, to1.y, ( i - 0.5 + c )*1.0 / this.n )
+        );
+
+      //line( p1.x, p1.y, p2.x, p2.y );
+
+      s.noStroke();
+      s.fill( color(0) );
+      s.quad( p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y );
     }
   }
 }

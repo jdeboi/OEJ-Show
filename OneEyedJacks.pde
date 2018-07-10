@@ -13,7 +13,7 @@ int LOLLIES = 12;
 int CRUSH = 3;
 int RITE = 11;
 int ELO = 14;
-
+int SONG = 9;
 int LARGE_CENTER = 0;
 int MID_CENTER = 1;
 //////////
@@ -70,7 +70,7 @@ void setup() {
   initColors();
   initEye();
   
-  changeScene(RITE);
+  changeScene(LOLLIES);
 }
 
 void draw() {
