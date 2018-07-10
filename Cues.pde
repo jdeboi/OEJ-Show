@@ -494,27 +494,31 @@ void initDelta() {
   //initVid("scenes/wizrock/movies/1_540.mp4");
 
   tempo = 133;
-  cues = new Cue[13];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(7, 'v', 0.0, 0); // bass beat
-  cues[2] = new Cue(14.95, 'v', 0.0, 0); //xylophone
+  cues = new Cue[15];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(7.5, 'v', 0.0, 0); // bass beat
+  cues[2] = new Cue(14.9, 'v', 0.0, 0); //xylophone
   //cues[3] = new Cue(29, 'v', 0.0, 0); // kinda2
-  cues[3] = new Cue(36, 'g', 0.0, 0); // derrr neener derrr
+  cues[3] = new Cue(36, 'v', 0.0, 0); // derrr neener derrr
   cues[4] = new Cue(51, 'v', 0.0, 0); // "help meee coffee", big base beat
   cues[5] = new Cue(72.2, 'v', 0.0, 0);  // wooo
-  cues[6] = new Cue(102, 'v', 0.0, 0);  // "delta waves"
+  cues[6] = new Cue(101.5, 'v', 0.0, 0);  // "delta waves"
   cues[7] = new Cue(115, 'v', 0.0, 0);
-  cues[8] = new Cue(137, 'v', 0.0, 0);// woo
-  cues[9] = new Cue(166, 'v', 0.0, 0);
-  cues[10] = new Cue(181, 'v', 0.0, 0);
-  cues[11] = new Cue(199, 'v', 0.0, 0);
-  cues[12] = new Cue(203, 'v', 0.0, 0);
+  cues[8] = new Cue(135.5, 'v', 0.0, 0);
+  cues[9] = new Cue(137.6, 'v', 0.0, 0);// woo
+  cues[10] = new Cue(152, 'v', 0.0, 0);
+  cues[11] = new Cue(166, 'v', 0.0, 0);
+  cues[12] = new Cue(181, 'v', 0.0, 0);
+  cues[13] = new Cue(191.7, 'v', 0.0, 0);
+  cues[14] = new Cue(202, 'v', 0.0, 0);
 
 
   cubesFront();
 
   initHands();
+  initTheremin();
   initSymbols();
+  initNodesSym(2);
 }
 
 void deconstructDelta() {
@@ -530,98 +534,183 @@ void displayDelta() {
     drawEye();
     drawWaveHands();
   }
-  //float[] deltaBeats2 = {1, 1, 1, 1}; // -1, 1, .5, .5, -1, -1};
-  // index = getMoveOnBeats(deltaBeats2, 4);
 
 
-  // if (index > 0) {
-  //   p = hands[index%4];
-  //   println(index);
-  //   h = p.height*screenW/p.width;
-  //   screens[0].drawImage(p, 0, screenH/2 -h/2, screenW, h);
-  // }
-
-  displayLinesCenterFocus(color(255));
   innerScreensOut();
-
   int h = int(hands[0].height*1.0*screenW/hands[0].width);
+
   switch(currentCue) {
   case 0:
-    if (!personOnPlatform) {
-      PImage p = hands[(currentCycle) % hands.length];
-      screens[0].drawImage(p, 0, screenH/2 -h/2, screenW, h);
-      screens[3].drawImage(p, 0, screenH/2 -h/2, screenW, h);
-    }
+    openCloseOutside();
+
     break;
   case 1:
-    // alternate left, right open
-    if (!personOnPlatform) {
-      if (currentCycle%2 == 0) {
-        screens[0].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
-        screens[3].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
-      } else {
-        screens[0].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
-        screens[3].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
-      }
-    }
+    alternateDelta();
     break;
   case 2:
-    if (!personOnPlatform) {
-      PImage p = symbols[((currentCycle+2)/4) % symbols.length];
-      int w = int(p.width * 1.0 * screens[0].s.height/p.height);
-      screens[0].drawImage(p, screenW/2-w/2, 0, w, screenH);
-      screens[3].drawImage(p, screenW/2-w/2, 0, w, screenH);
-    }
+    chillSymbols();
     break;
   case 3:
     cycleHandsFFT();
+    displayLines(white);
     break;
   case 4:
-    if (!personOnPlatform) {
-      float[] deltaBeats2 = {1, 1, 1, -1, 1, .5, .5, -1, -1};
-      currentBeatIndex = getMoveOnBeats(deltaBeats2, 8);
-
-
-      if (currentBeatIndex >= 0) {
-        if (currentBeatIndex != previousBeatIndex) {
-          previousBeatIndex = currentBeatIndex;
-          numBeatsIndex++;
-        }
-        float rot = PI/2 * numBeatsIndex;
-        for (int i = 0; i < 2; i++) {
-          PGraphics s = screens[i*3].s;
-          s.beginDraw();
-          s.background(0);
-          s.blendMode(BLEND);
-          s.pushMatrix();
-          s.translate(screenW/2, screenH/2);
-          s.rotateZ(rot);
-          s.image(hands[currentCycle%4], -screenW/2, -h/2, screenW, h);
-          s.popMatrix();
-          s.endDraw();
-        }
-      }
-    }
+    datDeltaBass();
+    break;
+  case 5:
+    crazyDelta();
     break;
   case 6:
-
+    chillSymbols();
     break;
   case 7:
-
+    chillSymbols();
     break;
   case 8:
-
+    crazySymbols();
     break;
   case 9:
-
+    crazierDelta();
     break;
   case 10:
-
+    crazyDelta();
+    break;
+  case 11:
+    crazyDelta();
+    break;
+  case 12:
+    datDeltaBass();
+    break;
+  case 13:
+   displaySymbolParticlesCenter();
+    fadeOutAllScreens(cues[currentCue].startT, 5);
     break;
   default:
     drawSolidAll(color(0));
     break;
   }
+}
+
+void openCloseOutside() {
+  int h = int(hands[0].height*1.0*screenW/hands[0].width);
+  PImage p;
+  float per = percentToNumBeats(8);
+  if (per < 0.5) {
+    int num = int(map(per, 0, 0.5, 0, 5));
+    p = hands[num];
+  } else {
+    int num = int(map(per, 0.5, 1, 4, -1));
+    p = hands[num];
+  }
+  screens[0].drawImage(p, 0, screenH/2 -h/2, screenW, h);
+  screens[3].drawImage(p, 0, screenH/2 -h/2, screenW, h);
+
+  display4FaceLines(white, 0);
+  display4FaceLines(white, 3);
+}
+void alternateDelta() {
+  int h = int(hands[0].height*1.0*screenW/hands[0].width);
+  if ((currentCycle-1)/2%2 == 0) {
+    screens[0].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+    screens[3].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+  } else {
+    screens[0].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+    screens[3].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+  }
+  display4FaceLines(white, 0);
+  display4FaceLines(white, 3);
+}
+
+void datDeltaBass() {
+  drawSolidAllCubes(0);
+  float[] deltaBeats2 = {1, 1, 1, -1, 1, .5, .5, -1, -1};
+  currentBeatIndex = getMoveOnBeats(deltaBeats2, 8);
+
+
+  if (currentBeatIndex >= 0) {
+    if (currentBeatIndex != previousBeatIndex) {
+      previousBeatIndex = currentBeatIndex;
+      numBeatsIndex++;
+    }
+  }
+  display4FaceLines(white, numBeatsIndex%4);
+  drawImageCenteredMaxFitSole(screens[numBeatsIndex%4].s, theremin[numBeatsIndex%theremin.length]);
+}
+
+void crazySymbols() {
+  int num = millis()/100%theremin.length;
+  PImage p = theremin[num];
+
+  drawImageCenteredMaxFitSole(screens[0].s, p);
+  drawImageCenteredMaxFitSole(screens[3].s, p);
+
+  num = millis()/100%symbols.length;
+  p = symbols[num];
+  drawImageCenteredMaxFitSole(screens[1].s, p);
+  drawImageCenteredMaxFitSole(screens[2].s, p);
+
+  displayLines(white);
+}
+
+void chillSymbols() {
+  PImage p = theremin[((currentCycle-1)/4)%theremin.length];
+
+  drawImageCenteredMaxFitSole(screens[0].s, p);
+  drawImageCenteredMaxFitSole(screens[3].s, p);
+
+  p = symbols[((currentCycle-1)/4) % symbols.length];
+  drawImageCenteredMaxFitSole(screens[1].s, p);
+  drawImageCenteredMaxFitSole(screens[2].s, p);
+
+  displayLines(white);
+}
+
+void crazyDelta() {
+  int h = int(hands[0].height*1.0*screenW/hands[0].width);
+  if ((currentCycle-1)%2 == 0) {
+    screens[0].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+    screens[3].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+  } else {
+    screens[0].drawImage(hands[4], 0, screenH/2 -h/2, screenW, h);
+    screens[3].drawImage(hands[0], 0, screenH/2 -h/2, screenW, h);
+  }
+  //PImage p = theremin[currentCycle % theremin.length];
+  //drawImageCenteredMaxFitSole(screens[0].s, p);
+  //drawImageCenteredMaxFitSole(screens[3].s, p);
+  displaySymbolParticlesCenter();
+}
+
+void crazierDelta() {
+
+  PImage p = symbols[currentCycle % symbols.length];
+  float per = percentToNumBeats(4);
+  if (per < 0.5) per = map(per, 0, .5, 255, 0);
+  else per = map(per, .5, 1, 0, 255);
+  for (int i = 0; i < 4; i+=3) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.noStroke();
+    s.background(0);
+    drawImageCenteredMaxFit(s, p);
+    s.endDraw();
+  }
+  displaySymbolParticlesCenter();
+}
+
+void rotateDelta() {
+  //float rot = PI/2 * numBeatsIndex;
+  //for (int i = 0; i < 2; i++) {
+  //  PGraphics s = screens[i*3].s;
+  //  s.beginDraw();
+  //  s.background(0);
+  //  s.blendMode(BLEND);
+  //  s.pushMatrix();
+  //  s.translate(screenW/2, screenH/2);
+  //  s.rotateZ(rot);
+  //  s.image(hands[currentCycle%4], -screenW/2, -h/2, screenW, h);
+  //  s.popMatrix();
+  //  s.endDraw();
+  //}
 }
 
 
@@ -926,7 +1015,7 @@ void initLollies() {
   cues[13] = new Cue(178, 'v', 0.0, 0);
   cues[14] = new Cue(192.5, 'v', 0.0, 0);
   cues[15] = new Cue(206.7, 'v', 0.0, 0);
-  cues[16] = new Cue(213.8, 'v', 0.0, 0);
+  cues[16] = new Cue(213, 'v', 0.0, 0);
   cues[17] = new Cue(216, 'v', 0.0, 0);
 
   initSymbols();
@@ -944,72 +1033,11 @@ void displayLollies() {
   else drawEye();
 
 
-  switch(currentCue) {
-  case 0:
-    initializeTriangulation(0);
-    drawDelaunayTriAll();
-    //cycleCubeLight(black, white, pink, pink);
+  initializeTriangulation(currentCue);
+  if (currentCue == 0)  cycleCubeDelaunay(pink, pink);
+  else drawDelaunayTriAll();
 
-    break;
-  case 1:
-    initializeTriangulation(1);
-    drawDelaunayTriAll();
-
-    //if (songFile.position()/1000.0 < 10.8)  drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 0);
-    //else if (songFile.position()/1000.0 < 14.4) drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 1);
-    //else if (songFile.position()/1000.0 < 18) drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 2);
-    //else drawVertLinesAcrossAll(30, 30, percentToNumBeats(16), lime, 3);
-    break;
-  case 2:
-    initializeTriangulation(2);
-    drawDelaunayTriAll();
-    //color [] colors = {lime, white, lime, white};
-    //drawVertLinesAcrossAll(30, int(60 + 50*sin(percentToNumBeats(8)*2*PI)), percentToNumBeats(16), colors, 0); // int(30*15*percentToNumBeats(8))
-    break;
-  case 3:
-    drawVertLinesGradientAcrossAll(30, int(60 + 40*sin(percentToNumBeats(8)*2*PI)), percentToNumBeats(16), lime, pink, cyan);
-    break;
-  case 4:
-
-    drawDelaunayTriAll();
-    break;
-  case 5:
-    drawDelaunayTriAll();
-    break;
-  case 6:
-    drawSolidAll(color(255));
-    break;
-  case 7:
-    drawSolidAll(color(0, 0, 0));
-    break;
-  case 8:
-    drawSolidAll(color(0, 255, 255));
-    break;
-  case 9:
-    drawSolidAll(color(0, 0, 255));
-    break;
-  case 10:
-    drawSolidAll(color(255, 0, 255));
-    break;
-  case 11:
-    drawSolidAll(color(255, 0, 0));
-    break;
-  case 12:
-    drawSolidAll(color(255, 255, 0));
-    break;
-  case 13:
-    drawSolidAll(color(0, 255, 0));
-    break;
-  case 14:
-    drawSolidAll(color(255, 0, 255));
-    break;
-  case 15:
-    drawSolidAll(color(255, 255, 0));
-    break;
-  default:
-    drawSolidAll(color(0));
-    break;
-  }
+  if (currentCue == 16) fadeOutAllScreens(cues[currentCue].startT, 3);
 }
 
 void lineEllipse() {
@@ -1026,195 +1054,6 @@ void testthestuff() {
   //screens[0].s.endDraw();
 }
 
-void ellipseRun(PGraphics s, float w, float sp, float per, color c1, color c2) {
-  s.noStroke();
-  for (int i = s.width*2; i > 0; i-= (sp+w)) {
-    s.noFill();
-    s.strokeWeight(w/2);
-
-
-    float newW = map(per, 0, 1, 0, s.width*2);
-    newW += i;
-    newW %= s.width*2;
-    s.stroke(lerpColor(c1, c2, newW/ s.width));
-    s.ellipse(s.width/2, s.height/2, newW, newW);
-  }
-}
-void splitRect(PGraphics s, color c1, color c2) {
-  int mode = (currentCycle-1)/4%4;
-  s.fill(c2);
-  s.noStroke();
-  if (mode > 0) {
-    for (int x = 0; x <= pow(2, mode); x++) {
-      s.pushMatrix();
-      //s.translate(10*sin(percentToNumBeats(8)*2*PI), 0);
-      for (int y = 0; y <= pow(2, mode); y++) {
-        if (y%2 ==0) s.rect(x*s.width/pow(2, mode)*2, y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
-        else s.rect(x*s.width/pow(2, mode)*2 + s.width/pow(2, mode), y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
-      }
-      s.popMatrix();
-    }
-  }
-}
-
-void cycleCubeMovingStripes(int lw, int lsp, float per, color c1, color c2, color l1, color l2) {
-  if ((currentCycle-1)/4 % 2 == 0) {
-    drawVertLinesScreen(screens[0].s, lw, lsp, per, c1, 0);
-    colorMode(HSB);
-    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
-    drawVertLinesScreen(screens[1].s, lw, lsp, per, c, 0);
-    colorMode(RGB);
-    screens[2].blackOut();
-    screens[3].blackOut();
-    displayCubeLines(l1, 0);
-  } else {
-    drawVertLinesScreen(screens[2].s, lw, lsp, per, c2, 0);
-    colorMode(HSB);
-    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
-    drawVertLinesScreen(screens[3].s, lw, lsp, per, c, 0);
-    colorMode(RGB);
-    screens[0].blackOut();
-    screens[1].blackOut();
-    displayCubeLines(0, l2);
-  }
-}
-
-void cycleCubeLight(color c1, color c2, color l1, color l2) {
-  if ((currentCycle-1)/4 % 2 == 0) {
-    PGraphics s = screens[0].s;
-    s.beginDraw();
-    s.background(c1);
-    s.noStroke();
-    s.fill(c2);
-    s.rect(0, 0, s.width, s.height/2);
-    s.fill(c1);
-    s.ellipse(s.width/2, s.height/2, s.width/2, s.width/2);
-    s.fill(c2);
-    s.arc(s.width/2, s.height/2, s.width/2, s.width/2, 0, PI);
-    s.endDraw();
-    colorMode(HSB);
-    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
-    screens[1].drawSolid(c);
-    colorMode(RGB);
-    screens[2].blackOut();
-    screens[3].blackOut();
-    displayCubeLines(l1, 0);
-  } else {
-    screens[2].drawSolid(c2);
-    colorMode(HSB);
-    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
-    screens[3].drawSolid(c);
-    colorMode(RGB);
-    screens[0].blackOut();
-    screens[1].blackOut();
-    displayCubeLines(0, l2);
-  }
-}
-
-void drawHorizLinesGradientScreen(PGraphics s, int lh, int lsp, float per, color c1, color c2) {
-  s.noStroke();
-  int extra = (lh + 2*lsp);
-  for (int i = 0; i < s.height + extra; i += (lh + lsp)) {
-
-    float y = map(per, 0, 1, -extra, s.height);
-
-    y += i;
-    if (y >= s.height) y -= (extra + s.height);
-    s.fill(lerpColor(c1, c2, y/s.height));
-    s.rect(0, y, s.width, lh);
-  }
-}
-
-void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenNum, float per, color c1, color c2, color c3) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
-  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-
-    float x = map(per, 0, 1, -extra, s.width);
-
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.fill(getCycleColor(c1, c2, c3, (x+screenNum * screenW)/(screenW*4)));
-    s.rect(x, 0, lw, s.height);
-  }
-}
-
-void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
-  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-
-    float x = map(per, 0, 1, -extra, s.width);
-
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.fill(lerpColor(c1, c2, x/s.width));
-    s.rect(x, 0, lw, s.height);
-  }
-}
-
-void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int direction) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
-  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-    s.fill(c);
-    //s.fill(255);
-    float x = 0;
-    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
-    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.rect(x, 0, lw, s.height);
-  }
-}
-
-void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2) {
-  for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2);
-    screens[j].s.endDraw();
-  }
-}
-
-void drawVertLinesGradientAcrossAll(int lw, int lsp, float per, color c1, color c2, color c3) {
-  for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    drawVertLinesGradientScreenAcross(screens[j].s, lw, lsp, j, per, c1, c2, c3);
-    screens[j].s.endDraw();
-  }
-}
-
-void drawVertLinesAcrossAll(int lw, int lsp, float per, color c, int mode) {
-  color [] colors = {c, c, c, c};
-  drawVertLinesAcrossAll(lw, lsp, per, colors, mode);
-}
-
-void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode) {
-  for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    screens[j].s.blendMode(SCREEN);
-    int direction = 0;
-    if (mode == 0) direction = 1;
-    else if (mode == 1) direction = -1;
-    else if (mode == 2) {
-      if (j == 0 || j == 1) direction = 1;
-      else direction = -1;
-    } else if (mode == 3) {
-      if (j == 0 || j == 1) direction = -1;
-      else direction = 1;
-    }
-    //temp.beginDraw();
-    //temp.background(0);
-    drawVertLinesScreen(screens[j].s, lw, lsp, per, colors[j], direction);
-    //temp.endDraw();
-    //screens[j].s.image(currentImages.get(0), -screenW * j, 0);
-    //screens[j].s.mask(temp);
-    screens[j].s.endDraw();
-  }
-}
 
 void displayCycles() {
   if (!personOnPlatform) sphereScreen.drawSolid(0);

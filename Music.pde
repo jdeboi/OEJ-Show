@@ -10,6 +10,11 @@ int currentCycle = 0;
 int lastCheckedShape = 0;
 int previousCycle = 0;
 
+PImage[] constellations;
+PImage[] hands;
+PImage[] theremin;
+PImage[] symbols;
+
 FFT         myAudioFFT;
 
 int         myAudioRange     = 256;
@@ -159,9 +164,7 @@ void cycleShapeFFT(PGraphics s) {
   s.endDraw();
 }
 
-PImage[] constellations;
-PImage[] hands;
-PImage[] symbols;
+
 void initConst() {
   constellations = new PImage[5];
   constellations[0] = loadImage("images/constellations/0.jpg");
@@ -192,10 +195,18 @@ void cycleConstFFT() {
   }
 }
 void initHands() {
-  int numHands = 6;
+  int numHands = 5;
   hands = new PImage[numHands];
   for (int i = 0; i < numHands; i++) {
     hands[i] = loadImage("images/hand/hand" + i + ".jpg");
+  }
+}
+
+void initTheremin() {
+  int numHands = 8;
+  theremin = new PImage[numHands];
+  for (int i = 0; i < numHands; i++) {
+    theremin[i] = loadImage("images/theremin/" + i + ".jpg");
   }
 }
 void cycleHandsFFT() {
@@ -210,8 +221,15 @@ void cycleHandsFFT() {
     sc.s.rectMode(CENTER);
 
     int imgW = 400;
-    int imgH = int(hands[(currentCycle+j)%hands.length].height *  imgW*1.0/hands[(currentCycle+j)%hands.length].width);
-    sc.drawImage(hands[(currentCycle+j)%hands.length], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
+    
+    // 4 forward
+    // 2 back
+    // repeat
+    int num = (currentCycle + j)% 6;
+    if (num > 4) num = 8 - num;
+    PImage p = hands[num];
+    int imgH = int(p.height *  imgW*1.0/p.width);
+    sc.drawImage(p, screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     //if (currentCycle%hands.length == j) sc.drawImage(hands[0], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     //else  sc.drawImage(hands[4], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
     sc.s.rectMode(CORNERS);

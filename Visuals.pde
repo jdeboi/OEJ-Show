@@ -158,6 +158,13 @@ void initNodesMain() {
   }
 }
 
+void initNodesSym(int numScreens) {
+  nodes = new Node[10];
+  for (int i = 0; i < nodes.length; i++) {
+    nodes[i] = new Node(numScreens);
+  }
+}
+
 void updateNodeConstellation(PGraphics s) {
   updateNodeConstellation(s, 150);
 }
@@ -191,6 +198,12 @@ void displayNodeConstellation(PGraphics s) {
   }
 }
 
+void updateNodeSymbols() {
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveSym(2);
+  }
+}
+
 void displayNodeConstellationMain() {
   int dis = 150;
   for (int i=0; i<nodes.length; i++) {
@@ -207,9 +220,14 @@ void displayNodeConstellationMain() {
 
 class Node {
   PVector pos, vel;
-
+  int sym = int(random(6));
   Node(PGraphics s) {
     this.pos = new PVector(random(s.width), random(s.height));
+    this.vel = new PVector(random(-3, 3), random(-3, 3));
+  }
+  
+  Node(int numScreens) {
+    this.pos = new PVector(random(screenW * numScreens), random(screenH));
     this.vel = new PVector(random(-3, 3), random(-3, 3));
   }
 
@@ -225,6 +243,17 @@ class Node {
   void display() {
     fill(245);
     ellipse(this.pos.x, this.pos.y, 5, 5);
+  }
+  void displaySym(PGraphics s, int screenNum, int size) {
+    s.image(symbols[sym], -screenW * screenNum + this.pos.x, this.pos.y, size, symbols[sym].height * size*1.0/symbols[sym].width);
+  }
+  void moveSym(int numScreens) {
+    this.pos.add(vel);
+    if (this.pos.x > screenW*numScreens) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = screenW*numScreens;
+
+    if (this.pos.y > screenH) this.pos.y = 0;
+    else if (this.pos.y < 0) this.pos.y = screenH;
   }
   void move(PGraphics s, int maxY) {
     this.pos.add(vel);
@@ -262,6 +291,19 @@ class Node {
   }
 }
 
+void displaySymbolParticlesCenter() {
+  updateNodeSymbols();
+  for (int j = 0; j < 2; j++) {
+    PGraphics s = screens[j + 1].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(LIGHTEST);
+    for (int i=0; i<nodes.length; i++) {
+      nodes[i].displaySym(s, j, 140);
+    }
+    s.endDraw();
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // NERVOUS WAVES 2
@@ -2927,7 +2969,7 @@ void initializeTriangulation(int cuenum) {
     for ( int i = 0; i < n; i ++ ) {
       pts.add( new PVector( int(random( screenW )), int(random( screenH )) ) );
     }
-  
+
     Triangulate();
   }
 }
@@ -2962,6 +3004,7 @@ public class DelaunayTriangulator {
   // returns true if A is CCW in relation to B
   // reference: http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
   // NOTE: not currently in use
+
   private boolean IsCcw(PVector a, PVector b, PVector center) {
     PVector diffA = PVector.sub(center, a);
     PVector diffB = PVector.sub(center, b);
@@ -3141,6 +3184,25 @@ class Edge {
   }
 }
 
+void drawDelaunayTriCube(int index) {
+
+  for (int j = index*2; j < (index+1)*2; j++) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    if (dt != null)
+      if (j % 2 == 0) {
+        s.pushMatrix();
+        s.scale(-1, 1);
+        s.translate(-screenW, 0);
+        for (Triangle t : dt.triangles) t.display(s);
+        s.popMatrix();
+      } else {
+        for (Triangle t : dt.triangles) t.display(s);
+      }
+    s.endDraw();
+  }
+}
+
 void drawDelaunayTriAll() {
   int j = 0;
   for (Screen s : screens) {
@@ -3154,7 +3216,6 @@ void drawDelaunayTriAll() {
         s.s.popMatrix();
       } else {
         for (Triangle t : dt.triangles) t.display(s.s);
-        
       }
     j++;
     s.s.endDraw();
@@ -3338,5 +3399,213 @@ class Triangle {
       s.fill( color(0) );
       s.quad( p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y );
     }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Some LINE STUFF
+//////////////////////////////////////////////////////////////////////////////////
+
+void ellipseRun(PGraphics s, float w, float sp, float per, color c1, color c2) {
+  s.noStroke();
+  for (int i = s.width*2; i > 0; i-= (sp+w)) {
+    s.noFill();
+    s.strokeWeight(w/2);
+
+
+    float newW = map(per, 0, 1, 0, s.width*2);
+    newW += i;
+    newW %= s.width*2;
+    s.stroke(lerpColor(c1, c2, newW/ s.width));
+    s.ellipse(s.width/2, s.height/2, newW, newW);
+  }
+}
+void splitRect(PGraphics s, color c1, color c2) {
+  int mode = (currentCycle-1)/4%4;
+  s.fill(c2);
+  s.noStroke();
+  if (mode > 0) {
+    for (int x = 0; x <= pow(2, mode); x++) {
+      s.pushMatrix();
+      //s.translate(10*sin(percentToNumBeats(8)*2*PI), 0);
+      for (int y = 0; y <= pow(2, mode); y++) {
+        if (y%2 ==0) s.rect(x*s.width/pow(2, mode)*2, y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
+        else s.rect(x*s.width/pow(2, mode)*2 + s.width/pow(2, mode), y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
+      }
+      s.popMatrix();
+    }
+  }
+}
+
+void cycleCubeMovingStripes(int lw, int lsp, float per, color c1, color c2, color l1, color l2) {
+  if ((currentCycle-1)/4 % 2 == 0) {
+    drawVertLinesScreen(screens[0].s, lw, lsp, per, c1, 0);
+    colorMode(HSB);
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
+    drawVertLinesScreen(screens[1].s, lw, lsp, per, c, 0);
+    colorMode(RGB);
+    screens[2].blackOut();
+    screens[3].blackOut();
+    displayCubeLines(l1, 0);
+  } else {
+    drawVertLinesScreen(screens[2].s, lw, lsp, per, c2, 0);
+    colorMode(HSB);
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
+    drawVertLinesScreen(screens[3].s, lw, lsp, per, c, 0);
+    colorMode(RGB);
+    screens[0].blackOut();
+    screens[1].blackOut();
+    displayCubeLines(0, l2);
+  }
+}
+
+void cycleCubeDelaunay(color l1, color l2) {
+  if ((currentCycle-1)/4 % 2 == 0) {
+    drawDelaunayTriCube(0);
+    screens[2].blackOut();
+    screens[3].blackOut();
+    displayCubeLines(l1, 0);
+  } else {
+    drawDelaunayTriCube(1);
+    screens[0].blackOut();
+    screens[1].blackOut();
+    displayCubeLines(0, l2);
+  }
+}
+
+void cycleCubeLight(color c1, color c2, color l1, color l2) {
+  if ((currentCycle-1)/4 % 2 == 0) {
+    PGraphics s = screens[0].s;
+    s.beginDraw();
+    s.background(c1);
+    s.noStroke();
+    s.fill(c2);
+    s.rect(0, 0, s.width, s.height/2);
+    s.fill(c1);
+    s.ellipse(s.width/2, s.height/2, s.width/2, s.width/2);
+    s.fill(c2);
+    s.arc(s.width/2, s.height/2, s.width/2, s.width/2, 0, PI);
+    s.endDraw();
+    colorMode(HSB);
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
+    screens[1].drawSolid(c);
+    colorMode(RGB);
+    screens[2].blackOut();
+    screens[3].blackOut();
+    displayCubeLines(l1, 0);
+  } else {
+    screens[2].drawSolid(c2);
+    colorMode(HSB);
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
+    screens[3].drawSolid(c);
+    colorMode(RGB);
+    screens[0].blackOut();
+    screens[1].blackOut();
+    displayCubeLines(0, l2);
+  }
+}
+
+void drawHorizLinesGradientScreen(PGraphics s, int lh, int lsp, float per, color c1, color c2) {
+  s.noStroke();
+  int extra = (lh + 2*lsp);
+  for (int i = 0; i < s.height + extra; i += (lh + lsp)) {
+
+    float y = map(per, 0, 1, -extra, s.height);
+
+    y += i;
+    if (y >= s.height) y -= (extra + s.height);
+    s.fill(lerpColor(c1, c2, y/s.height));
+    s.rect(0, y, s.width, lh);
+  }
+}
+
+void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenNum, float per, color c1, color c2, color c3) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+
+    float x = map(per, 0, 1, -extra, s.width);
+
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.fill(getCycleColor(c1, c2, c3, (x+screenNum * screenW)/(screenW*4)));
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+
+    float x = map(per, 0, 1, -extra, s.width);
+
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.fill(lerpColor(c1, c2, x/s.width));
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int direction) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+    s.fill(c);
+    //s.fill(255);
+    float x = 0;
+    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
+    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
+    x += i;
+    if (x >= s.width) x -= (extra + s.width);
+    s.rect(x, 0, lw, s.height);
+  }
+}
+
+void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2);
+    screens[j].s.endDraw();
+  }
+}
+
+void drawVertLinesGradientAcrossAll(int lw, int lsp, float per, color c1, color c2, color c3) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    drawVertLinesGradientScreenAcross(screens[j].s, lw, lsp, j, per, c1, c2, c3);
+    screens[j].s.endDraw();
+  }
+}
+
+void drawVertLinesAcrossAll(int lw, int lsp, float per, color c, int mode) {
+  color [] colors = {c, c, c, c};
+  drawVertLinesAcrossAll(lw, lsp, per, colors, mode);
+}
+
+void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode) {
+  for (int j = 0; j < screens.length; j++) {
+    screens[j].s.beginDraw();
+    screens[j].s.background(0);
+    screens[j].s.blendMode(SCREEN);
+    int direction = 0;
+    if (mode == 0) direction = 1;
+    else if (mode == 1) direction = -1;
+    else if (mode == 2) {
+      if (j == 0 || j == 1) direction = 1;
+      else direction = -1;
+    } else if (mode == 3) {
+      if (j == 0 || j == 1) direction = -1;
+      else direction = 1;
+    }
+    //temp.beginDraw();
+    //temp.background(0);
+    drawVertLinesScreen(screens[j].s, lw, lsp, per, colors[j], direction);
+    //temp.endDraw();
+    //screens[j].s.image(currentImages.get(0), -screenW * j, 0);
+    //screens[j].s.mask(temp);
+    screens[j].s.endDraw();
   }
 }

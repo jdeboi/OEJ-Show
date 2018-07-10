@@ -70,7 +70,7 @@ void setup() {
   initColors();
   initEye();
   
-  changeScene(LOLLIES);
+  changeScene(DELTA);
 }
 
 void draw() {
@@ -87,15 +87,9 @@ void draw() {
     playShow();
     renderScreens();
     if (showMask) maskScreens(0);
-    //blackoutScreens();
-    //haromAll(color(255), 3);
-    //renderScreens();
   }
 
   drawControls();
-  //translate(420, 940);
-  //scale(.4);
-  //image(currentImages.get(0), 0, 0);
 }
 
 void playShow() {
