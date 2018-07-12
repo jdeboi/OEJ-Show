@@ -77,22 +77,33 @@ void displayViolate() {
     cave.changeMovementSetting(CRISSCROSS);
     cave.displayCaveLeftRightBounce();
     break;
-    //case 7:
-    //  changeAllColorSettings(6);
-    //  break;
-    //case 8:
-    //  changeAllColorSettings(0);
-    //  break;
-    //case 9:
-    //  changeAllColorSettings(1);
-    //  break;
-    //case 10:
-    //  changeAllColorSettings(2);
-    //  break;
-    //case 11:
-    //  break;
-    //case 12:
-    //  break;
+  case 7:
+    cave.changeAllColorSettings(6);
+    break;
+  case 8:
+    cave.changeAllColorSettings(0);
+    break;
+  case 9:
+    cave.changeAllColorSettings(1);
+    break;
+  case 10:
+    cave.changeAllColorSettings(2);
+    break;
+  case 11:
+    cave.displayCaveAllBounce();
+    break;
+  case 12:
+    cave.displayCaveAllBounce();
+    break;
+  case 13:
+    cave.displayCaveAllBounce();
+    break;
+  case 14:
+    cave.displayCaveAllBounce();
+    break;
+  case 15:
+    cave.displayCaveAllBounce();
+    break;
 
     ///////////////////////////////// DONE
   case 16:
@@ -1047,7 +1058,7 @@ void displayMoon() {
 
 void initLollies() {
   cues = new Cue[18];
-  cues[0] = new Cue(0, 'g', 0, 0);
+  cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(7.5, 'v', 0.0, 0);
   cues[2] = new Cue(21.8, 'v', 0.0, 0);
   cues[3] = new Cue(36, 'v', 0.0, 0);
@@ -1067,7 +1078,6 @@ void initLollies() {
   cues[17] = new Cue(216, 'v', 0.0, 0);
 
   initSymbols();
-  //currentGifs.get(4).loop();
   temp = createGraphics(screenW, screenH);
   initializeTriangulation(-1);
   startFadeLine = false;
@@ -1149,7 +1159,7 @@ void initDirty() {
   resetAudioAmp();
 
   sphereImg = loadImage("images/sphere/1.jpg");
-  
+
   centerScreen = new Screen(screenW*2, screenH, -2);
 }
 
@@ -1409,7 +1419,6 @@ void initWiz() {
   //initDrip(centerScreen.s);
   initDots(100);
   initAllFlowyWaves();
-  currentGifs.get(4).loop();
 
   //initNodesMain();
   initSymbols();
@@ -1598,7 +1607,8 @@ void initEgrets() {
   cues[19] = new Cue(264, 'v', 0.0, 0); // done
 }
 
-void deconstructEgrets() {}
+void deconstructEgrets() {
+}
 
 void displayEgrets() {
   //cycleShapeFFTTop();
@@ -1671,10 +1681,10 @@ void initIntro() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(2, 'v', 0.0, 0);
-  cues[2] = new Cue(240, 'v', 0.0, 0); 
-
+  cues[2] = new Cue(240, 'v', 0.0, 0);
 }
-void deconstructIntro() {}
+void deconstructIntro() {
+}
 
 void displayIntro() {
   if (!personOnPlatform) sphereScreen.blackOut();

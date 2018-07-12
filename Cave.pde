@@ -365,16 +365,16 @@ class OEJCave {
     upZ = 0;
   }
 
-  void drawCubeCave(PGraphics s) {
-    pushMatrix();
-    translate(s.width/2, s.height/2, 0);
-    rotateY(radians(45));
-    noFill();
-    strokeWeight(3);
-    stroke(255, 0, 255);
-    cubeCave(s, s.width, s.height, s.width);
-    popMatrix();
-  }
+  //void drawCubeCave(PGraphics s) {
+  //  pushMatrix();
+  //  translate(s.width/2, s.height/2, 0);
+  //  rotateY(radians(45));
+  //  noFill();
+  //  strokeWeight(3);
+  //  stroke(255, 0, 255);
+  //  cubeCave(s, s.width, s.height, s.width);
+  //  popMatrix();
+  //}
 
   color getBrightnessPixel(color p, int index, int max) {
     colorMode(RGB);
@@ -846,6 +846,7 @@ class OEJCave {
     void display(int screenNum, PGraphics s) {
       for (int i = 0; i < ySteps; i++ ) {
         setColors(screenNum, s, i);
+        s.blendMode(BLEND);
         s.pushMatrix();
 
         //colorMode(HSB, 100);
