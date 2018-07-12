@@ -127,24 +127,24 @@ void beatCycle(int delayT) {
     currentCycle++;
   }
 }
-void cycleShapeFFTTop() {
+void cycleShapeFFTTop(color c) {
   for (Screen sc : topScreens) {
-    cycleShapeFFT(sc.s);
+    cycleShapeFFT(sc.s, c);
   }
 }
 
-void cycleShapeFFTCubes() {
+void cycleShapeFFTCubes(color c) {
   //updateSpectrum();
   //beatCycle(300);
   for (Screen sc : screens) {
-    cycleShapeFFT(sc.s);
+    cycleShapeFFT(sc.s, c);
   }
 }
 
-void cycleShapeFFT(PGraphics s) {
+void cycleShapeFFT(PGraphics s, color c) {
   s.beginDraw();
   s.background(0);
-  s.stroke(255);
+  s.stroke(c);
   s.noFill();
   s.strokeWeight(3);
   s.rectMode(CENTER);

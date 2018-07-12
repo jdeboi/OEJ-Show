@@ -333,6 +333,12 @@ void initCrush() {
   cues[12] = new Cue(115, 'v', 0.0, 0);
 
   initSphereBoxRot();
+
+  // initTerrainCenter();
+  //resetAudioAmp();
+  //sphereImg = loadImage("images/sphere/1.jpg");
+  //centerScreen = new Screen(screenW*2, screenH, -2);
+  //centerScreenFrontInner();
 }
 
 void deconstructCrush() {
@@ -347,6 +353,14 @@ void resetRedPlanet() {
 }
 
 void displayCrush() {
+
+  //displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
+  //  fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
+  //cycleAudioAmp(percentToNumBeats(4));
+  //setGridTerrain(0, 0.01);
+  //displayTerrainCenter();
+  //cycleShapeFFTTop();
+
   if (!personOnPlatform) displayRedPlanetSphere();
   else {
     drawEye();
@@ -414,42 +428,12 @@ void displayCrush() {
     displayLinesInnerFaces(white);
     drawSolidOuter(0);
 
-    for (int i = 1; i < 3; i++) {
-      PGraphics s = screens[i].s;
-      s.beginDraw();
-      s.blendMode(BLEND);
-      //s.background(color(180, 0, 80));
-      //int hg = (currentGifs.get(7).height - screenH)/2;
-      s.background(0);
-      if (i == 1) {
-        s.pushMatrix();
-        s.scale(-1.0, 1.0);
-
-        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-hg, screenW, currentGifs.get(7).height * currentGifs.get(7).width/screenW);
-        s.popMatrix();
-      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-hg, screenW, currentGifs.get(7).height * currentGifs.get(7).width/screenW);
-      //s.filter(THRESHOLD, .2);
-      //s.filter(GRAY);
-      //s.blendMode(BLEND);
-      s.endDraw();
-    }
+    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0);
     break;
   case 6:// puter
     displayLinesOutsideFaces(color(255), color(255));
     drawSolidInner(0);
-    for (int i = 0; i < screens.length; i+=3) {
-      PGraphics s = screens[i].s;
-      s.beginDraw();
-      s.background(0);
-      if (i == 3) {
-        s.pushMatrix();
-        s.scale(-1.0, 1.0);
-        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);
-        s.popMatrix();
-      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH);
-      //s.filter(THRESHOLD, .2);
-      s.endDraw();
-    }
+    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0);
     break;
   case 7:
     display4FaceLines(white, 1);
@@ -1080,7 +1064,7 @@ void initLollies() {
   initSymbols();
   temp = createGraphics(screenW, screenH);
   initializeTriangulation(-1);
-  startFadeLine = false;
+  
 }
 
 void deconstructLollies() {
@@ -1090,7 +1074,7 @@ void deconstructLollies() {
   dt = null;
 }
 
-PGraphics temp;
+PGraphics temp, temp2;
 int lastCueDelaunay = -2;
 
 void displayLollies() {
@@ -1133,9 +1117,9 @@ void displayCycles() {
 }
 
 void initDirty() {
-  cues = new Cue[11];
+  cues = new Cue[10];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(11, 'v', 0.0, 0); // tic toc begins
+  cues[1] = new Cue(11.4, 'v', 0.0, 0); // tic toc begins
   cues[2] = new Cue(33.4, 'v', 0.0, 0); // tic toc repeat
   cues[3] = new Cue(55, 'v', 0.0, 0); // down chords
   cues[4] = new Cue(77, 'v', 0.0, 0);  // tic toc
@@ -1143,125 +1127,113 @@ void initDirty() {
   cues[6] = new Cue(121, 'v', 0.0, 0);  // guitar
   cues[7] = new Cue(143.5, 'v', 0.0, 0);  // tic toc
   cues[8] = new Cue(165.5, 'v', 0.0, 0);  // down chords
-  cues[9] = new Cue(178, 'v', 0.0, 0);  // fade out
-  cues[10] = new Cue(184, 'v', 0.0, 0);  // end
-
-  drawSolidAll(color(0));
-  //loadKeystone(MID_CENTER);
-  initSpaceRects();
-
-  resetFade();
-  initTerrainCenter();
-  initTesseract();
-  centerScreenFrontInner();
-
-  initZZoom();
-  resetAudioAmp();
-
-  sphereImg = loadImage("images/sphere/1.jpg");
+  //cues[9] = new Cue(178, 'v', 0.0, 0);  // fade out
+  cues[9] = new Cue(184, 'v', 0.0, 0);  // end
 
   centerScreen = new Screen(screenW*2, screenH, -2);
+  temp = createGraphics(screenW, screenH, P3D);
+  temp2 = createGraphics(screenW*2, screenH, P3D);
+  initSpaceRects();
 }
 
 void deconstructDirty() {
   terrain = null;
   sphereImg = null;
   centerScreen = null;
+  temp = null;
+  temp2 = null;
+  spaceRects = null;
 }
 
 void displayDirty() {
-  displayLinesCenterFocus(color(255));
-  if (!personOnPlatform) sphereScreen.drawImage(sphereImg, 0, 0, screenW, screenH);//displayStripedMoon(20);
+  //displayGradientVertLines(cyan, pink, percentToNumBeats(4));
+
+  if (!personOnPlatform) paradiseSphere(50, pink, blue, cyan);//displayStripedMoon(20);
   else drawEye();
 
-  switch(currentCue) {
+  colorMode(RGB, 255);
+  switch(currentCue) {   
   case 0:
-    centerScreenFrontInner();
+    displayLines(pink);
 
-    zoomTerrain(cues[currentCue].startT, cues[currentCue + 1].startT);
-    setGridTerrain(0, 0.01);
-    displayTerrainCenter();
-    //displayCycleSingleFaceLines(white, -1);
-    fadeInAllScreens(cues[currentCue].startT, 4);
-    break;
-  case 1: // tic toc
-    zZoom = endingTerrain;
-    centerScreenFrontInner();
-    startAudioAmp();
-    displayCycle4FaceLines(white);
-    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
-    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
-    fadeAudioAmp(cues[1].startT, cues[2].startT, 1, 1);
-    cycleAudioAmp(percentToNumBeats(4));
-
-    setGridTerrain(0, 0.01);
-    displayTerrainCenter();
-    cycleShapeFFTTop();
-    break;
-  case 2: // tic toc repeat
-    zZoom = endingTerrain;
-    centerScreenFrontInner();
-    fadeAudioLev(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
-    setGridTerrain(1, 1); // sin
-    displayTerrainCenter();
-    cycleShapeFFTTop();
-    break;
-  case 3: // dooo, doo, do
     cubesFront();
-    drawSolidTop(color(0));
-    displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
-    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
-    //display3DDots2Screens(100, 0, 0.005);
-    //displayTesseract2Screens();
-    break;
-  case 4: // tic toc
-    zZoom = endingTerrain;
-    centerScreenFrontInner();
-    startAudioAmp();
-    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
-    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
-    fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
-    cycleAudioAmp(percentToNumBeats(4));
+    cyclingRects = true;
+    displaySpaceRects(5, -1, pink, blue, cyan); 
+    fadeInAllScreens(cues[0].startT, 3);
+    break;  
+  case 1:
+    displayLines(pink);
+    cubesFront();
 
-    setGridTerrain(0, 0.01);
-    displayTerrainCenter();
-    cycleShapeFFTTop();
+    cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+    displaySpaceRects(5, -1, pink, blue, cyan); 
+
+    hasResetRects = false;
+    break;
+  case 2:
+    displayLinesCenterFocus(pink);
+    cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+    centerScreenFrontInner();
+    displayTwoWayTunnels();
     fadeInCenter(cues[currentCue].startT, 2);
+    break;
+  case 3:
+    displayLines(pink);
+    centerScreenFrontInner();
+
+    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
+    hasResetRects = false;
+    resetSpaceRects(false);
+    break;
+  case 4: 
+    displayLines(pink);
+    cubesFront();
+    cyclingRects = true;
+    displaySpaceRects(5, 1, pink, blue, cyan);
+
     break;
   case 5:
-    cubesFront();
-    drawSolidTop(color(0));
-    displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
-    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
-    break;
-  case 6: 
-    // something up top?
-    cubesFront();
-    displayNervous2Screens();
-    fadeInCubes(cues[currentCue].startT, 2);
-    fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
-    break;
-  case 7: // tic toc
-    zZoom = endingTerrain;
+    displayLinesCenterFocus(pink);
+    resetSpaceRects(false);
     centerScreenFrontInner();
-    startAudioAmp();
-    // tempo is bpm; bpm * 60 = bps = 1000 * bpms
-    // 8 beats per clause, 4 clauses, 1 sine wave per 8 beats = 4 clauses
-    fadeAudioAmp(cues[currentCue].startT, cues[currentCue+1].startT, 1, 1);
-    cycleAudioAmp(percentToNumBeats(4));
 
-    setGridTerrain(0, 0.01);
-    displayTerrainCenter();
-    cycleShapeFFTTop();
-    fadeInCenter(cues[currentCue].startT, 2);
+    displayCenterSpaceRects(5, -1, blue, cyan, pink);
+    break;
+  case 6:
+    displayLines(pink);
+    cubesFront();
+    displaySpaceRects(5, -1, pink, blue, cyan); 
+    hasResetRects = false;
+    break;
+  case 7:
+    displayLines(pink);
+    centerScreenFrontInner();
+
+    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
+    hasResetRects = false;
+    resetSpaceRects(false);
+
+    fadeOutCenter(cues[currentCue+1].startT - .5, .5);
     break;
   case 8:
-    resetFade();
+    displayLinesCenterFocus(pink);
+    
+    cubesFront();
+    displaySpaceRects(5, 0, pink, blue, cyan);
+    //centerScreenFrontInner();
+    //displayTwoWayTunnels();
+    //fadeInCenter(cues[currentCue].startT, 2);
+  //  break;
+  //case 9: // tee tahh
+  //  displayLines(pink);
+  //  cubesFront();
+  //  displaySpaceRects(5, 1, pink, blue, cyan);
+
+    fadeOutAllScreens(cues[currentCue + 1].startT - 4, 4);
+    fadeOutAllLines(4, pink);
     break;
-  case 9:
-    fadeOutAllScreens(cues[currentCue].startT, 3);
-    break;
-  default:
+
+  default:     
     drawSolidAll(color(0));
     break;
   }

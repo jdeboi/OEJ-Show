@@ -68,7 +68,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
   
-  changeScene(MOON);
+  changeScene(DIRTY);
 }
 
 void draw() {

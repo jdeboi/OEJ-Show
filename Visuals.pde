@@ -1899,80 +1899,93 @@ void resetSpaceRects(boolean zoomIn) {
   }
 }
 // only onerect at a time changing colors through gradient
+ 
 void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
+  temp.beginDraw();
+  temp.background(0);
+  temp.rectMode(CENTER);
+
+  temp.pushMatrix();
+  temp.translate(temp.width/2, temp.height/2);
+  for (int j = 0; j < numRects; j++) {
+    temp.noFill();
+    temp.strokeWeight(sw);
+    spaceRects[j].zGradientStroke(temp, c1, c2, c3);
+    spaceRects[j].display(temp);
+    spaceRects[j].update(mode);
+  }
+  temp.popMatrix();
+  temp.rectMode(CORNER);
+  temp.endDraw();
+
   for (int i = 1; i < 3; i++) {
     PGraphics s = screens[i].s;
     s.beginDraw();
+    s.blendMode(ADD);
     s.background(0);
-    s.rectMode(CENTER);
-    s.pushMatrix();
-    s.translate(s.width/2, s.height/2);
-    for (int j = 0; j < numRects; j++) {
-      s.noFill();
-      s.strokeWeight(sw);
-      spaceRects[j].zGradientStroke(s, c1, c2, c3);
-      spaceRects[j].display(s);
-      if (i== 1)spaceRects[j].update(mode);
-    }
-    s.popMatrix();
-    s.rectMode(CORNER);
+    s.image(currentImages.get(0), -(i-1)*screenW, 0);
+    s.image(temp, 0, 0);
     s.endDraw();
   }
 }
 
 void displayTwoScreenCascade() {
-  //PGraphics s = centerScreen.s;
+  temp.beginDraw();
+  temp.blendMode(BLEND);
+  temp.background(0, 100, 0, 1);
+  temp.blendMode(SCREEN);
+  temp.noFill();
+  temp.strokeWeight(10);
+  int num = 10;
+  int spacing = 100;
+  int bounceD = 200;
+  temp.noFill();
+  temp.strokeWeight(10);
+  for (int i = 0; i < num; i++) {
+    spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].zGradientStroke(temp, cyan, blue, pink);
+    spaceRects[i].display(temp);
+  }
+  temp.endDraw();
   for (int j = 1; j < 3; j++) {
     PGraphics s = screens[j].s;
     s.beginDraw();
-    s.blendMode(BLEND);
-    //s.fill(0, 1);
-    //s.rect(0, 0, s.width, s.height);
-    s.background(0, 100, 0, 1);
-    s.blendMode(SCREEN);
-    s.noFill();
-    s.strokeWeight(10);
-    int num = 10;
-    int spacing = 100;
-    int bounceD = 200;
-    s.noFill();
-    s.strokeWeight(10);
-    for (int i = 0; i < num; i++) {
-      spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
-      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
-      spaceRects[i].display(s);
-    }
+    s.blendMode(ADD);
+    s.background(0);
+    s.image(currentImages.get(0), -(j-1)*screenW, 0);
+    s.image(temp, 0, 0);
     s.endDraw();
   }
 }
 
 void displayTwoWayTunnels() {
+  temp2.beginDraw();
+  temp2.blendMode(SCREEN);
+  temp2.background(0);
+  int num = 5;
+  int spacing = 20;
+  int bounceD = 400;
+  temp2.noFill();
+  temp2.strokeWeight(10);
+  for (int i = 0; i < num; i++) {
+    spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
+    spaceRects[i].display(temp2);
+  }
+  for (int i = num; i < num*2 && i < spaceRects.length; i++) {
+    spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
+    spaceRects[i].display(temp2);
+  }
+  temp2.endDraw();
+
   if (centerScreen != null) {
     PGraphics s = centerScreen.s;
     s.beginDraw();
-    s.blendMode(SCREEN);
+    s.blendMode(ADD);
     s.background(0);
-    //int spacing = 50;
-    //for (int i = 0; i < s.height; i += spacing) {
-    //  line(0, 0, 
-    //int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
-    //displayTunnelCenter(150, 3, 0,z, color(0, 255, 255), color(0, 0, 255), false);
-    //displayTunnelCenter(150, 3, 0,-z, color(0, 255, 255), color(0, 0, 255), false);
-    int num = 5;
-    int spacing = 20;
-    int bounceD = 400;
-    s.noFill();
-    s.strokeWeight(10);
-    for (int i = 0; i < num; i++) {
-      spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
-      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
-      spaceRects[i].display(s);
-    }
-    for (int i = num; i < num*2 && i < spaceRects.length; i++) {
-      spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
-      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
-      spaceRects[i].display(s);
-    }
+    s.image(currentImages.get(0), 0, 0);
+    s.image(temp2, 0, 0);
     s.endDraw();
   }
 }
@@ -2096,22 +2109,30 @@ void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, colo
 }
 
 void displayCenterSpaceRects(int sw, int mode, color c1, color c2, color c3) {
+  temp2.beginDraw();
+  temp2.background(0);
+  temp2.rectMode(CENTER);
+  temp2.pushMatrix();
+  temp2.translate(temp2.width/2, temp2.height/2);
+  for (int j = 0; j < numRects; j++) {
+    temp2.noFill();
+    temp2.strokeWeight(sw);
+    spaceRects[j].zGradientStroke(temp2, c1, c2, c3);
+    spaceRects[j].display(temp2);
+    spaceRects[j].update(mode);
+  }
+  temp2.popMatrix();
+  temp2.rectMode(CORNER);
+  temp2.endDraw();
+
+
   if (centerScreen != null) {
     PGraphics s = centerScreen.s;
     s.beginDraw();
+    s.blendMode(ADD);
     s.background(0);
-    s.rectMode(CENTER);
-    s.pushMatrix();
-    s.translate(s.width/2, s.height/2);
-    for (int j = 0; j < numRects; j++) {
-      s.noFill();
-      s.strokeWeight(sw);
-      spaceRects[j].zGradientStroke(s, c1, c2, c3);
-      spaceRects[j].display(s);
-      spaceRects[j].update(mode);
-    }
-    s.popMatrix();
-    s.rectMode(CORNER);
+    s.image(currentImages.get(0), 0, 0);
+    s.image(temp2, 0, 0);
     s.endDraw();
   }
 }
@@ -2401,9 +2422,13 @@ void displayLACircle(PGraphics s, float radius, float step) {
 // OP ART
 //////////////////////////////////////////////////////////////////////////////////
 // Richard Anuszkiewicz art
-void displayDivisionOfIntensity2Screens(float per, int sqX, int sqY) {
+void displayDivisionOfIntensityInner(float per, int sqX, int sqY) {
   displayDivisionOfIntensity(screens[1].s, per, sqX, sqY);
   displayDivisionOfIntensity(screens[2].s, per, sqX, sqY);
+}
+void displayDivisionOfIntensityOuter(float per, int sqX, int sqY) {
+  displayDivisionOfIntensity(screens[0].s, per, sqX, sqY);
+  displayDivisionOfIntensity(screens[3].s, per, sqX, sqY);
 }
 void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY) {
   float period = per * 2 * PI;
@@ -3647,4 +3672,33 @@ void gradientSphere(color c1, color c2, color c3) {
   s.mask(tempSphere);
   s.blendMode(BLEND);
   s.endDraw();
+}
+
+color getRandomColor(color c1, color c2, color c3, color c4) {
+  color [] colors = {c1, c2, c3, c4};
+  return getRandomColor(colors);
+}
+
+color getRandomColor(color c1, color c2, color c3) {
+  color [] colors = {c1, c2, c3};
+  return getRandomColor(colors);
+}
+
+color getRandomColor(color [] colors) {
+  int r = int(random(colors.length));
+  return colors[r];
+}
+
+color getColorOnBeat(color c1, color c2, color c3, color c4) {
+  color [] colors = {c1, c2, c3, c4};
+  return getColorOnBeat(colors);
+}
+
+color getColorOnBeat(color c1, color c2, color c3) {
+  color [] colors = {c1, c2, c3};
+  return getColorOnBeat(colors);
+}
+
+color getColorOnBeat(color [] colors) {
+  return colors[currentCycle % colors.length];
 }

@@ -102,7 +102,8 @@ class Scene {
     songFile.pause();
     //initBeat();
 
-    startFade = false;
+    resetFade();
+    startFadeLine = false;
     currentCycle = 0;
     
     if (song.equals("Intro")) initIntro();
