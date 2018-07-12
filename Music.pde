@@ -1,6 +1,10 @@
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 
+boolean backingTracks = true;
+int cueDelay = 0;
+//int cueDelay = 2300;
+
 Minim minim;
 AudioPlayer songFile;
 //Song songFile;
@@ -53,33 +57,37 @@ class BeatListener implements AudioListener
   }
 }
 
-void initFFT() {
+void initMusic() {
   minim = new Minim(this);
-  songFile = minim.loadFile("music/moon.mp3", 1024);
+  if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3", 1024);
+  else songFile = minim.loadFile("music/backing/intro.mp3", 1024);
+}
 
-
-  myAudioFFT = new FFT(songFile.bufferSize(), songFile.sampleRate());
-  myAudioFFT.linAverages(myAudioRange);
+//void initFFT() {
+  //minim = new Minim(this);
+  //songFile = minim.loadFile("music/moon.mp3", 1024);
+  //myAudioFFT = new FFT(songFile.bufferSize(), songFile.sampleRate());
+  //myAudioFFT.linAverages(myAudioRange);
   //myAudioFFT.window(FFT.GAUSS);
-}
+//}
 
-void initBeat() {
-  beat = new BeatDetect(songFile.bufferSize(), songFile.sampleRate());
-  beat.setSensitivity(200);  
-  bl = new BeatListener(beat, songFile);
-}
+//void initBeat() {
+//  beat = new BeatDetect(songFile.bufferSize(), songFile.sampleRate());
+//  beat.setSensitivity(200);  
+//  bl = new BeatListener(beat, songFile);
+//}
 
-void drawFFTBarsCubes() {
-  for (int i = 0; i < numScreens; i++) {
-    screens[i].drawFFTBars();
-  }
-}
+//void drawFFTBarsCubes() {
+//  for (int i = 0; i < numScreens; i++) {
+//    screens[i].drawFFTBars();
+//  }
+//}
 
-void drawFFTBarsTop() {
-  for (int i = 0; i < 2; i++) {
-    topScreens[i].drawFFTBars();
-  }
-}
+//void drawFFTBarsTop() {
+//  for (int i = 0; i < 2; i++) {
+//    topScreens[i].drawFFTBars();
+//  }
+//}
 
 void drawSpectrumCubes() {
   //updateSpectrum();
@@ -648,6 +656,26 @@ int getClickTrackLen() {
   float bpm = currentScene.tempo;
   float mpb = 1/bpm;
   int mspb = int(mpb * 60 * 1000);
-  int mspbar = mspb * currentScene.signature;
-  return mspbar * 2;
+  int mspbars = mspb * currentScene.signature * currentScene.numClickBars;
+  return mspbars;
+}
+
+float getClickTrackLenSeconds() {
+  if (currentScene.shortName.equals("dirty")) println(getClickTrackLen()/1000.0);
+  return getClickTrackLen()/1000.0;
+}
+
+void checkClickTrack() {
+  if (clickTrackStarted) {
+    if (backingTracks) {
+      songFile.cue(getClickTrackLen());
+      songFile.pause();
+    }
+    fill(0, 255, 0);
+    rect(width-5, height-5, 5, 5);
+    if (millis() - midiStartTime > (getClickTrackLen() - cueDelay)) {
+      playScene();
+      clickTrackStarted = false;
+    }
+  }
 }

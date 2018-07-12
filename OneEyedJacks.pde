@@ -56,9 +56,9 @@ void setup() {
   initScreens();
 
   //songFile = new Song(0, 0);
-  initFFT();
+  //initFFT();
   initMidi();
-
+  initMusic();
   initMask();
   initLines();
 
@@ -120,7 +120,8 @@ void keyPressed() {
     }
   } else if (key == ' ') {
     if (!startShow) startShow = true;
-    togglePlay();
+    if (betweenSongs && backingTracks) startScene();
+    else togglePlay();
   } else if (key == ']') {
     bracketDown = true;
   } else if (key == '/') {
@@ -174,6 +175,7 @@ void startScene() {
   midiStartTime = millis();
   //currentScene.startScene();
   clickTrackStarted = true;
+  betweenSongs = false;
 }
 
 void pauseScene() {

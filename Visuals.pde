@@ -1252,10 +1252,10 @@ void displayMoveSpaceCenter(int mode, float speed) {
   if (centerScreen != null) displayMoveSpace(centerScreen.s, mode, speed);
 }
 
-void displayMoveSpaceCenterCycle(float speed) {
-  cycleStarsSpaceModes();
-  if (centerScreen != null) displayMoveSpace(centerScreen.s, speed);
-}
+//void displayMoveSpaceCenterCycle(float speed) {
+//  cycleStarsSpaceModes();
+//  if (centerScreen != null) displayMoveSpace(centerScreen.s, speed);
+//}
 
 void displayMoveSpaceAll(int mode, float speed) {
   speed = constrain(speed, 0.6, 1.0);
@@ -1374,16 +1374,16 @@ void displayMoveSpace(PGraphics s, float speed) {
   s.endDraw();
 }
 
-void cycleStarsSpaceModes() {
-  updateSpectrum();
-  beatCycle(500);
-  if (currentCycle > previousCycle) {
-    convergeX = (currentCycle/3)%3;
-    convergeY = currentCycle%3;
+//void cycleStarsSpaceModes() {
+//  updateSpectrum();
+//  beatCycle(500);
+//  if (currentCycle > previousCycle) {
+//    convergeX = (currentCycle/3)%3;
+//    convergeY = currentCycle%3;
 
-    //previousCycle = currentCycle;
-  }
-}
+//    //previousCycle = currentCycle;
+//  }
+//}
 
 //////////////////////////////////////////////////////////////////////////////////
 // RED PLANET
@@ -1899,7 +1899,7 @@ void resetSpaceRects(boolean zoomIn) {
   }
 }
 // only onerect at a time changing colors through gradient
- 
+
 void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
   temp.beginDraw();
   temp.background(0);
@@ -1958,7 +1958,7 @@ void displayTwoScreenCascade() {
   }
 }
 
-void displayTwoWayTunnels() {
+void displayTwoWayTunnels(float per) {
   temp2.beginDraw();
   temp2.blendMode(SCREEN);
   temp2.background(0);
@@ -1968,12 +1968,12 @@ void displayTwoWayTunnels() {
   temp2.noFill();
   temp2.strokeWeight(10);
   for (int i = 0; i < num; i++) {
-    spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].pos.z = sin(per*2*PI + i * .2) * bounceD - bounceD - i * spacing;
     spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
     spaceRects[i].display(temp2);
   }
   for (int i = num; i < num*2 && i < spaceRects.length; i++) {
-    spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
+    spaceRects[i].pos.z = cos(per*2*PI + i * .2) * bounceD - bounceD - i * spacing;
     spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
     spaceRects[i].display(temp2);
   }
@@ -3546,6 +3546,28 @@ void drawHorizLinesGradientScreen(PGraphics s, int lh, int lsp, float per, color
   }
 }
 
+void drawVertDirtyOutside(float per) {
+  for (int i = 0; i < 4; i+= 3) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    if (i == 0) drawVertLinesScreen(s, 8, 50, per, cyan, -1);
+    else drawVertLinesScreen(s, 8, 50, per, cyan, 1);
+    s.endDraw();
+  }
+}
+
+void drawVertDirtySineOutside(float per) {
+  for (int i = 0; i < 4; i+= 3) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    if (i == 0) drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, -1);
+    else drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, 1);
+    s.endDraw();
+  }
+}
+
 void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenNum, float per, color c1, color c2, color c3) {
   s.noStroke();
   int extra = (lw + 2*lsp);
@@ -3560,13 +3582,14 @@ void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenN
   }
 }
 
-void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2) {
+void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2, int direction) {
   s.noStroke();
   int extra = (lw + 2*lsp);
   for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-
-    float x = map(per, 0, 1, -extra, s.width);
-
+    
+    float x = 0;
+    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
+    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
     x += i;
     if (x >= s.width) x -= (extra + s.width);
     s.fill(lerpColor(c1, c2, x/s.width));
@@ -3575,25 +3598,14 @@ void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color 
 }
 
 void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int direction) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
-  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-    s.fill(c);
-    //s.fill(255);
-    float x = 0;
-    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
-    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.rect(x, 0, lw, s.height);
-  }
+  drawVertLinesGradientScreen(s, lw, lsp, per, c, c, direction);
 }
 
-void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2) {
+void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2, int direction) {
   for (int j = 0; j < screens.length; j++) {
     screens[j].s.beginDraw();
     screens[j].s.background(0);
-    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2);
+    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2, direction);
     screens[j].s.endDraw();
   }
 }

@@ -3,7 +3,6 @@ MidiBus myBus; // The MidiBus
 long lastMidi = 0;
 boolean midiPlayed = false;
 boolean betweenSongs = true;
-int cueDelay = 2300;
 int midiStartTime = 0;
 boolean clickTrackStarted = false;
 
@@ -11,7 +10,7 @@ boolean clickTrackStarted = false;
 // INITIALIZE CUES
 //////////////////////////////////////////////////////////////////////////////////
 void initViolate() {
-  cues = new Cue[22];
+  cues = new Cue[23];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(10.5, 'v', 0.0, 0);
   cues[2] = new Cue(21.8, 'v', 0.0, 0);
@@ -125,7 +124,8 @@ void displayViolate() {
     fadeOutAllScreens(cues[currentCue].startT, 1);
     break;
   default:
-    cave.displayCaveAllBounce();
+    displayLines(color(0));
+    drawSolidAll(color(0));
     break;
   }
 }
@@ -257,6 +257,7 @@ void displaySong() {
     fadeOutAllScreens(cues[currentCue].startT, 5);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -468,6 +469,7 @@ void displayCrush() {
     drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -591,6 +593,7 @@ void displayDelta() {
     fadeOutAllScreens(cues[currentCue].startT, 5);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -720,7 +723,7 @@ void rotateDelta() {
 
 
 void initRite() {
-  cues = new Cue[24];
+  cues = new Cue[25];
   cues[0] = new Cue(0, 'v', 0, 0); // stars and constellations
   cues[1] = new Cue(8.4, 'v', 0.0, 0); // Y whale
   cues[2] = new Cue(16.4, 'v', 0.0, 0); // Y whale
@@ -861,6 +864,7 @@ void displayRite() {
     fadeOutAllScreens(cues[currentCue].startT, 5);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -1064,7 +1068,6 @@ void initLollies() {
   initSymbols();
   temp = createGraphics(screenW, screenH);
   initializeTriangulation(-1);
-  
 }
 
 void deconstructLollies() {
@@ -1092,6 +1095,7 @@ void displayLollies() {
     fadeOutAllScreens(cues[currentCue].startT, 3);
     fadeOutAllLines(3, pink);
   } else {
+    displayLines(color(0));
     drawSolidAll(color(0));
   }
 }
@@ -1111,6 +1115,7 @@ void displayCycles() {
     drawImageAll(currentImages.get(0), 0, 0);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -1146,9 +1151,8 @@ void deconstructDirty() {
 }
 
 void displayDirty() {
-  //displayGradientVertLines(cyan, pink, percentToNumBeats(4));
 
-  if (!personOnPlatform) paradiseSphere(50, pink, blue, cyan);//displayStripedMoon(20);
+  if (!personOnPlatform) paradiseSphere(50, pink, blue, cyan); //displayStripedMoon(20);
   else drawEye();
 
   colorMode(RGB, 255);
@@ -1164,9 +1168,11 @@ void displayDirty() {
   case 1:
     displayLines(pink);
     cubesFront();
-
     cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+
     displaySpaceRects(5, -1, pink, blue, cyan); 
+
+    drawVertDirtyOutside(percentToNumBeats(16));
 
     hasResetRects = false;
     break;
@@ -1174,7 +1180,10 @@ void displayDirty() {
     displayLinesCenterFocus(pink);
     cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
     centerScreenFrontInner();
-    displayTwoWayTunnels();
+
+    displayTwoWayTunnels(percentToNumBeats(16));
+    drawVertDirtySineOutside(percentToNumBeats(16));
+
     fadeInCenter(cues[currentCue].startT, 2);
     break;
   case 3:
@@ -1217,23 +1226,24 @@ void displayDirty() {
     break;
   case 8:
     displayLinesCenterFocus(pink);
-    
+
     cubesFront();
     displaySpaceRects(5, 0, pink, blue, cyan);
     //centerScreenFrontInner();
     //displayTwoWayTunnels();
     //fadeInCenter(cues[currentCue].startT, 2);
-  //  break;
-  //case 9: // tee tahh
-  //  displayLines(pink);
-  //  cubesFront();
-  //  displaySpaceRects(5, 1, pink, blue, cyan);
+    //  break;
+    //case 9: // tee tahh
+    //  displayLines(pink);
+    //  cubesFront();
+    //  displaySpaceRects(5, 1, pink, blue, cyan);
 
     fadeOutAllScreens(cues[currentCue + 1].startT - 4, 4);
     fadeOutAllLines(4, pink);
     break;
 
   default:     
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -1421,8 +1431,11 @@ void displayWiz() {
   //updateNodeConstellationMain();
   //displayNodeConstellationMain();
 
-  displayFlowyWavesWiz();
-
+  if (currentCue < cues.length -1) displayFlowyWavesWiz();
+  else {
+    displayLines(color(0));
+    drawSolidAll(color(0));
+  }
 
   //switch(currentCue) {
   //case 0:
@@ -1518,6 +1531,7 @@ void displayMood() {
     drawSolidAll(color(0));
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -1549,6 +1563,7 @@ void displayEllon() {
     fadeOutAllScreens(cues[currentCue].startT, 3);
     break;
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
@@ -1644,12 +1659,14 @@ void displayEgrets() {
   case 17:
     pulsing(white, percentToNumBeats(8));
   default:
+    displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
 }
 
 void initIntro() {
+  println("why");
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(2, 'v', 0.0, 0);
@@ -1743,7 +1760,7 @@ void setCurrentCue() {
     } else {
       if (c != currentCue) {
         currentCue = c;
-        cues[currentCue].initCue();
+        if (c >= 0) cues[currentCue].initCue();
       }
       return;
     }
@@ -1755,7 +1772,7 @@ void setCurrentCue() {
 // MIDI CUES
 /////////////////////////////////////////////////////////////////////////////////////
 void initMidi() {
-  MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.
+  //MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.
   //                 Parent  In        Out
   //                   |     |          |
   myBus = new MidiBus(this, 1, "Gervill"); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
@@ -1814,16 +1831,5 @@ void displayCues() {
       text(j++, position, ySpace + vH/2);
     }
     colorMode(RGB, 255);
-  }
-}
-
-void checkClickTrack() {
-  if (clickTrackStarted) {
-    fill(0, 255, 0);
-    rect(width-5, height-5, 5, 5);
-    if (millis() - midiStartTime > (getClickTrackLen() - cueDelay)) {
-      playScene();
-      clickTrackStarted = false;
-    }
   }
 }
