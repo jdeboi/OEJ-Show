@@ -478,7 +478,7 @@ float percentToNumBeats(int numBeats) {
 }
 float percentToNumBeats(float startT, int numBeats) {
   float timePassed = songFile.position()/1000.0 - startT;
-  float bps = tempo / 60.0;
+  float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
   int cyclesSinceStartT = floor(timePassed / spb);
   int currentGroup = (cyclesSinceStartT) / numBeats;
@@ -489,26 +489,14 @@ float percentToNumBeats(float startT, int numBeats) {
   //println(currentGroup, timeFromLastGroup, timePassed, perGroup);
   return constrain(perGroup, 0, 1);
 }
-//float percentToNumBeats(float startT, int numBeats) {
-//  float timePassed = songFile.position()/1000.0 - startT;
-//  float bps = tempo / 60.0;
-//  float spb = 1.0 / bps;
-//  int currentGroup = (currentCycle-1) / numBeats;
-//  if (currentCycle == 0) currentGroup = 0;
-//  float timePerGroup = numBeats * spb;
-//  float timeFromLastGroup = timePassed - (currentGroup * timePerGroup);
-//  float perGroup = map(timeFromLastGroup, 0, timePerGroup, 0, 1);
-//  //if (perGroup < 0 || perGroup > 1) println(currentCycle, timeFromLastGroup, timePassed);
-//  return perGroup;
-//}
 
 void setCurrentCycleCueClick() {
   float timePassedMinutes = (songFile.position()/1000.0/60); 
-  currentCycle = int(timePassedMinutes/tempo);
+  currentCycle = int(timePassedMinutes/currentScene.tempo);
 }
 
-float percentToNextMeasure(float startT, int timeSig) {
-  return percentToNumBeats(startT, timeSig);
+float percentToNextMeasure(float startT) {
+  return percentToNumBeats(startT, currentScene.signature);
 }
 
 float percentToNextBeat(float startT) {
@@ -518,7 +506,7 @@ float percentToNextBeat(float startT) {
 
 void checkBeatReady(float startT) {
   float timePassed = songFile.position()/1000.0 - startT;
-  float bps = tempo / 60.0;
+  float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
 
   if (currentCycle == 0) {
@@ -533,7 +521,6 @@ void checkBeatReady(float startT) {
 class Song {
   int duration, position;
   long startTime;
-  float tempo;
   boolean isPaused = true;
   ArrayList left, right;
 
@@ -541,7 +528,6 @@ class Song {
     left = new ArrayList<Integer>();
     right = new ArrayList<Integer>();
     this.duration = duration;
-    this.tempo = tempo;
   }
 
   int length() {
@@ -575,10 +561,6 @@ class Song {
       position = p;
       startTime = millis();
     }
-  }
-
-  float getTempo() {
-    return tempo;
   }
 
   void skip(int mil) {
@@ -660,4 +642,12 @@ void drawLines() {
     //line(i, 50  + songFile.left.get(i)*50, i+1, 50  + songFile.left.get(i+1)*50);
     //line(i, 150 + songFile.right.get(i)*50, i+1, 150 + songFile.right.get(i+1)*50);
   }
+}
+
+int getClickTrackLen() {
+  float bpm = currentScene.tempo;
+  float mpb = 1/bpm;
+  int mspb = int(mpb * 60 * 1000);
+  int mspbar = mspb * currentScene.signature;
+  return mspbar * 2;
 }

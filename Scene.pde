@@ -1,25 +1,25 @@
-Scene[] scenes = new Scene[15];
+Scene[] scenes = new Scene[14];
 Scene currentScene;
 int currentSceneIndex = 0;
 boolean isPlaying = false;
 float tempo;
 
 void initScenes() {
-  scenes[0] = new Scene("When the Moon Comes", "moon", 1);
-  scenes[1] = new Scene("Dirty", "dirty", 2);
-  scenes[2] = new Scene("Fifty Fifty", "fifty", 3);
-  scenes[3] = new Scene("Crush Proof", "crush", 4);
-  scenes[4] = new Scene("Cycles", "cycles", 5);
-  scenes[5] = new Scene("WizRock", "wizrock", 6);
-  scenes[6] = new Scene("Violate Expectations", "violate", 7);
-  scenes[7] = new Scene("Mood #2", "mood", 8);
-  scenes[8] = new Scene("Delta Waves", "delta", 9);
-  scenes[9] = new Scene("Song for M", "song", 10);
-  scenes[10] = new Scene("Ellon", "ellon", 11);
-  scenes[11] = new Scene("Rite of Spring", "rite", 12);
-  scenes[12] = new Scene("Lollies", "lollies", 13);
-  scenes[13] = new Scene("Egrets", "egrets", 14);
-  scenes[14] = new Scene("Turn to Stone", "elo", 15);
+  scenes[0] = new Scene("Intro", "intro", 1, 80, 4);
+  scenes[1] = new Scene("When the Moon Comes", "moon", 1, 80.01, 4);
+  scenes[2] = new Scene("Dirty", "dirty", 2, 90, 4);
+  //scenes[2] = new Scene("Fifty Fifty", "fifty", 3, 120, 4);
+  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4);
+  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 6);  //6/8
+  scenes[5] = new Scene("WizRock", "wizrock", 6, 148, 4);
+  scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4);
+  scenes[7] = new Scene("Mood #2", "mood", 8, 0, 4);
+  scenes[8] = new Scene("Delta Waves", "delta", 9, 66.4, 4);
+  scenes[9] = new Scene("Song for M", "song", 10, 59.4, 4);
+  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4);
+  scenes[11] = new Scene("Rite of Spring", "rite", 12, 121, 4);
+  scenes[12] = new Scene("Lollies", "lollies", 13,  128, 4);
+  scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4);
   currentScene = scenes[0];
 }
 
@@ -47,13 +47,28 @@ class Scene {
   String song;
   String shortName;
   int order;
+  float tempo;
+  int signature;
 
-  Scene(String s, String sn, int o) {
+  Scene(String s, String sn, int o, float t, int sig) {
     song = s;
     shortName = sn;
     order = o;
+    tempo = t;
+    signature = sig;
   }
 
+  void startScene() {
+    betweenSongs = false;
+    isPlaying = true;
+    //timeStarted = millis();
+    songFile.cue(2450);
+    songFile.play();
+    println(song + " is playing");
+
+    if (currentCue != -1) cues[currentCue].initCue();
+  }
+  
   void playScene() {
     betweenSongs = false;
     isPlaying = true;
@@ -81,21 +96,22 @@ class Scene {
     currentCue = 0;
 
     songFile = minim.loadFile("music/" + shortName + ".mp3", 1024);
-    
-    
+
+
     songFile.cue(0);
     songFile.pause();
-    initBeat();
+    //initBeat();
 
     startFade = false;
     currentCycle = 0;
-
-    if (song.equals("Delta Waves")) initDelta();
+    
+    if (song.equals("Intro")) initIntro();
+    else if (song.equals("Delta Waves")) initDelta();
     else if (song.equals("Rite of Spring")) initRite();
     else if (song.equals("When the Moon Comes")) initMoon();
     else if (song.equals("Lollies")) initLollies();
     else if (song.equals("Dirty")) initDirty();
-    else if (song.equals("Fifty Fifty")) initFifty();
+    //else if (song.equals("Fifty Fifty")) initFifty();
     else if (song.equals("Crush Proof")) initCrush();
     else if (song.equals("Cycles")) initCycles();
     else if (song.equals("WizRock")) initWiz();
@@ -104,23 +120,24 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
-    else if (song.equals("Turn to Stone")) initELO();
+    
+    
   }
 
 
   void display() {
     if (isPlaying) {
-      
+
       updateSpectrum();
       checkBeatReady(0);
-      
+
       setCurrentCue();
       if (song.equals("Delta Waves")) displayDelta();
       else if (song.equals("Rite of Spring")) displayRite();
       else if (song.equals("When the Moon Comes")) displayMoon();
       else if (song.equals("Lollies")) displayLollies();
       else if (song.equals("Dirty")) displayDirty();
-      else if (song.equals("Fifty Fifty")) displayFifty();
+      //else if (song.equals("Fifty Fifty")) displayFifty();
       else if (song.equals("Crush Proof")) displayCrush();
       else if (song.equals("Cycles")) displayCycles();
       else if (song.equals("WizRock")) displayWiz();
@@ -129,25 +146,41 @@ class Scene {
       else if (song.equals("Song for M")) displaySong();
       else if (song.equals("Ellon")) displayEllon();
       else if (song.equals("Egrets")) displayEgrets();
-      else if (song.equals("Turn to Stone")) displayELO();
+      else if (song.equals("Intro")) displayIntro();
       previousCycle = currentCycle;
-      
+
       //songFile.update();
-  
+
       if (currentCue == cues.length-1) {
         println("next");
         nextSong();
       }
-      
-      
-      
     }
+  }
+  
+  void deconstruct() {
+    if (song.equals("Delta Waves")) deconstructDelta();
+      else if (song.equals("Rite of Spring")) deconstructRite();
+      else if (song.equals("When the Moon Comes")) deconstructMoon();
+      else if (song.equals("Lollies")) deconstructLollies();
+      else if (song.equals("Dirty")) deconstructDirty();
+      //else if (song.equals("Fifty Fifty")) deconstructFifty();
+      else if (song.equals("Crush Proof")) deconstructCrush();
+      else if (song.equals("Cycles")) deconstructCycles();
+      else if (song.equals("WizRock")) deconstructWiz();
+      else if (song.equals("Violate Expectations")) deconstructViolate();
+      else if (song.equals("Mood #2")) deconstructMood();
+      else if (song.equals("Song for M")) deconstructSong();
+      else if (song.equals("Ellon")) deconstructEllon();
+      else if (song.equals("Egrets")) deconstructEgrets();
+      else if (song.equals("Intro")) deconstructIntro();
   }
 
   void resetScene() {
     isPlaying = false;
     songFile.pause();
     songFile.cue(0);
+    deconstruct();
     println(song + " has ended");
   }
 }

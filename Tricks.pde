@@ -364,114 +364,133 @@ void drawConstellationLinesHand() {
 //////////////////////////////////////////////////////////////////////////////////
 // EYE
 //////////////////////////////////////////////////////////////////////////////////
-GShader shader;
-int idxShader = -1;
-
+PImage iris;
+PShape eyeball;
 void initEye() {
-  shader = new GShader("shaders/eye.glsl");
-  shader.addParameter("mouse", 0, width, 0, height);
+  iris = loadImage("images/iris.png");
+  noStroke();
+  eyeball = createShape(SPHERE, sphereScreen.s.width*.43); 
+  eyeball.setTexture(iris);
 }
 
-void drawEye() { 
-  int x = constrain(int(map(mouseX, width/2-mxW, width/2+mxW, 0, 600)), 0, 500);
-  int y = constrain(int(map(mouseY, height/2, height, 0, height/2)), 0, 500);
-  setEyePos(x, y);
-  shader.setShaderParameters();
-
+void drawEye() {
   PGraphics s = sphereScreen.s;
   s.beginDraw();
-  //if (millis()%8000 < 100) {
-  //  s.background(0);
-  //} else {
-  s.shader(shader.shader);
-  s.rect(0, 0, s.width, s.height);
-  //}
+  s.background(0);
+  s.translate(s.width/2, s.height/2);
+  s.rotateX(constrain(map(mouseY, height, height-200, -PI/5, PI/4), -PI/5, PI/4));
+  s.rotateY(constrain(map(mouseX, width/2 - 100, width/2 + 100, PI/3.5, PI/1.5), PI/3.5, PI/1.5));
+  s.shape(eyeball);
   s.endDraw();
-
-  //fill(0);
-  //image(pg, 0, 0);
 }
+//GShader shader;
+//int idxShader = -1;
 
-void setEyePos(int x, int y) {
-  for (Param p : shader.parameters) {  
-    if (p.name.equals("mouse")) {
-      float[] pts = {x, y};
-      p.set( pts );
-      return;
-    }
-  }
-}
+//void initEye() {
+//  shader = new GShader("shaders/eye.glsl");
+//  shader.addParameter("mouse", 0, width, 0, height);
+//}
 
-class Param 
-{
-  String name;
-  float value;
-  PVector value2;
-  float minValue, maxValue;
-  PVector minValue2, maxValue2;
-  boolean is2d;
+//void drawEye() { 
+//  int x = constrain(int(map(mouseX, width/2-mxW, width/2+mxW, 0, 600)), 0, 500);
+//  int y = constrain(int(map(mouseY, height/2, height, 0, height/2)), 0, 500);
+//  setEyePos(x, y);
+//  shader.setShaderParameters();
 
-  Param(String name, float minValue, float maxValue) {
-    this.name = name;
-    this.minValue = minValue;
-    this.maxValue = maxValue;
-    this.value = 0.5 * (minValue + maxValue);
-    is2d = false;
-  }
+//  PGraphics s = sphereScreen.s;
+//  s.beginDraw();
+//  //if (millis()%8000 < 100) {
+//  //  s.background(0);
+//  //} else {
+//  s.shader(shader.shader);
+//  s.rect(0, 0, s.width, s.height);
+//  //}
+//  s.endDraw();
 
-  Param(String name, float minValue1, float maxValue1, float minValue2, float maxValue2) {
-    this.name = name;
-    this.minValue2 = new PVector(minValue1, minValue2);
-    this.maxValue2 = new PVector(maxValue1, maxValue2);
-    this.value2 = new PVector(0.5 * (this.minValue2.x + this.maxValue2.x), 
-      0.5 * (this.minValue2.y + this.maxValue2.y) );
-    is2d = true;
-  }
+//  //fill(0);
+//  //image(pg, 0, 0);
+//}
 
-  void set(float value) {
-    this.value = value;
-  }
+//void setEyePos(int x, int y) {
+//  for (Param p : shader.parameters) {  
+//    if (p.name.equals("mouse")) {
+//      float[] pts = {x, y};
+//      p.set( pts );
+//      return;
+//    }
+//  }
+//}
 
-  void set(float[] value) {
-    this.value2.set(value[0], value[1]);
-  }
-}
+//class Param 
+//{
+//  String name;
+//  float value;
+//  PVector value2;
+//  float minValue, maxValue;
+//  PVector minValue2, maxValue2;
+//  boolean is2d;
 
-class GShader
-{
-  String path;
-  PShader shader;
-  ArrayList<Param> parameters;
+//  Param(String name, float minValue, float maxValue) {
+//    this.name = name;
+//    this.minValue = minValue;
+//    this.maxValue = maxValue;
+//    this.value = 0.5 * (minValue + maxValue);
+//    is2d = false;
+//  }
 
-  GShader(String path) {
-    this.path = path;
-    shader = loadShader(path);
-    parameters = new ArrayList<Param>();
-  }
+//  Param(String name, float minValue1, float maxValue1, float minValue2, float maxValue2) {
+//    this.name = name;
+//    this.minValue2 = new PVector(minValue1, minValue2);
+//    this.maxValue2 = new PVector(maxValue1, maxValue2);
+//    this.value2 = new PVector(0.5 * (this.minValue2.x + this.maxValue2.x), 
+//      0.5 * (this.minValue2.y + this.maxValue2.y) );
+//    is2d = true;
+//  }
 
-  void addParameter(String name, float minVal, float maxVal) {
-    Param param = new Param(name, minVal, maxVal);
-    parameters.add(param);
-  }
+//  void set(float value) {
+//    this.value = value;
+//  }
 
-  void addParameter(String name, float minVal1, float maxVal1, float minVal2, float maxVal2) {
-    Param param = new Param(name, minVal1, maxVal1, minVal2, maxVal2);
-    parameters.add(param);
-  }
+//  void set(float[] value) {
+//    this.value2.set(value[0], value[1]);
+//  }
+//}
 
-  void setShaderParameters() {
-    PGraphics s = sphereScreen.s;
-    shader.set("time", (float) millis()/1000.0);
-    shader.set("resolution", float(s.width), float(s.height));
-    for (Param p : parameters) {
-      if (p.is2d) {
-        shader.set(p.name, p.value2.x, p.value2.y);
-      } else {
-        shader.set(p.name, p.value);
-      }
-    }
-  }
-}
+//class GShader
+//{
+//  String path;
+//  PShader shader;
+//  ArrayList<Param> parameters;
+
+//  GShader(String path) {
+//    this.path = path;
+//    shader = loadShader(path);
+//    parameters = new ArrayList<Param>();
+//  }
+
+//  void addParameter(String name, float minVal, float maxVal) {
+//    Param param = new Param(name, minVal, maxVal);
+//    parameters.add(param);
+//  }
+
+//  void addParameter(String name, float minVal1, float maxVal1, float minVal2, float maxVal2) {
+//    Param param = new Param(name, minVal1, maxVal1, minVal2, maxVal2);
+//    parameters.add(param);
+//  }
+
+//  void setShaderParameters() {
+//    PGraphics s = sphereScreen.s;
+//    shader.set("time", (float) millis()/1000.0);
+//    shader.set("resolution", float(s.width), float(s.height));
+//    for (Param p : parameters) {
+//      if (p.is2d) {
+//        shader.set(p.name, p.value2.x, p.value2.y);
+//      } else {
+//        shader.set(p.name, p.value);
+//      }
+//    }
+//  }
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 void handsHorizFaceLines(color c) {

@@ -28,17 +28,19 @@ Screen [] screens;
 Screen [] topScreens;
 Screen centerScreen;
 Screen sphereScreen;
-boolean useCenterScreen = true;
+
 int numScreens = 4;
 int centerX, centerY;
 boolean editingMapping = false;
 int numMappings = 2;
 
+PImage sphereImg;
+
 class Screen {
 
   PGraphics s;
   int snakeLoc;
-  
+
   int zIndex = 0;
   //Tesseract tesseract;
 
@@ -197,7 +199,7 @@ void blackoutScreens() {
     topScreens[i].blackOut();
   }
   sphereScreen.blackOut();
-  centerScreen.blackOut();
+  if (centerScreen != null) centerScreen.blackOut();
 }
 
 void drawSolidTop(color c) {
@@ -219,7 +221,7 @@ void drawSolidAll(color c) {
   for (int i = 0; i < 2; i++) {
     topScreens[i].drawSolid(c);
   }
-  centerScreen.drawSolid(c);
+  if (centerScreen != null) centerScreen.drawSolid(c);
   sphereScreen.drawSolid(c);
 }
 
@@ -286,26 +288,25 @@ void initScreens() {
     topScreens[i] = new Screen(topScreenW, topScreenH, 1);
   } 
 
-  if (useCenterScreen) {
-    centerSurface = ks.createCornerPinSurface(screenW*4, screenH, 20);
-    centerScreen = new Screen(screenW*4, screenH, -2);
-  }
-
   sphereSurface = ks.createCornerPinSurface(sphereW, sphereW, 20);
   sphereScreen = new Screen(sphereW, sphereW, 1);
 
+  centerSurface = ks.createCornerPinSurface(screenW*2, screenH, 20);
+  //centerScreen = new Screen(screenW*2, screenH, -2);
 
   loadKeystone(0);
 }
 
 void saveKeystone() {
-  if (useTestKeystone) ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
-  else ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
+  //if (useTestKeystone) ks.save("data/keystone/testEnv/keystoneCenter" + keystoneNum + ".xml");
+  //else ks.save("data/keystone/keystoneCenter" + keystoneNum + ".xml");
+  ks.save("data/keystone/noCenter/keystone.xml");
 }
 void loadKeystone(int i) {
   keystoneNum = i;
-  if (useTestKeystone) ks.load("data/keystone/testEnv/keystoneCenter" +  i + ".xml");
-  else ks.load("data/keystone/keystoneCenter" +  i + ".xml");
+  ks.load("data/keystone/noCenter/keystone.xml");
+  //if (useTestKeystone) ks.load("data/keystone/testEnv/keystoneCenter" +  i + ".xml");
+  //else ks.load("data/keystone/keystoneCenter" +  i + ".xml");
 }
 
 void renderScreens() {
@@ -319,10 +320,12 @@ void renderScreens() {
     popMatrix();
   }
 
-  pushMatrix();
-  translate(0, 0, centerScreen.zIndex);
-  centerSurface.render(centerScreen.s);
-  popMatrix();
+  if (centerScreen != null) {
+    pushMatrix();
+    translate(0, 0, centerScreen.zIndex);
+    centerSurface.render(centerScreen.s);
+    popMatrix();
+  }
 
   // screens above mask
   pushMatrix();
@@ -363,7 +366,7 @@ void sphereImage(PImage p) {
 }
 
 void drawSolidCenter(color c) {
-  centerScreen.drawSolid(c);
+  if (centerScreen != null) centerScreen.drawSolid(c);
 }
 void drawSolidOuter(color c) {
   screens[0].drawSolid(c);
@@ -376,7 +379,8 @@ void drawSolidInner(color c) {
 }
 
 void centerScreenFrontInner() {
-  centerScreen.zIndex = -2;
+
+  if (centerScreen != null) centerScreen.zIndex = -2;
   screens[0].zIndex = -1;
   screens[1].zIndex = -3;
   screens[2].zIndex = -3;
@@ -386,7 +390,8 @@ void centerScreenFrontInner() {
 }
 
 void centerScreenFrontAll() {
-  centerScreen.zIndex = -1;
+  if (centerScreen != null) centerScreen.zIndex = -1;
+
   for (Screen s : screens) {
     s.zIndex = -2;
   }
@@ -394,7 +399,7 @@ void centerScreenFrontAll() {
 }
 
 void cubesFront() {
-  centerScreen.zIndex = -2;
+  if (centerScreen != null) centerScreen.zIndex = -2;
   for (Screen s : screens) { 
     s.zIndex = -1;
   }
@@ -414,8 +419,7 @@ void drawImageMaxFit(PGraphics s, PImage p, int x) {
     int h = int(1.0*s.width/imgw*imgh);
     int y = (s.height - h)/2;
     s.image(p, x, y, s.width, h);
-  }
-  else {
+  } else {
     int w = int(1.0* s.height/imgh*imgw);
     s.image(p, x, 0, w, s.height);
   }
@@ -429,8 +433,7 @@ void drawImageCenteredMaxFit(PGraphics s, PImage p) {
     int h = int(1.0*s.width/imgw*imgh);
     int y = (s.height - h)/2;
     s.image(p, 0, y, s.width, h);
-  }
-  else {
+  } else {
     int w = int(1.0* s.height/imgh*imgw);
     int x = (s.width - w)/2;
     s.image(p, x, 0, w, s.height);
@@ -446,8 +449,7 @@ void drawImageCenteredMaxFitSole(PGraphics s, PImage p) {
     int h = int(1.0*s.width/imgw*imgh);
     int y = (s.height - h)/2;
     s.image(p, 0, y, s.width, h);
-  }
-  else {
+  } else {
     int w = int(1.0* s.height/imgh*imgw);
     int x = (s.width - w)/2;
     s.image(p, x, 0, w, s.height);

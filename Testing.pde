@@ -35,20 +35,20 @@ void testLines() {
   displayCycle4FaceLines(color(0, 255, 255)); 
   displayCycleSingleFaceLines(color(0, 255, 255), -1); 
   linesGradientFaceCycle(color(0, 255, 255), color(0, 50, 255)); 
-  sineGradientFaceCycle(color(255), color(0), percentToNextMeasure(0, 4)*2, 0.8);
+  sineGradientFaceCycle(color(255), color(0), percentToNextMeasure(0)*2, 0.8);
 
 
-  pulseVertLongCenterBeat(cyan, percentToNextMeasure(0, 4)*2);
-  pulsing(color(255, 0, 255), percentToNextMeasure(0, 4));
-  pulsingGrad(pink, cyan, percentToNextMeasure(0, 4));
+  pulseVertLongCenterBeat(cyan, percentToNextMeasure(0)*2);
+  pulsing(color(255, 0, 255), percentToNextMeasure(0));
+  pulsingGrad(pink, cyan, percentToNextMeasure(0));
 
-  sineWaveVert(cyan, pink, percentToNextMeasure(0, 4)*2, 0.8);
+  sineWaveVert(cyan, pink, percentToNextMeasure(0)*2, 0.8);
 
-  snakeFaceAll(red, percentToNextMeasure(0, 4), 2);
-  growShrinkBlockEntire(cyan, percentToNextMeasure(0, 4));
-  displayYPoints(percentToNextMeasure(0, 4));
+  snakeFaceAll(red, percentToNextMeasure(0), 2);
+  growShrinkBlockEntire(cyan, percentToNextMeasure(0));
+  displayYPoints(percentToNextMeasure(0));
 
-  showOne(percentToNextMeasure(0, 4));
+  showOne(percentToNextMeasure(0));
 }
 
 

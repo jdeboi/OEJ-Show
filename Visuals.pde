@@ -225,7 +225,7 @@ class Node {
     this.pos = new PVector(random(s.width), random(s.height));
     this.vel = new PVector(random(-3, 3), random(-3, 3));
   }
-  
+
   Node(int numScreens) {
     this.pos = new PVector(random(screenW * numScreens), random(screenH));
     this.vel = new PVector(random(-3, 3), random(-3, 3));
@@ -712,17 +712,6 @@ void startAudioAmp() {
   addAudioAmp = true;
 }
 
-//void rampUpAudioAmp() {
-//  audioAmpLev += 0.01;
-//  if (audioAmpLev > 1) audioAmpLev = 1;
-//}
-
-//void rampAudioAmp(float val) {
-//  audioAmpLev += val;
-//  if (audioAmpLev < 0) audioAmpLev = 0;
-//  else if (audioAmpLev > 1) audioAmpLev = 1;
-//}
-
 void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
   float seconds = songFile.position()/1000.0;
   // fade in audio amp 
@@ -810,32 +799,34 @@ void setGridTerrain(int mode, float param) {
 }
 
 void displayTerrainCenter() {
-  PGraphics s = centerScreen.s;
-  //setGrid();
+  if (centerScreen != null) {
+    PGraphics s = centerScreen.s;
+    //setGrid();
 
-  s.beginDraw();
-  s.background(0);
-  s.pushMatrix();
-  s.translate(screenW*2, screenH/2, 0);
-  if (beginningTerrain) s.rotateX(radians(millis()/100.0));
-  else s.rotateX(radians(60));
+    s.beginDraw();
+    s.background(0);
+    s.pushMatrix();
+    s.translate(screenW*2, screenH/2, 0);
+    if (beginningTerrain) s.rotateX(radians(millis()/100.0));
+    else s.rotateX(radians(60));
 
-  s.translate(0, zZoom, 0);
-  s.noFill();
-  s.stroke(255);
-  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
-  s.colorMode(HSB, 255);
-  for (int y = 0; y < rowsTerr-1; y++) {
-    s.beginShape(TRIANGLE_STRIP);
-    for (int x = 0; x < colsTerr; x++) {
-      //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
-      s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]*audioLev);
-      s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]*audioLev);
+    s.translate(0, zZoom, 0);
+    s.noFill();
+    s.stroke(255);
+    s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
+    s.colorMode(HSB, 255);
+    for (int y = 0; y < rowsTerr-1; y++) {
+      s.beginShape(TRIANGLE_STRIP);
+      for (int x = 0; x < colsTerr; x++) {
+        //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
+        s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]*audioLev);
+        s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]*audioLev);
+      }
+      s.endShape();
     }
-    s.endShape();
+    s.popMatrix();
+    s.endDraw();
   }
-  s.popMatrix();
-  s.endDraw();
 }
 
 // return frequency from 0 to 100 at x (band) between 0 and 100
@@ -955,7 +946,7 @@ void updateTreeBranches() {
   for (int i=0; i<paths.length; i++) {
     paths[i].update();
   }
-  if (currentCycle > previousCycle && currentCycle%12 == 0) resetTreeBranchesAll();
+  if (currentCycle > previousCycle && currentCycle%16 == 0) resetTreeBranchesAll();
 }
 void displayTreeBranchesOuter() {
   for (int j = 0; j < 4; j +=3) {
@@ -1123,18 +1114,20 @@ void branch(PGraphics s, float h) {
 //////////////////////////////////////////////////////////////////////////////////
 // https://www.openprocessing.org/sketch/546665
 void displayWavesCenter() {
-  cycleWaves(centerScreen.s);
-  PGraphics s = centerScreen.s;
-  s.beginDraw();
-  s.background(0);  
-  for (int i = 0; i < waves.size(); i++) {
-    Wave w = waves.get(i);
-    if (w != null) {
-      w.tick();
-      w.display(s);
+  if (centerScreen != null) {
+    cycleWaves(centerScreen.s);
+    PGraphics s = centerScreen.s;
+    s.beginDraw();
+    s.background(0);  
+    for (int i = 0; i < waves.size(); i++) {
+      Wave w = waves.get(i);
+      if (w != null) {
+        w.tick();
+        w.display(s);
+      }
     }
+    s.endDraw();
   }
-  s.endDraw();
 }
 ArrayList<Wave> waves;
 void initWaves() {
@@ -1189,7 +1182,7 @@ void displayLineBounceAll(color c1, color c2, int sw) {
   angleBottom += 0.01;
 }
 void displayLineBounceCenter(float rate, int spacing, color c1, color c2, int sw) {
-  displayLineBounce(centerScreen.s, spacing, c1, c2, sw);
+  if (centerScreen != null) displayLineBounce(centerScreen.s, spacing, c1, c2, sw);
   angleBottom += rate;
 }
 void set2ScreensBlend(int mode) {
@@ -1248,63 +1241,66 @@ void displayLinesMouse(PGraphics s) {
 // MOVING THROUGH SPACE
 //////////////////////////////////////////////////////////////////////////////////
 // https://www.openprocessing.org/sketch/96938
-ArrayList<PVector> starsSpace = new ArrayList<PVector>();
+ArrayList<PVector> starsSpace;
 int convergeX = 1;
 int convergeY = 1;
 
-void displayMoveSpaceAll(float speed) {
-  cycleStarsSpaceModes();
-  for (Screen s : screens) {
-    displayMoveSpace(s.s, speed);
-  }
+void initStarSpace() {
+  starsSpace = new ArrayList<PVector>();
 }
-
 void displayMoveSpaceCenter(int mode, float speed) {
-  displayMoveSpace(centerScreen.s, mode, speed);
+  if (centerScreen != null) displayMoveSpace(centerScreen.s, mode, speed);
 }
 
 void displayMoveSpaceCenterCycle(float speed) {
   cycleStarsSpaceModes();
-  displayMoveSpace(centerScreen.s, speed);
+  if (centerScreen != null) displayMoveSpace(centerScreen.s, speed);
 }
 
-//void displayMoveSpaceStage(float speed) {
-//  cycleStarsSpaceModes();
-//  displayMoveSpace(speed);
-//}
+void displayMoveSpaceAll(int mode, float speed) {
+  speed = constrain(speed, 0.6, 1.0);
+  convergeX = (mode/3)%3;
+  convergeY = mode%3;
+  int wfull = screenW * 4;
+  int controlX = int(map(convergeX, 0, 2, wfull*(1-speed), wfull*speed));
+  int controlY = int(map(convergeY, 0, 2, screenH*(1-speed), screenH*speed));
+  float w2=screenW*2;
+  float h2= screenH/2;
+  float d2 = dist(0, 0, w2, h2);
+  int maxSizeStar = 5;
+  int minSizeStar = 3;
+  for (int i = 0; i<80; i++) {   // star init
+    starsSpace.add(new PVector(random(wfull), random(screenH), random(minSizeStar, maxSizeStar)));
+  }
+  for (int i = 0; i<starsSpace.size(); i++) {
+    float x =starsSpace.get(i).x;//local vars
+    float y =starsSpace.get(i).y;
+    float d =starsSpace.get(i).z;
 
-//void displayMoveSpace(float speed) {
-//  //int controlX = mouseX;
-//  //int controlY = mouseY;
-//  speed = constrain(speed, 0.6, 1.0);
-//  int controlX = int(map(convergeX, 0, 2, width*(1-speed), width*speed));
-//  int controlY = int(map(convergeY, 0, 2, height*(1-speed), height*speed));
-//  float w2=width/2;
-//  float h2= height/2;
-//  float d2 = dist(0, 0, w2, h2);
-//  noStroke();
-//  fill(0, map(dist(controlX, controlY, w2, h2), 0, d2, 255, 5));
-//  rect(0, 0, width, height);
-//  fill(255);
+    /* movement+"glitter"*/
+    starsSpace.set(i, new PVector(x-map(controlX, 0, wfull, -0.05, 0.05)*(w2-x), y-map(controlY, 0, screenH, -0.05, 0.05)*(h2-y), d+0.2-0.6*noise(x, y, frameCount)));
 
-//  for (int i = 0; i<20; i++) {   // star init
-//    starsSpace.add(new PVector(random(width), random(height), random(1, 3)));
-//  }
+    if (d>maxSizeStar||d<-3) starsSpace.set(i, new PVector(x, y, maxSizeStar));
+    if (x<0||x>wfull||y<0||y>screenH) starsSpace.remove(i);
+    if (starsSpace.size()>399) starsSpace.remove(1);
+  }
+  for (int j = 0; j < screens.length; j++ ) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    s.noStroke();
+    s.fill(0, map(dist(controlX, controlY, w2, h2), 0, d2, 255, 5));
+    s.rect(0, 0, s.width, s.height);
+    s.fill(255);
 
-//  for (int i = 0; i<starsSpace.size(); i++) {
-//    float x =starsSpace.get(i).x;//local vars
-//    float y =starsSpace.get(i).y;
-//    float d =starsSpace.get(i).z;
-
-//    /* movement+"glitter"*/
-//    starsSpace.set(i, new PVector(x-map(controlX, 0, width, -0.05, 0.05)*(w2-x), y-map(controlY, 0, height, -0.05, 0.05)*(h2-y), d+0.2-0.6*noise(x, y, frameCount)));
-
-//    if (d>3||d<-3) starsSpace.set(i, new PVector(x, y, 3));
-//    if (x<0||x>width||y<0||y>height) starsSpace.remove(i);
-//    if (starsSpace.size()>999) starsSpace.remove(1);
-//    ellipse(x, y, d, d);//draw stars
-//  }
-//}
+    for (int i = 0; i<starsSpace.size(); i++) {
+      float x =starsSpace.get(i).x;//local vars
+      float y =starsSpace.get(i).y;
+      float d =starsSpace.get(i).z;
+      s.ellipse(x -j *screenW, y, d, d);//draw stars
+    }
+    s.endDraw();
+  }
+}
 
 void displayMoveSpace(PGraphics s, int mode, float speed) {
   //int controlX = mouseX;
@@ -1672,9 +1668,11 @@ float countFW=startCountFW;
 float  mapHeightFW;
 int modeFW = 0;
 PGraphics tempImg;
+PGraphics tempSphere;
 
 void initAllFlowyWaves() {
   tempImg = createGraphics(screenW*2, screenH);
+
   mapHeightFW = screenH/2;
   tempImg.beginDraw();
   tempImg.background(0);
@@ -1827,12 +1825,12 @@ void fadeInCubes(float startT, float  seconds) {
 
 void fadeOutCenter(float startT, float seconds) {
   int alph = getFadeOutAlpha(startT, seconds);
-  centerScreen.drawFadeAlpha(alph);
+  if (centerScreen != null) centerScreen.drawFadeAlpha(alph);
 }
 
 void fadeInCenter(float startT, float  seconds) {
   int alph = getFadeInAlpha(startT, seconds);
-  centerScreen.drawFadeAlpha(alph);
+  if (centerScreen != null) centerScreen.drawFadeAlpha(alph);
 }
 
 int getFadeOutAlpha(float startT, float seconds) {
@@ -1865,7 +1863,7 @@ void setAllScreensAlpha(int alph) {
     s.drawFadeAlpha(alph);
   }
   sphereScreen.drawFadeAlpha(alph);
-  centerScreen.drawFadeAlpha(alph);
+  if (centerScreen != null) centerScreen.drawFadeAlpha(alph);
 }
 
 void resetFade() {
@@ -1949,32 +1947,34 @@ void displayTwoScreenCascade() {
 }
 
 void displayTwoWayTunnels() {
-  PGraphics s = centerScreen.s;
-  s.beginDraw();
-  s.blendMode(SCREEN);
-  s.background(0);
-  //int spacing = 50;
-  //for (int i = 0; i < s.height; i += spacing) {
-  //  line(0, 0, 
-  //int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
-  //displayTunnelCenter(150, 3, 0,z, color(0, 255, 255), color(0, 0, 255), false);
-  //displayTunnelCenter(150, 3, 0,-z, color(0, 255, 255), color(0, 0, 255), false);
-  int num = 5;
-  int spacing = 20;
-  int bounceD = 400;
-  s.noFill();
-  s.strokeWeight(10);
-  for (int i = 0; i < num; i++) {
-    spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
-    spaceRects[i].zGradientStroke(s, cyan, blue, pink);
-    spaceRects[i].display(s);
+  if (centerScreen != null) {
+    PGraphics s = centerScreen.s;
+    s.beginDraw();
+    s.blendMode(SCREEN);
+    s.background(0);
+    //int spacing = 50;
+    //for (int i = 0; i < s.height; i += spacing) {
+    //  line(0, 0, 
+    //int z = (millis()/2%(-endPSpaceRects+400))+endPSpaceRects;
+    //displayTunnelCenter(150, 3, 0,z, color(0, 255, 255), color(0, 0, 255), false);
+    //displayTunnelCenter(150, 3, 0,-z, color(0, 255, 255), color(0, 0, 255), false);
+    int num = 5;
+    int spacing = 20;
+    int bounceD = 400;
+    s.noFill();
+    s.strokeWeight(10);
+    for (int i = 0; i < num; i++) {
+      spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
+      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
+      spaceRects[i].display(s);
+    }
+    for (int i = num; i < num*2 && i < spaceRects.length; i++) {
+      spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
+      spaceRects[i].zGradientStroke(s, cyan, blue, pink);
+      spaceRects[i].display(s);
+    }
+    s.endDraw();
   }
-  for (int i = num; i < num*2 && i < spaceRects.length; i++) {
-    spaceRects[i].pos.z = cos(millis()/1000.0 + i * .2) * bounceD - bounceD - i * spacing;
-    spaceRects[i].zGradientStroke(s, cyan, blue, pink);
-    spaceRects[i].display(s);
-  }
-  s.endDraw();
 }
 
 float sphereCycle = 0;
@@ -2015,7 +2015,7 @@ void displayTunnel2Screens(int len, int num, int gap, int z, color c1, color c2,
 }
 
 void displayTunnelCenter(int len, int num, int gap, int z, color c1, color c2, boolean isGradient) {
-  displayTunnel(centerScreen.s, len, num, gap, z, c1, c2, isGradient);
+  if (centerScreen != null) displayTunnel(centerScreen.s, len, num, gap, z, c1, c2, isGradient);
 }
 void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, color c2, boolean isGradient) {
   //s.pointLight(255, 255, 255, s.width/2 + 50* sin(millis()/1000.0),s.height/2 + 47* sin(millis()/700.0), -100);
@@ -2096,22 +2096,24 @@ void displayTunnel(PGraphics s, int len, int num, int gap, int z, color c1, colo
 }
 
 void displayCenterSpaceRects(int sw, int mode, color c1, color c2, color c3) {
-  PGraphics s = centerScreen.s;
-  s.beginDraw();
-  s.background(0);
-  s.rectMode(CENTER);
-  s.pushMatrix();
-  s.translate(s.width/2, s.height/2);
-  for (int j = 0; j < numRects; j++) {
-    s.noFill();
-    s.strokeWeight(sw);
-    spaceRects[j].zGradientStroke(s, c1, c2, c3);
-    spaceRects[j].display(s);
-    spaceRects[j].update(mode);
+  if (centerScreen != null) {
+    PGraphics s = centerScreen.s;
+    s.beginDraw();
+    s.background(0);
+    s.rectMode(CENTER);
+    s.pushMatrix();
+    s.translate(s.width/2, s.height/2);
+    for (int j = 0; j < numRects; j++) {
+      s.noFill();
+      s.strokeWeight(sw);
+      spaceRects[j].zGradientStroke(s, c1, c2, c3);
+      spaceRects[j].display(s);
+      spaceRects[j].update(mode);
+    }
+    s.popMatrix();
+    s.rectMode(CORNER);
+    s.endDraw();
   }
-  s.popMatrix();
-  s.rectMode(CORNER);
-  s.endDraw();
 }
 
 
@@ -3608,4 +3610,41 @@ void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode
     //screens[j].s.mask(temp);
     screens[j].s.endDraw();
   }
+}
+
+void sphereEdgeInit() {
+  tempSphere = createGraphics(sphereScreen.s.width, sphereScreen.s.height);
+  tempSphere.beginDraw();
+  tempSphere.background(0);
+  tempSphere.noStroke();
+  int startW = tempSphere.width - 50;
+  for (int i = tempSphere.width; i >= startW; i--) {
+    float br = map(i, tempSphere.width, startW, 0, 255);
+    tempSphere.fill(br);
+    tempSphere.ellipse(tempSphere.width/2, tempSphere.height/2, i, i);
+  }
+  tempSphere.endDraw();
+}
+
+// getColorFW
+void gradientSphere(color c1, color c2, color c3) {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.blendMode(BLEND);
+
+  //s.strokeWeight(1);
+  s.noStroke();
+  for (int i = s.width; i > 0; i --) {
+    float per = map(i, s.width, 0, 0, 0.5);
+    //per += millis()/4000.0;
+    //per %= 1;
+    s.fill(paradiseStrokeReturn(per, c2, c1, c3));
+    s.ellipse(s.width/2, s.height/2, i, i);
+  }
+
+
+  //s.image(tempSphere, 0, 0, s.width, s.height);
+  s.mask(tempSphere);
+  s.blendMode(BLEND);
+  s.endDraw();
 }

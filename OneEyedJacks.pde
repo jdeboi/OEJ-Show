@@ -3,7 +3,7 @@ boolean mappingON = false;
 boolean useMusic = true;
 boolean useTestKeystone = true;
 
-int MOON = 0;
+int MOON = 1;
 int DELTA = 8;
 int WIZ = 5;
 int VIOLATE = 6;
@@ -15,7 +15,6 @@ int RITE = 11;
 int ELO = 14;
 int SONG = 9;
 int LARGE_CENTER = 0;
-int MID_CENTER = 1;
 //////////
 
 import gifAnimation.*;
@@ -26,7 +25,6 @@ Movie myMovie;
 boolean bracketDown = false;
 boolean slashDown = false;
 PImage stage;
-//ArrayList<PImage> images;
 
 int MAX_GIF = 50;
 int MAX_IMG = 50;
@@ -49,7 +47,7 @@ int TILE_VID = 6;
 int VID_ACROSS = 7;
 int VID_MIRROR = 8;
 int CUBE_MODE = 9;
-
+int DIRTY = 2;
 
 
 void setup() {
@@ -60,17 +58,17 @@ void setup() {
   //songFile = new Song(0, 0);
   initFFT();
   initMidi();
-  
+
   initMask();
-  centerScreen.drawSolid(color(0));
   initLines();
-  
+
   if (!showTime) initControls();
 
   initColors();
   initEye();
+  sphereEdgeInit();
   
-  changeScene(DELTA);
+  changeScene(MOON);
 }
 
 void draw() {
@@ -88,6 +86,7 @@ void draw() {
     renderScreens();
     if (showMask) maskScreens(0);
   }
+  checkClickTrack();
 
   drawControls();
 }
@@ -168,11 +167,17 @@ void hideControls() {
 }
 
 void playScene() {
-  isPlaying = true;
   currentScene.playScene();
 }
 
+void startScene() {
+  midiStartTime = millis();
+  //currentScene.startScene();
+  clickTrackStarted = true;
+}
+
 void pauseScene() {
+
   isPlaying = false;
   currentScene.pauseScene();
 }
