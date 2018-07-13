@@ -3,6 +3,39 @@ boolean personOnPlatform = false;
 
 int mxW = 100;
 
+void changePlatform() {
+  personOnPlatform = !personOnPlatform;
+  sphereScreen.drawSolid(0);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// CRUSH Z
+//////////////////////////////////////////////////////////////////////////////////
+int getZCrushHand() {
+  return int(constrain(map(mouseX, width/2 - mxW, width/2 + mxW, 0, -800), -800, 0));
+}
+
+// an old idea
+void pinkTint() {
+    //int index = constrain(int(mouseX*1.0/width*4), 0, 3);
+    //display4FaceLines(pink, index);
+    //PGraphics s = screens[index].s;
+    //s.beginDraw();
+    //s.fill(pink, 50);
+    //s.blendMode(SCREEN);
+    //s.noStroke();
+    //s.rect(0, 0, s.width, s.height);
+    //s.endDraw();
+}
+//////////////////////////////////////////////////////////////////////////////////
+// DIRTY LINES
+//////////////////////////////////////////////////////////////////////////////////
+void drawVertDirtyOutsideHand() {
+  float lr = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+  drawVertDirtyOutsideSpeed(lr);
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // MOTH FLAP
@@ -212,7 +245,7 @@ void updateSphereBoxHand() {
   sphereBoxRot.set(0, rot, 0);
 }
 
-void crushSphere() {
+void crushSphere(int z) {
   updateSphereBoxHand();
   for (int i = 1; i < 3; i++) {
     PGraphics s = screens[i].s;
@@ -222,11 +255,11 @@ void crushSphere() {
       s.pushMatrix();
       s.scale(-1.0, 1.0);
       s.translate(-screenW, 0, 0);
-      displaySphereBox(s);
+      displaySphereBox(s, z);
       s.popMatrix();
     } else {
       //s.background(pink);
-      displaySphereBox(s);
+      displaySphereBox(s, z);
     }
     s.endDraw();
   }
@@ -378,7 +411,7 @@ void drawEye() {
   s.beginDraw();
   s.background(0);
   s.translate(s.width/2, s.height/2);
-  s.rotateX(constrain(map(mouseY, height, height-200, -PI/5, PI/4), -PI/5, PI/4));
+  s.rotateX(constrain(map(mouseY, height, height/2, -PI/5, PI/4), -PI/5, PI/4));
   s.rotateY(constrain(map(mouseX, width/2 - 100, width/2 + 100, PI/3.5, PI/1.5), PI/3.5, PI/1.5));
   s.shape(eyeball);
   s.endDraw();

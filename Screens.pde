@@ -92,25 +92,25 @@ class Screen {
     s.endDraw();
   }
 
-  void drawFFTBars() {
-    s.beginDraw();
-    s.background(0);
-    float rectW = screenW / beat.detectSize();
-    for (int i = 0; i < beat.detectSize(); ++i) {    
-      if ( beat.isOnset(i) ) {  // test one frequency band for an onset
-        s.fill(200);
-        s.rect( i*rectW, 0, rectW, screenH);
-      }
-    }
-    int lowBand = 5;
-    int highBand = 15;
-    int numberOfOnsetsThreshold = 4; // at least this many bands must have an onset for isRange to return true 
-    if ( beat.isRange(lowBand, highBand, numberOfOnsetsThreshold) ) {
-      s.fill(232, 0, 2, 200);
-      s.rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, screenH);
-    }
-    s.endDraw();
-  }
+  //void drawFFTBars() {
+  //  s.beginDraw();
+  //  s.background(0);
+  //  float rectW = screenW / beat.detectSize();
+  //  for (int i = 0; i < beat.detectSize(); ++i) {    
+  //    if ( beat.isOnset(i) ) {  // test one frequency band for an onset
+  //      s.fill(200);
+  //      s.rect( i*rectW, 0, rectW, screenH);
+  //    }
+  //  }
+  //  int lowBand = 5;
+  //  int highBand = 15;
+  //  int numberOfOnsetsThreshold = 4; // at least this many bands must have an onset for isRange to return true 
+  //  if ( beat.isRange(lowBand, highBand, numberOfOnsetsThreshold) ) {
+  //    s.fill(232, 0, 2, 200);
+  //    s.rect(rectW*lowBand, 0, (highBand-lowBand)*rectW, screenH);
+  //  }
+  //  s.endDraw();
+  //}
 
   void drawImage(PImage img, int x, int y, int w, int h) {
     s.beginDraw();
@@ -309,15 +309,17 @@ void loadKeystone(int i) {
   //else ks.load("data/keystone/keystoneCenter" +  i + ".xml");
 }
 
+boolean renderCubes = true;
 void renderScreens() {
   // screens below mask
 
-
-  for (int i = 0; i < numScreens; i++) {
-    pushMatrix();
-    translate(0, 0, screens[i].zIndex);
-    surfaces[i].render(screens[i].s);
-    popMatrix();
+  if (renderCubes) {
+    for (int i = 0; i < numScreens; i++) {
+      pushMatrix();
+      translate(0, 0, screens[i].zIndex);
+      surfaces[i].render(screens[i].s);
+      popMatrix();
+    }
   }
 
   if (centerScreen != null) {
@@ -386,7 +388,7 @@ void centerScreenFrontInner() {
   screens[2].zIndex = -3;
   screens[3].zIndex = -1;
 
-  drawSolidAll(color(0));
+  drawSolidAllCubes(color(0));
 }
 
 void centerScreenFrontAll() {

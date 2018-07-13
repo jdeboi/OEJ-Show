@@ -145,6 +145,19 @@ void displayAllFaceLinesColor(color c1, color c2, color c3, color c4) {
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+void fadeOutLinesCenterFocus(int seconds, color c) {
+  if (!startFadeLine) {
+    startFadeTime = millis();
+    startFadeLine = true;
+  } 
+  float timePassed = (millis() - startFadeTime)/1000.0;
+  int brig = constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
+  float h = hue(c);
+  colorMode(HSB, 255);
+  color cr = color(h, 255, brig);
+  colorMode(RGB, 255);
+  displayLinesCenterFocus(cr);
+}
 
 void fadeOutAllLines(int seconds, color c) {
   if (!startFadeLine) {
@@ -160,11 +173,25 @@ void fadeOutAllLines(int seconds, color c) {
   displayLines(cr);
 }
 
-void fftLines() {
-  for (Line l : lines) {
-    l.fftLine();
-  }
+void fadeInAllLines(int seconds, color c) {
+  if (!startFadeLine) {
+    startFadeTime = millis();
+    startFadeLine = true;
+  } 
+  float timePassed = (millis() - startFadeTime)/1000.0;
+  int brig = constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
+  float h = hue(c);
+  colorMode(HSB, 255);
+  color cr = color(h, 255, brig);
+  colorMode(RGB, 255);
+  displayLines(cr);
 }
+
+//void fftLines() {
+//  for (Line l : lines) {
+//    l.fftLine();
+//  }
+//}
 void displayRandomLines(color c) {
   if ((millis()/100)%2 == 0) {
     for (Line l : lines) {
@@ -238,13 +265,13 @@ void pulsing(color c, float per) {
   float b = 0;
   if (per < 0.5) b = map(per, 0, .5, 255, 0);
   else b = map(per, 0.5, 1, 0, 255);
-
+  colorMode(RGB, 255);
   float hue = hue(c);
-
+  float sat = saturation(c);
   colorMode(HSB, 255);
   for (int i = 0; i < lines.size(); i++) {
-    stroke(hue, 255, b);
-    fill(hue, 255, b);
+    stroke(hue, sat, b);
+    fill(hue, sat, b);
     lines.get(i).display();
   }
   colorMode(RGB, 255);
@@ -660,13 +687,13 @@ class Line {
     drawEndCaps(p1, p2);
   }
 
-  void fftLine() {
-    lineW = int(map(bands[0], 0, 600, 0, 10));
-    lineW = constrain(lineW, 0, 10);
+  //void fftLine() {
+  //  lineW = int(map(bands[0], 0, 600, 0, 10));
+  //  lineW = constrain(lineW, 0, 10);
 
-    display();
-    lineW = origLineW;
-  }
+  //  display();
+  //  lineW = origLineW;
+  //}
 
   void twinkle(int wait) {
     int num = int(dist(p1.x, p1.y, p2.x, p2.y)/100);

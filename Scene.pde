@@ -4,20 +4,35 @@ int currentSceneIndex = 0;
 boolean isPlaying = false;
 
 void initScenes() {
-  scenes[0] = new Scene("Intro", "intro", 1, 80, 4, 2);
-  scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80.01, 4, 2);
-  scenes[2] = new Scene("Dirty", "dirty", 2, 90, 4, 2);
+
+  //  When The Moon Comes = 80 4/4
+  //Subatomic = 87 4/4
+  //Crush Proof = 102 4/4
+  //Cycles = 81 3/4
+  //Papercuts = 151 4/4
+  //Cave Dwellers = 90 4/4
+  //Mood = 80 4/4
+  //Ellon = 112 4/4
+  //Deltawaves = 66.5 4/4
+  //Song For M = 60 4/4
+  //Rite Of Spring = 61 4/4
+  //Hypercube = 135 4/4
+  //Egrets = 122 4/4
+
+  scenes[0] = new Scene("Intro", "intro", 1, 60, 4, 0);
+  scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80, 4, 2);
+  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 0);
   //scenes[2] = new Scene("Fifty Fifty", "fifty", 3, 120, 4);
-  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 2);
-  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 6, 1);  //6/8
-  scenes[5] = new Scene("WizRock", "wizrock", 6, 148, 4, 2);
+  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 0);
+  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 3, 1);  //6/8
+  scenes[5] = new Scene("WizRock", "wizrock", 6, 151, 4, 2);
   scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4, 2);
-  scenes[7] = new Scene("Mood #2", "mood", 8, 0, 4, 2);
-  scenes[8] = new Scene("Delta Waves", "delta", 9, 66.4, 4, 2);
-  scenes[9] = new Scene("Song for M", "song", 10, 59.4, 4, 2);
-  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 2);
-  scenes[11] = new Scene("Rite of Spring", "rite", 12, 121, 4, 2);
-  scenes[12] = new Scene("Lollies", "lollies", 13, 128, 4, 2);
+  scenes[7] = new Scene("Mood #2", "mood", 8, 80, 4, 2);
+  scenes[8] = new Scene("Delta Waves", "delta", 9, 132.8, 4, 1);
+  scenes[9] = new Scene("Song for M", "song", 10, 60, 4, 2);
+  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 1);
+  scenes[11] = new Scene("Rite of Spring", "rite", 12, 61, 4, 2);
+  scenes[12] = new Scene("Lollies", "lollies", 13, 128, 135, 2);
   scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4, 2);
   currentScene = scenes[0];
 }
@@ -85,12 +100,14 @@ class Scene {
     currentImages = loadImages("scenes/" + shortName + "/images/");
     currentCue = 0;
 
-    if (!backingTracks) songFile = minim.loadFile("music/fullsong/" + shortName + ".mp3", 1024);
+    if (!backingTracks) songFile = minim.loadFile("music/fullsong/" + shortName + ".mp3");
 
     else {
-      if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3", 1024);
-      else songFile = minim.loadFile("music/backing/" + shortName + ".wav", 1024);
+      if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
+      else songFile = minim.loadFile("music/backing/" + shortName + ".wav");
     }
+
+    //printMeasureBeatsCurrentScene();
 
     songFile.cue(0);
     songFile.pause();
@@ -115,10 +132,6 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
-    
-    for (int i = 0; i < cues.length; i++) {
-      cues[i].startT += getClickTrackLenSeconds();
-    }
   }
 
 
@@ -229,4 +242,16 @@ ArrayList<Movie> loadMovies(String dir) {
     }
   }
   return movies;
+}
+
+void addClickTimes() {
+  for (int i = 0; i < cues.length; i++) {
+    cues[i].startT += getClickTrackLenSeconds();
+  }
+}
+
+void addClickTimes(float t) {
+  for (int i = 0; i < cues.length; i++) {
+    cues[i].startT += t;
+  }
 }

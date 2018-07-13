@@ -693,6 +693,15 @@ boolean addAudioAmp = false;
 float audioAmpLev = 0;
 float audioLev = 0;
 
+void initTerrain() {
+  int w = 500; 
+  int h = 400; 
+  int spacing = 20;
+  this.colsTerr = w/spacing;
+  this.rowsTerr = h/spacing;
+  this.spacingTerr = spacing;
+  terrain = new float[colsTerr][rowsTerr];
+}
 void initTerrainCenter() {
   int w = 800; 
   int h = 500; 
@@ -711,6 +720,7 @@ void resetAudioAmp() {
 void startAudioAmp() {
   addAudioAmp = true;
 }
+
 
 void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
   float seconds = songFile.position()/1000.0;
@@ -733,10 +743,10 @@ void cycleAudioAmp(float per) {
   audioLev = audioAmpLev*sin(period);
 }
 
-void setSinGrid(float tempo) {
+void setSinGrid(float per) {
   for (int y = 0; y < rowsTerr; y++) {
     for (int x = 0; x < colsTerr; x++) {
-      terrain[x][y] = 10* sin(tempo * millis()/1000.0 + y*5.0);
+      terrain[x][y] = 10* sin(per*2*PI + y*5.0);
     }
   }
 }
@@ -764,18 +774,18 @@ void setAudioGrid(float flyingTerrInc) {
   }
 }
 
-void updateFlying(int delayT) {
-  if (flyingTerrOn) {
-    if (acceleratingTerr) {
-      flyingTerr -= 0.3;
-      if (millis() - lastCheckedTerr > delayT) {
-        acceleratingTerr = false;
-      }
-    } else {
-      flyingTerr -= flyingTerrInc;
-    }
-  }
-}
+//void updateFlying(int delayT) {
+//  if (flyingTerrOn) {
+//    if (acceleratingTerr) {
+//      flyingTerr -= 0.3;
+//      if (millis() - lastCheckedTerr > delayT) {
+//        acceleratingTerr = false;
+//      }
+//    } else {
+//      flyingTerr -= flyingTerrInc;
+//    }
+//  }
+//}
 
 int startingTerrain = -1400;
 int endingTerrain = -150;
@@ -795,45 +805,78 @@ void zoomTerrain(float startT, float endT) {
 void setGridTerrain(int mode, float param) {
   if (mode == 0) setAudioGrid(param);
   else if (mode == 1) setSinGrid(param);
-  else if (mode == 1) setSinGrid(param);
 }
 
-void displayTerrainCenter() {
-  if (centerScreen != null) {
-    PGraphics s = centerScreen.s;
-    //setGrid();
-
-    s.beginDraw();
-    s.background(0);
-    s.pushMatrix();
-    s.translate(screenW*2, screenH/2, 0);
-    if (beginningTerrain) s.rotateX(radians(millis()/100.0));
-    else s.rotateX(radians(60));
-
-    s.translate(0, zZoom, 0);
-    s.noFill();
-    s.stroke(255);
-    s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
-    s.colorMode(HSB, 255);
-    for (int y = 0; y < rowsTerr-1; y++) {
-      s.beginShape(TRIANGLE_STRIP);
-      for (int x = 0; x < colsTerr; x++) {
-        //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
-        s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]*audioLev);
-        s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]*audioLev);
-      }
-      s.endShape();
+void displayTerrainAllCrush() {
+  setGridTerrain(0, .02);
+  audioLev = 1;
+  int index = (currentCycle-1)/4%4;
+  if (index > 2) index = 4-index;
+  for (int i = 0; i < screens.length; i++) {
+    if (index == i || i == index + 1) {
+      displayTerrain(screens[i].s, i);
+      display4FaceLines(white, i);
     }
-    s.popMatrix();
-    s.endDraw();
+    else {
+      screens[i].drawSolid(0);
+      display4FaceLines(0, i);
+    }
   }
+}
+void displayTerrain(PGraphics s, int screenNum) {
+
+  s.beginDraw();
+  s.background(0);
+  //s.ambientLight(0, 0, 0);
+  //s.directionalLight(128, 128, 128, 0, 0, -1); 
+  //s.lightFalloff(1, 0, 0);
+  //s.lightSpecular(0, 0, 0);
+  //s.lights();
+  float per =  percentToNumBeats(8);
+  int padding = -200;
+  if (per < 0.5) per = map(per, 0, .5, padding, screenW*4 - padding);
+  else per = map(per, .5, 1, screenW*4-padding, padding);
+  float xp = per - screenNum*screenW;
+  //s.pointLight(255, 255, 255, xp, screenH/2-200, 0);
+  s.pushMatrix();
+  int sc = 1;
+  int xt = 0;
+  if (screenNum == 1 || screenNum == 3) {
+    sc = -1;
+    xt = -screenW;
+  }
+  s.pushMatrix();
+  s.scale(sc, 1);
+  s.translate(xt, 0, 0);
+  s.translate(screenW/2, screenH/2, -100);
+  s.rotateX(radians(60));
+  s.noFill();
+  s.stroke(255);
+  //s.noStroke();
+  //s.fill(255, 50);
+  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr/2);
+  //s.colorMode(HSB, 255);
+  for (int y = 0; y < rowsTerr-1; y++) {
+    s.beginShape(TRIANGLE_STRIP);
+    for (int x = 0; x < colsTerr; x++) {
+      //s.fill(map(terrain[x][y], -100, 100, 0, 255), 255, 255);  // rainbow
+      s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]*audioLev);
+      s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]*audioLev);
+    }
+    s.endShape();
+  }
+  s.popMatrix();
+  s.popMatrix();
+  //s.lights();
+  s.endDraw();
 }
 
 // return frequency from 0 to 100 at x (band) between 0 and 100
 float getFreq(float col) {
-  int x = constrain((int)col, 0, 100);
-  x = (int)(x * (bands.length/100.0));
-  return constrain(bands[x], 0, 100);
+  //int x = constrain((int)col, 0, 100);
+  //x = (int)(x * (bands.length/100.0));
+  //return constrain(bands[x], 0, 100);
+  return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -1203,6 +1246,7 @@ void displayLineBounce(PGraphics s, int spacing, color c1, color c2, int sw) {
   //int bottomY = h-50;
   int bottomY = h;
   int centerY = bottomY/2;
+  s.image(currentImages.get(0), 0, 0);
   for (int i = 0; i<w; i+=spacing) {
     // 0 -> 1, not 0 -> 2h
     color c = lerpColor(c1, c2, map(i, 0, w, 0, 1));
@@ -1845,14 +1889,31 @@ int getFadeInAlpha(float startT, float  seconds) {
   return constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
 }
 
-void fadeInAllScreens(float startT, int seconds) {
+void fadeInAllScreens(float startT, float seconds) {
   int alph = getFadeInAlpha(startT, seconds);
   setAllScreensAlpha(alph);
+}
+
+void fadeInTopScreens(float startT, float seconds) {
+  int alph = getFadeInAlpha(startT, seconds);
+  setTopScreensAlpha(alph);
+}
+
+void fadeInOutsideScreens(float startT, float seconds) {
+  int alph = getFadeInAlpha(startT, seconds);
+  screens[0].drawFadeAlpha(alph);
+  screens[3].drawFadeAlpha(alph);
 }
 
 void fadeOutAllScreens(float startT, float  seconds) {
   int alph = getFadeOutAlpha(startT, seconds);
   setAllScreensAlpha(alph);
+}
+
+void setTopScreensAlpha(int alph) {
+  for (Screen s : topScreens) {
+    s.drawFadeAlpha(alph);
+  }
 }
 
 void setAllScreensAlpha(int alph) {
@@ -1900,7 +1961,7 @@ void resetSpaceRects(boolean zoomIn) {
 }
 // only onerect at a time changing colors through gradient
 
-void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
+void displaySpaceRects(int sw, int mode, color c1, color c2, color c3, boolean isCenter) {
   temp.beginDraw();
   temp.background(0);
   temp.rectMode(CENTER);
@@ -1911,7 +1972,7 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3) {
     temp.noFill();
     temp.strokeWeight(sw);
     spaceRects[j].zGradientStroke(temp, c1, c2, c3);
-    spaceRects[j].display(temp);
+    spaceRects[j].display(temp, isCenter);
     spaceRects[j].update(mode);
   }
   temp.popMatrix();
@@ -1944,7 +2005,7 @@ void displayTwoScreenCascade() {
   for (int i = 0; i < num; i++) {
     spaceRects[i].pos.z = sin(millis()/2000.0 + i * .2) * bounceD - bounceD - i * spacing;
     spaceRects[i].zGradientStroke(temp, cyan, blue, pink);
-    spaceRects[i].display(temp);
+    spaceRects[i].display(temp, true);
   }
   temp.endDraw();
   for (int j = 1; j < 3; j++) {
@@ -1970,12 +2031,12 @@ void displayTwoWayTunnels(float per) {
   for (int i = 0; i < num; i++) {
     spaceRects[i].pos.z = sin(per*2*PI + i * .2) * bounceD - bounceD - i * spacing;
     spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
-    spaceRects[i].display(temp2);
+    spaceRects[i].display(temp2, true);
   }
   for (int i = num; i < num*2 && i < spaceRects.length; i++) {
     spaceRects[i].pos.z = cos(per*2*PI + i * .2) * bounceD - bounceD - i * spacing;
     spaceRects[i].zGradientStroke(temp2, cyan, blue, pink);
-    spaceRects[i].display(temp2);
+    spaceRects[i].display(temp2, true);
   }
   temp2.endDraw();
 
@@ -2118,7 +2179,7 @@ void displayCenterSpaceRects(int sw, int mode, color c1, color c2, color c3) {
     temp2.noFill();
     temp2.strokeWeight(sw);
     spaceRects[j].zGradientStroke(temp2, c1, c2, c3);
-    spaceRects[j].display(temp2);
+    spaceRects[j].display(temp2, true);
     spaceRects[j].update(mode);
   }
   temp2.popMatrix();
@@ -2177,11 +2238,13 @@ class SpaceRect {
   }
 
 
-  void display(PGraphics s) {
+  void display(PGraphics s, boolean isCenter) {
     s.pushMatrix();
-    s.rotateX(rot.x);
-    s.rotateY(rot.y);
-    s.rotateZ(rot.z);
+    if (!isCenter) {
+      s.rotateX(rot.x);
+      s.rotateY(rot.y);
+      s.rotateZ(rot.z);
+    }
     s.translate(pos.x, pos.y, pos.z);
     float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
     if (pos.z > endPSpaceRects) s.rect(0, 0, s.width-dw, s.height-dw);
@@ -2422,22 +2485,26 @@ void displayLACircle(PGraphics s, float radius, float step) {
 // OP ART
 //////////////////////////////////////////////////////////////////////////////////
 // Richard Anuszkiewicz art
-void displayDivisionOfIntensityInner(float per, int sqX, int sqY) {
-  displayDivisionOfIntensity(screens[1].s, per, sqX, sqY);
-  displayDivisionOfIntensity(screens[2].s, per, sqX, sqY);
+void displayDivisionOfIntensityInner(float per, int sqX, int sqY, int z) {
+  displayDivisionOfIntensity(screens[1].s, per, sqX, sqY, z);
+  displayDivisionOfIntensity(screens[2].s, per, sqX, sqY, z);
 }
-void displayDivisionOfIntensityOuter(float per, int sqX, int sqY) {
-  displayDivisionOfIntensity(screens[0].s, per, sqX, sqY);
-  displayDivisionOfIntensity(screens[3].s, per, sqX, sqY);
+void displayDivisionOfIntensityOuter(float per, int sqX, int sqY, int z) {
+  displayDivisionOfIntensity(screens[0].s, per, sqX, sqY, z);
+  displayDivisionOfIntensity(screens[3].s, per, sqX, sqY, z);
 }
+
 void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY) {
+  displayDivisionOfIntensity(s, per, sqX, sqY, 0);
+}
+void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY, int z) {
   float period = per * 2 * PI;
   float space = sin(period)*20 + 27;
   space = constrain(space, 5, 55);
   s.beginDraw();
   s.pushMatrix();
   s.background(0);
-  s.translate(s.width/2, s.height/2);
+  s.translate(s.width/2, s.height/2, z);
 
   //if (mode == 1) rotateZ(frameCount/100.0);
   //else if (mode == 2) rotateY(frameCount/100.0);
@@ -2582,6 +2649,23 @@ color color_from;
 color color_to;
 PGraphics s;
 
+void  displaySquiggleParticlesAll() {
+  updateSquiggle();
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    if (i == 1 || i == 3) {
+      s.beginDraw(); 
+      s.pushMatrix();
+      s.scale(-1, 1);
+      s.translate(-screenW, 0);
+      displaySquiggle(s);
+      s.popMatrix();
+      s.endDraw();
+    } else {
+      displaySquiggleParticles(s);
+    }
+  }
+}
 void displaySquiggleParticles(PGraphics s) {
   //displayDrip();
   s.beginDraw(); 
@@ -2589,11 +2673,24 @@ void displaySquiggleParticles(PGraphics s) {
   s.endDraw();
 }
 
-void displayDripParticles(PGraphics s) {
-  //displayDrip();
-  s.beginDraw(); 
-  displayDrip(s);
-  s.endDraw();
+void displayDripParticlesAll() {
+  ++fadeFrame;
+  updateDrip();
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw(); 
+    if (i == 1 || i == 3) {
+
+      s.pushMatrix();
+      s.scale(-1, 1);
+      s.translate(-screenW, 0);
+      displayDrip(s);
+      s.popMatrix();
+    } else {
+      displayDrip(s);
+    }
+    s.endDraw();
+  }
 }
 
 void initDrip(PGraphics s) {
@@ -2607,8 +2704,6 @@ void initDrip(PGraphics s) {
 
 
   //background(backgroundColor);
-
-
 
   padding_top = 0;
   padding_side = 0;
@@ -2625,9 +2720,17 @@ void initDrip(PGraphics s) {
   s.endDraw();
 }
 
+void updateDrip() {
+  for (int i = 0; i < nums; i++) {
+    float iterations = map(i, 0, nums, 5, 1);
+    particlesDrip[i].move(screens[0].s, iterations);
+    particlesDrip[i].checkEdge(screens[0].s);
+  }
+}
+
 void displayDrip(PGraphics s) {
 
-  ++fadeFrame;
+
   if (fadeFrame % 5 == 0) {
 
     s.blendMode(SUBTRACT);
@@ -2642,12 +2745,13 @@ void displayDrip(PGraphics s) {
 
   s.blendMode(BLEND);
 
+
   for (int i = 0; i < nums; i++) {
     float iterations = map(i, 0, nums, 5, 1);
     float radius = map(i, 0, nums, 1, 3);
 
     particlesDrip[i].move(s, iterations);
-    particlesDrip[i].checkEdge(s);
+
 
     int alpha = 255;
 
@@ -2667,7 +2771,7 @@ void displayDrip(PGraphics s) {
 }
 
 void initSquiggle(PGraphics s) {
-  nums = 200;
+  nums = 100;
   noiseScale = 800;
   particles_a = new ParticleDrip[nums];
   particles_b = new ParticleDrip[nums];
@@ -2679,6 +2783,17 @@ void initSquiggle(PGraphics s) {
   }
 }
 
+void updateSquiggle() {
+  for (int i = 0; i < nums; i++) {
+    particles_a[i].move();
+    particles_a[i].checkEdge();
+    particles_b[i].move();
+    particles_b[i].checkEdge();
+    particles_c[i].move();
+    particles_c[i].checkEdge();
+  }
+}
+
 void displaySquiggle(PGraphics s) {
   s.noStroke();
   s.smooth();
@@ -2687,19 +2802,13 @@ void displaySquiggle(PGraphics s) {
     float alpha = map(i, 0, nums, 0, 250);
 
     s.fill(69, 33, 124, alpha);
-    particles_a[i].move();
     particles_a[i].display(s, radius);
-    particles_a[i].checkEdge(s);
 
     s.fill(7, 153, 242, alpha);
-    particles_b[i].move();
     particles_b[i].display(s, radius);
-    particles_b[i].checkEdge(s);
 
     s.fill(255, 255, 255, alpha);
-    particles_c[i].move();
     particles_c[i].display(s, radius);
-    particles_c[i].checkEdge(s);
   }
 }
 
@@ -2713,7 +2822,7 @@ class ParticleDrip {
   color color2;
   color c;
   boolean isSquiggle;
-  float speed = 0.4;
+  float speed = 0.06;
 
   ParticleDrip(PGraphics s, boolean isSquiggle) {
     this.isSquiggle = isSquiggle;
@@ -2772,6 +2881,22 @@ class ParticleDrip {
     }
   }
 
+  void checkEdge() {
+    if (!isSquiggle) {
+      if (this.pos.x > screenW - padding_side
+        || this.pos.x < padding_side
+        || this.pos.y > screenH - padding_top
+        || this.pos.y < padding_top) {
+        respawnTop(s);
+      }
+    } else {
+      if (this.pos.x > screenW || this.pos.x < 0 || this.pos.y > screenH || this.pos.y < 0) {
+        this.pos.x = random(50, screenW);
+        this.pos.y = random(50, screenH);
+      }
+    }
+  }
+
   void respawn(PGraphics s) {
     this.pos.x = random(0, s.width);
     this.pos.y = random(0, s.height);
@@ -2800,16 +2925,17 @@ void initSphereBoxRot() {
   sphereBoxRot = new PVector(0, 0, 0);
 }
 void updateSphereBoxCrush() {
-  int index = (currentCycle/2)%4;
+  int index = 0;
+  if (currentCue > 0) index = (currentCycle/2)%4;
   if (index == 0) sphereBoxRot.set(0, percentToNumBeats(2)*PI, 0);
   else if (index == 1) sphereBoxRot.set(0, (1-percentToNumBeats(2))*PI, 0);
   else if (index == 2) sphereBoxRot.set(percentToNumBeats(2)*PI, 0, 0);
   else if (index == 3) sphereBoxRot.set((1-percentToNumBeats(2))*PI, 0, 0);
 }
-void displaySphereBox(PGraphics s) {
+void displaySphereBox(PGraphics s, int z) {
   int SPHERE_RADIUS=s.width/4;
   s.pushMatrix();
-  s.translate(s.width/2, s.height/2, 0);
+  s.translate(s.width/2, s.height/2, z);
   s.rotateX(sphereBoxRot.x);
   s.rotateY(sphereBoxRot.y);
   s.rotateZ(sphereBoxRot.z);
@@ -2822,8 +2948,8 @@ void displaySphereBox(PGraphics s) {
   s.popMatrix();
 }
 
-void displaySphereBoxCrush() {
-  updateSphereBoxCrush();
+void displaySphereBoxCrush(int z) {
+  if (currentCue != 0) updateSphereBoxCrush();
   for (int i = 1; i < 3; i++) {
     PGraphics s = screens[i].s;
     s.beginDraw();
@@ -2832,11 +2958,11 @@ void displaySphereBoxCrush() {
       s.pushMatrix();
       s.scale(-1.0, 1.0);
       s.translate(-screenW, 0, 0);
-      displaySphereBox(s);
+      displaySphereBox(s, z);
       s.popMatrix();
     } else {
       //s.background(pink);
-      displaySphereBox(s);
+      displaySphereBox(s, z);
     }
     s.endDraw();
   }
@@ -3557,6 +3683,16 @@ void drawVertDirtyOutside(float per) {
   }
 }
 
+void drawVertDirtyOutsideSpeed(float speed) {
+  for (int i = 0; i < 4; i+= 3) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    drawVertLinesScreen(s, 8, 50, cyan, pink, percentToNumBeats(8), speed);
+    s.endDraw();
+  }
+}
+
 void drawVertDirtySineOutside(float per) {
   for (int i = 0; i < 4; i+= 3) {
     PGraphics s = screens[i].s;
@@ -3586,7 +3722,7 @@ void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color 
   s.noStroke();
   int extra = (lw + 2*lsp);
   for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
-    
+
     float x = 0;
     if (direction > 0) x = map(per, 0, 1, -extra, s.width);
     else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
@@ -3597,6 +3733,22 @@ void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color 
   }
 }
 
+void drawVertLinesScreen(PGraphics s, int lw, int lsp, color c1, color c2, float per, float speed) {
+  s.noStroke();
+  int extra = (lw + 2*lsp);
+  for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
+
+    float x = 0;
+    if (speed > 0) x = map(per, 0, 1, -extra, s.width);
+    else if (speed < 0) x = map(1-per, 0, 1, -extra, s.width);
+    x *= abs(speed)  * 2;
+    x += i;
+
+    if (x >= s.width) x -= (extra + s.width);
+    s.fill(lerpColor(c1, c2, x/s.width));
+    s.rect(x, 0, lw, s.height);
+  }
+}
 void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int direction) {
   drawVertLinesGradientScreen(s, lw, lsp, per, c, c, direction);
 }
@@ -3713,4 +3865,61 @@ color getColorOnBeat(color c1, color c2, color c3) {
 
 color getColorOnBeat(color [] colors) {
   return colors[currentCycle % colors.length];
+}
+
+boolean thunder = false;
+boolean thundering = false;
+int lastThundering = 0;
+int lastThunder = 0;
+int thunderNum = 0;
+float ranTime = 0;
+int tTime = 20;
+
+void setThunder() {
+  if (!thundering) {
+    if (millis() - lastThundering > 1000 + ranTime) {
+      thundering = true;
+      lastThundering = millis();
+    }
+  } else if (thundering) {
+    if (!thunder) {
+      if (thunderNum == 0) {
+        thunder = true;
+        lastThunder = millis();
+        thunderNum++;
+        tTime += 50;
+      } else if (millis() - lastThunder > 50) {
+        thunder = true;
+        lastThunder = millis();
+      }
+    } else if (thunder) {
+      if (millis() - lastThunder > tTime) {
+        lastThunder = millis();
+        thunder = false;
+        thunderNum++;
+        if (thunderNum == 5) {
+          thundering = false;
+          thunderNum = 0;
+          tTime = 20;
+          lastThundering = millis();
+          ranTime = random(500);
+        }
+      }
+    }
+  }
+}
+
+boolean lightning = false;
+int lightningColor = 255;
+int lightningTime = 0;
+void setLightning() {
+  if (lightning) {
+    if (millis() - lightningTime > 100) lightning = false;
+  } else {
+    if (int(random(10)) == 0) {
+      lightning = true;
+      lightningTime = millis();
+      lightningColor = int(random(50, 200));
+    }
+  }
 }

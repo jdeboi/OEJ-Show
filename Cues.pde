@@ -316,30 +316,36 @@ void treeRun(int addonGif) {
 
 void initCrush() {
   //initVid("scenes/crush/movies/crush.mp4");
-  cues = new Cue[13];
+  cues = new Cue[18];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(17, 'v', 0.0, 0);  // X
-  cues[2] = new Cue(18.3, 'v', 0.0, 0);
-  cues[3] = new Cue(19.6, 'v', 0.0, 0);    // X
-  cues[4] = new Cue(28.2, 'g', 0.0, 0);   // chords slow
-  //cues[4] = new Cue(38, 'g', 0.0, 0);    // chords slow
-  cues[5] = new Cue(47.5, 'g', 0.0, 2);  // guitar
-  cues[6] = new Cue(56.7, 'g', 0.0, 2);    // guitar
-  cues[7] = new Cue(66, 'g', 20.0, 4);    // X
+  cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
+  cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
+  cues[3] = new Cue(27.2, 'v', 0.0, 0);
+  cues[4] = new Cue(28.4, 'g', 0.0, 0);
+  cues[5] = new Cue(37.6, 'g', 0.0, 0);    
+
+  cues[6] = new Cue(56.47, 'g', 0.0, 2);  // alternate cubes?
+  cues[7] = new Cue(61.2+4.7, 'g', 0.0, 2);    // alternate cubes?
+  cues[8] = new Cue(70.6+4.7, 'v', 20.0, 4);    // X
   //cues[6] = new Cue('v', 0, 75);   // X
-  cues[8] = new Cue(85, 'g', 0.0, 3);   // xylophone
-  cues[9] = new Cue(94, 'g', 0.0, 5);
-  cues[10] = new Cue(103.8, 'g', 0.0, 6);
-  cues[11] = new Cue(113.2, 'v', 0.0, 0);
-  cues[12] = new Cue(115, 'v', 0.0, 0);
+  cues[9] = new Cue(80+4.7, 'g', 0.0, 3);   // xylophone
+  cues[10] = new Cue(98.8+4.7, 'g', 0.0, 5);
+  cues[11] = new Cue(105.9, 'g', 0.0, 6);
+  cues[12] = new Cue(124.7, 'g', 0.0, 2);
+  cues[13] = new Cue(143.6, 'g', 0.0, 4);
+  cues[14] = new Cue(157.6+4.7, 'v', 0.0, 0);
+  cues[15] = new Cue(2*60 + 56.6+4.7, 'g', 0.0, 1);
+  cues[16] = new Cue(3*60 + 15.3+4.7, 'v', 0.0, 0);
+  cues[17] = new Cue(3*60 + 24+4.7, 'v', 0.0, 0);
 
   initSphereBoxRot();
 
   // initTerrainCenter();
-  //resetAudioAmp();
+  resetAudioAmp();
   //sphereImg = loadImage("images/sphere/1.jpg");
   //centerScreen = new Screen(screenW*2, screenH, -2);
   //centerScreenFrontInner();
+  initTerrain();
 }
 
 void deconstructCrush() {
@@ -353,48 +359,55 @@ void resetRedPlanet() {
   }
 }
 
+
 void displayCrush() {
-
-  //displayDivisionOfIntensity2Screens(percentToNumBeats(8), 0, 0);
-  //  fadeOutCubes(cues[currentCue + 1].startT - 2, 2);
-  //cycleAudioAmp(percentToNumBeats(4));
-  //setGridTerrain(0, 0.01);
-  //displayTerrainCenter();
+  int zCrush = 0;
   //cycleShapeFFTTop();
-
-  if (!personOnPlatform) displayRedPlanetSphere();
-  else {
+  if (!personOnPlatform) {
+    displayRedPlanetSphere();
+    zCrush = 0;
+  } else {
     drawEye();
-    drawWaveHands();
+   
+    zCrush = getZCrushHand();
   }
 
   switch(currentCue) {
   case 0:
-
-    displayLinesInnerFaces(white);
-    drawSolidOuter(0);
-    displaySphereBoxCrush();
-
-
-    fadeInCubes(cues[currentCue].startT, 4);
+    drawSolidAllCubes(0);
     break;
-  case 1:
-    drawSolidAll(black);
+  case 1: // spherebox
+    displayLinesInnerFaces(white);
+    displaySphereBoxCrush(zCrush);
+    fadeInCubes(cues[currentCue].startT, 2);
+    renderCubes = true;
+    break;
+  case 2: // cube right
+    renderCubes = false;
+    drawSphereCrush(maskPoints[keystoneNum][3].x+150, 750, zCrush);
+
+    drawSolidAllCubes(black);
     displayAllFaceLinesColor(0, 0, white, color(150));
     break;
-  case 2:
+  case 3: // cube left
+    renderCubes = false;
+    drawSphereCrush(maskPoints[keystoneNum][1].x-150, 750, zCrush);
+    drawSolidAllCubes(black);
     displayAllFaceLinesColor(white, color(150), 0, 0);
-    drawSolidAll(black);
     break;
-  case 3: // oscillate
+  case 4: // oscillate outside, inside harom
+    renderCubes = true;
     if (((currentCycle-1)/8)%2 == 0) {
       displayLinesOutsideFaces(color(255), color(255));
       drawSolidInner(0);
       for (int i = 0; i < screens.length; i+=3) {
         PGraphics s = screens[i].s;
         s.beginDraw();
+        s.pushMatrix();
+        s.translate(0, 0, zCrush);
         s.background(0);
         haromS(s, white, 3);
+        s.popMatrix();
         s.endDraw();
       }
     } else {
@@ -404,47 +417,86 @@ void displayCrush() {
         PGraphics s = screens[i].s;
         s.beginDraw();
         s.background(0);
+        s.pushMatrix();
+        s.translate(0, 0, zCrush);
         haromS(s, white, 3);
+        s.popMatrix();
         s.endDraw();
       }
     }
     break;
 
-  case 4: // all chill
-
-    for (int i = 0; i < 4; i++) {
-      PGraphics s = screens[i].s;
-      s.beginDraw();
-      s.blendMode(BLEND);
-      //s.background(color(180, 0, 80));
-      s.image(currentGifs.get(currentGif), 0, 0, screenW, screenW);
-      //s.filter(THRESHOLD, .01);
-      s.filter(GRAY);
-      //s.blendMode(BLEND);
-      s.endDraw();
-    }
-    //drawGifAll(currentGifs.get(0), 0, 0, screenW, screenH);
+  case 5: // all chill
+    drawGifAllCrush(zCrush);
     break;
-  case 5: // inner
+  case 6: // inner
     displayLinesInnerFaces(white);
     drawSolidOuter(0);
 
-    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0);
+    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0, zCrush);
     break;
-  case 6:// puter
+  case 7:// puter
     displayLinesOutsideFaces(color(255), color(255));
     drawSolidInner(0);
-    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0);
+    displayDivisionOfIntensityOuter(percentToNumBeats(8), 0, 0, zCrush);
     break;
-  case 7:
+  case 8:
+    drawSolidAllCubes(color(0));
+    if ((currentCycle -1)/8%2 == 0) {
+      displayAllFaceLinesColor(white, color(150), 0, 0);
+      displayDivisionOfIntensity(screens[0].s, percentToNumBeats(8), 0, 0, zCrush);
+      displayDivisionOfIntensity(screens[1].s, percentToNumBeats(8), 0, 0, zCrush);
+    } else {
+      displayAllFaceLinesColor(0, 0, white, color(150));
+      displayDivisionOfIntensity(screens[2].s, percentToNumBeats(8), 0, 0, zCrush);
+      displayDivisionOfIntensity(screens[3].s, percentToNumBeats(8), 0, 0, zCrush);
+    }
+    break;
+  case 9:
+    drawGifAllCrush(zCrush);
+    break;
+  case 10: 
+    drawGifAllCrush(zCrush);
+    break;
+  case 11: // spiral in groups of 2
+
+    drawSolidAllCubes(color(0));
+    int index = ((currentCycle -1)/4)%2;
+    if (index == 0) displayAllFaceLinesColor(white, 0, white, 0);
+    else displayAllFaceLinesColor(0, color(250), 0, color(150));
+    for (int i = 0; i < 2; i++) {
+      PGraphics s = screens[i*2 + index].s;
+      s.beginDraw();
+      s.blendMode(BLEND);
+      s.pushMatrix();
+      s.translate(0, 0, zCrush);
+      s.background(0);
+      s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+      s.popMatrix();
+      s.endDraw();
+    }
+    break;
+  case 12: // 
+    drawGifAllCrush(zCrush);
+    break;
+  case 13: // 
     display4FaceLines(white, 1);
     display4FaceLines(white, 2);
     drawSolidOuter(0);
-
-
+    currentGifDrawInner(zCrush);
+    break;
+  case 14:
+    //cycleAudioAmp(percentToNumBeats(4));
+    displayTerrainAllCrush();
+    break;
+  case 15: // draw the threshold
+    displayLinesInnerFaces(white);
     for (int i = 1; i < 3; i++) {
       PGraphics s = screens[i].s;
       s.beginDraw();
+      s.background(0);
+      s.pushMatrix();
+      s.translate(0, 0, zCrush);
       s.blendMode(BLEND);
       //s.background(color(180, 0, 80));
       if (i == 1) {
@@ -454,19 +506,15 @@ void displayCrush() {
         s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
         s.popMatrix();
       } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
-      //s.filter(THRESHOLD);
-      //s.blendMode(BLEND);
+      s.filter(THRESHOLD, .2);
+      s.blendMode(BLEND);
+      s.popMatrix();
       s.endDraw();
     }
     break;
-  case 8:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
-    break;
-  case 9:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
-    break;
-  case 10:
-    drawGifAll(currentGifs.get(currentGif), 0, 0, screenW, screenH);
+  case 16:
+    displaySphereBoxCrush(zCrush);
+    fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
     break;
   default:
     displayLines(color(0));
@@ -475,6 +523,55 @@ void displayCrush() {
   }
 }
 
+void drawGifAllCrush(float z) {
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.blendMode(BLEND);
+    s.background(0);
+    //s.fill(0, 10);
+    //s.noStroke();
+    //s.rect(0, 0, screenW, screenH);
+    s.pushMatrix();
+    s.translate(0, 0, z);
+    s.image(currentGifs.get(currentGif), 0, 0, screenW, screenW);
+    //s.filter(THRESHOLD, .01);
+    s.filter(GRAY);
+    s.popMatrix();
+    s.endDraw();
+  }
+}
+
+void currentGifDrawInner(float z) {
+  for (int i = 1; i < 3; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.pushMatrix();
+    s.translate(0, 0, z);
+    s.blendMode(BLEND);
+    s.background(0);
+    if (i == 1) {
+      s.pushMatrix();
+      s.scale(-1.0, 1.0);
+
+      s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+      s.popMatrix();
+    } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+    s.popMatrix();
+    s.endDraw();
+  }
+}
+void drawSphereCrush(int x, int y, int z) {
+  pushMatrix();
+  translate(x, y, -250 + z);
+  rotateY(millis()/900.0);
+  noFill();
+  stroke(255);
+  strokeWeight(1);
+  //translate(x, y, -250);
+  sphere(150);
+  popMatrix();
+}
 void displayIntenseSphereCrush() {
   //for (int i = 1; i < 3; i++) {
   //  PGraphics s = screens[i].s;
@@ -498,24 +595,21 @@ void initDelta() {
   //initVid("scenes/wizrock/movies/1_540.mp4");
 
   cues = new Cue[15];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(7.5, 'v', 0.0, 0); // bass beat
-  cues[2] = new Cue(14.9, 'v', 0.0, 0); //xylophone
-  //cues[3] = new Cue(29, 'v', 0.0, 0); // kinda2
-  cues[3] = new Cue(36, 'v', 0.0, 0); // derrr neener derrr
-  cues[4] = new Cue(51, 'v', 0.0, 0); // "help meee coffee", big base beat
-  cues[5] = new Cue(72.2, 'v', 0.0, 0);  // wooo
-  cues[6] = new Cue(101.5, 'v', 0.0, 0);  // "delta waves"
-  cues[7] = new Cue(115, 'v', 0.0, 0);
-  cues[8] = new Cue(135.5, 'v', 0.0, 0);
-  cues[9] = new Cue(137.6, 'v', 0.0, 0);// woo
-  cues[10] = new Cue(152, 'v', 0.0, 0);
-  cues[11] = new Cue(166, 'v', 0.0, 0);
-  cues[12] = new Cue(181, 'v', 0.0, 0);
-  cues[13] = new Cue(191.7, 'v', 0.0, 0);
-  cues[14] = new Cue(202, 'v', 0.0, 0);
-
-
+  cues[0] = new Cue(3.89, 'v', 0, 0);
+  cues[1] = new Cue(11.29, 'v', 0, 0);
+  cues[2] = new Cue(25.39, 'v', 0, 0);
+  cues[3] = new Cue(32.39, 'v', 0, 0);
+  cues[4] = new Cue(47.39, 'v', 0, 0);
+  cues[5] = new Cue(68.59, 'v', 0, 0);
+  cues[6] = new Cue(97.89, 'v', 0, 0);
+  cues[7] = new Cue(111.39, 'v', 0, 0);
+  cues[8] = new Cue(131.89, 'v', 0, 0);
+  cues[9] = new Cue(133.99, 'v', 0, 0);
+  cues[10] = new Cue(148.39, 'v', 0, 0);
+  cues[11] = new Cue(162.39, 'v', 0, 0);
+  cues[12] = new Cue(177.39, 'v', 0, 0);
+  cues[13] = new Cue(188.09, 'v', 0, 0);
+  cues[14] = new Cue(198.39, 'v', 0, 0);
   cubesFront();
 
   initHands();
@@ -901,25 +995,49 @@ void nodesWhale() {
 
 
 void initMoon() {
-  cues = new Cue[18];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(58.7, 'v', 0.0, 0); 
-  cues[3] = new Cue(82, 'v', 0.0, 0); 
-  cues[4] = new Cue(89, 'v', 0.0, 0); 
-  cues[5] = new Cue(94, 'v', 0.0, 0); 
-  cues[6] = new Cue(108, 'v', 0.0, 0); 
-  cues[7] = new Cue(114, 'v', 0.0, 0); 
-  cues[8] = new Cue(118.9, 'v', 0.0, 0); 
-  cues[9] =  new Cue(142.9, 'v', 0.0, 0); // big boom
-  cues[10] =  new Cue(166.5, 'v', 0.0, 0); // calm
-  cues[11] =  new Cue(184.8, 'v', 0.0, 0);
-  cues[12] =  new Cue(202.8, 'v', 0.0, 0);
-  cues[13] =  new Cue(214.9, 'v', 0.0, 0);
-  cues[14] =  new Cue(226.9, 'v', 0.0, 0);
-  cues[15] =  new Cue(230, 'v', 0.0, 0); 
-  cues[16] =  new Cue(238, 'v', 0.0, 0); 
-  cues[17] =  new Cue(243.0, 'v', 0.0, 0); // end
+
+  if (backingTracks) {
+    cues = new Cue[19];
+    cues[0] = new Cue(6, 'v', 0, 0);
+    cues[1] = new Cue(11, 'v', 0, 0);
+    cues[2] = new Cue(64.7, 'v', 0, 0);
+    cues[3] = new Cue(88, 'v', 0, 0);
+    cues[4] = new Cue(95, 'v', 0, 0);
+    cues[5] = new Cue(100, 'v', 0, 0);
+    cues[6] = new Cue(114, 'v', 0, 0);
+    cues[7] = new Cue(120, 'v', 0, 0);
+    cues[8] = new Cue(124.9, 'v', 0, 0);
+    cues[9] = new Cue(148.9, 'v', 0, 0);
+    cues[10] = new Cue(172.5, 'v', 0, 0);
+    cues[11] = new Cue(190.8, 'v', 0, 0);
+    cues[12] = new Cue(208.8, 'v', 0, 0);
+    cues[13] = new Cue(220.9, 'v', 0, 0);
+    cues[14] = new Cue(232.9, 'v', 0, 0);
+    cues[15] =  new Cue(256.8, 'v', 0.0, 0); 
+    cues[16] =  new Cue(270, 'v', 0.0, 0); 
+    cues[17] =  new Cue(280.9, 'v', 0.0, 0); 
+    cues[18] =  new Cue(290.9, 'v', 0.0, 0);// end
+  } else {
+    cues = new Cue[18];
+    //cues[0] = new Cue(0, 'v', 0, 0);
+    //cues[1] = new Cue(5, 'v', 0.0, 0);
+    //cues[2] = new Cue(58.7, 'v', 0.0, 0); 
+    //cues[3] = new Cue(82.5, 'v', 0.0, 0); 
+    //cues[4] = new Cue(88.8, 'v', 0.0, 0); 
+    //cues[5] = new Cue(94.8, 'v', 0.0, 0); 
+    //cues[6] = new Cue(108, 'v', 0.0, 0); 
+    //cues[7] = new Cue(114, 'v', 0.0, 0); 
+    //cues[8] = new Cue(118.9, 'v', 0.0, 0); 
+    //cues[9] =  new Cue(142.9, 'v', 0.0, 0); // big boom
+    //cues[10] =  new Cue(166.5, 'v', 0.0, 0); // calm
+    //cues[11] =  new Cue(184.8, 'v', 0.0, 0);
+    //cues[12] =  new Cue(202.8, 'v', 0.0, 0);
+    //cues[13] =  new Cue(214.9, 'v', 0.0, 0);
+    //cues[14] = new Cue(232.9, 'v', 0, 0);
+    //cues[15] =  new Cue(230, 'v', 0.0, 0); 
+    //cues[16] =  new Cue(238, 'v', 0.0, 0); 
+    //cues[17] =  new Cue(243.0, 'v', 0.0, 0); // end
+  }
 
   initStarSpace();
   drawSolidAll(color(0));
@@ -949,17 +1067,17 @@ void displayMoon() {
   case 0:    
     displayMoveSpaceAll(STATIC_STARS, 0.75);
 
-    pulsing(0, 1);
+    pulsing(color(255, 0, 0), percentToNumBeats(8));
     break;
   case 1: 
     displayMoveSpaceAll(STATIC_STARS, 0.86);
 
-    pulsing(0, 1);
+    pulsing(color(255, 0, 0), percentToNumBeats(8));
     break;
   case 2:
     displayMoveSpaceAll(DIVERGE_HORIZ_LINE, 0.86);
 
-    pulsing(0, 1);
+    pulsing(color(255, 0, 0), percentToNumBeats(8));
     break;
   case 3: 
     displayMoveSpaceAll(DIAG_EXIT_VERT, 0.66);
@@ -995,6 +1113,7 @@ void displayMoon() {
     displayMoveSpaceAll(LIGHT_SPEED, 1);
 
     displayRandomLines(color(255, 0, 0));
+    setLightning();
 
     break;
   case 10:
@@ -1021,21 +1140,33 @@ void displayMoon() {
     resetFade(); 
     break;
   case 14:
-    displayMoveSpaceAll(CONVERGE_HORIZ_LINE, 0.8);
 
+    displayMoveSpaceAll(LIGHT_SPEED, 1);
+
+    displayRandomLines(color(255, 0, 0));
+    setLightning();
+    break;
+  case 15:
+    displayMoveSpaceAll(DIAG_EXIT_HORIZ, .9);
     displayLines(color(255, 0, 0));
+    break;
+
+  case 16: // fade out lines
+    displayMoveSpaceAll(DIVERGE_VERT_LINE, .9);
+    displayLines(color(255, 0, 0));
+    startFadeLine = false;
     resetFade(); 
     break;
-  case 15: // fade out end
-    displayMoveSpaceAll(CONVERGE_CENTER, 0.75); 
+  case 17:
+    displayMoveSpaceAll(CONVERGE_CENTER, 0.66);
     fadeOutAllScreens(cues[currentCue].startT, 8);
 
     displayLines(color(255, 0, 0));
-    startFadeLine = false;
-    break;
-  case 16: // fade out lines
-    drawSolidAll(color(0));
     fadeOutAllLines(3, color(255, 0, 0));
+    break;
+  case 18: // fade out end
+    displayLines(color(0));
+    drawSolidAll(color(0));
     break;
   default:
     displayLines(color(0));
@@ -1122,18 +1253,27 @@ void displayCycles() {
 }
 
 void initDirty() {
-  cues = new Cue[10];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(11.4, 'v', 0.0, 0); // tic toc begins
-  cues[2] = new Cue(33.4, 'v', 0.0, 0); // tic toc repeat
-  cues[3] = new Cue(55, 'v', 0.0, 0); // down chords
-  cues[4] = new Cue(77, 'v', 0.0, 0);  // tic toc
-  cues[5] = new Cue(99, 'v', 0.0, 0);  // down chords
-  cues[6] = new Cue(121, 'v', 0.0, 0);  // guitar
-  cues[7] = new Cue(143.5, 'v', 0.0, 0);  // tic toc
-  cues[8] = new Cue(165.5, 'v', 0.0, 0);  // down chords
-  //cues[9] = new Cue(178, 'v', 0.0, 0);  // fade out
-  cues[9] = new Cue(184, 'v', 0.0, 0);  // end
+  cues = new Cue[17];
+
+  //cues[2] = new Cue(22.07, 'v', 0, 0);
+  //cues[4] = new Cue(60.69, 'v', 0, 0);
+  cues[0] = new Cue(5.52, 'v', 0, 0);
+  cues[1] = new Cue(11.03, 'v', 0, 0);
+  cues[2] = new Cue(38.62, 'v', 0, 0);
+  cues[3] = new Cue(49.66, 'v', 0, 0);
+  cues[4] = new Cue(71.72, 'v', 0, 0);
+  cues[5] = new Cue(82.76, 'v', 0, 0);
+  cues[6] = new Cue(104.83, 'v', 0, 0);
+  cues[7] = new Cue(115.86, 'v', 0, 0);
+  cues[8] = new Cue(137.93, 'v', 0, 0);
+  cues[9] = new Cue(154.48, 'v', 0, 0);
+  cues[10] = new Cue(165.52, 'v', 0, 0);
+  cues[11] = new Cue(176.55, 'v', 0, 0);
+  cues[12] = new Cue(187.59, 'v', 0, 0);
+  cues[13] = new Cue(198.62, 'v', 0, 0);
+  cues[14] = new Cue(209.66, 'v', 0, 0);
+  cues[15] = new Cue(217.93, 'v', 0, 0);
+  cues[16] = new Cue(220, 'v', 0, 0);
 
   centerScreen = new Screen(screenW*2, screenH, -2);
   temp = createGraphics(screenW, screenH, P3D);
@@ -1152,101 +1292,124 @@ void deconstructDirty() {
 
 void displayDirty() {
 
-  if (!personOnPlatform) paradiseSphere(50, pink, blue, cyan); //displayStripedMoon(20);
-  else drawEye();
+  if (!personOnPlatform) {
+    if (currentCue > 0) paradiseSphere(50, pink, blue, cyan); //displayStripedMoon(20);
+  } else drawEye();
 
   colorMode(RGB, 255);
-  switch(currentCue) {   
+  switch(currentCue) { 
   case 0:
-    displayLines(pink);
-
-    cubesFront();
-    cyclingRects = true;
-    displaySpaceRects(5, -1, pink, blue, cyan); 
-    fadeInAllScreens(cues[0].startT, 3);
-    break;  
-  case 1:
-    displayLines(pink);
-    cubesFront();
-    cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
-
-    displaySpaceRects(5, -1, pink, blue, cyan); 
-
-    drawVertDirtyOutside(percentToNumBeats(16));
-
-    hasResetRects = false;
+    fadeInAllLines(2, pink);
     break;
+
+  case 1:
+    glory();
+    fadeInAllScreens(cues[currentCue].startT, 3);
+    break;  
   case 2:
-    displayLinesCenterFocus(pink);
-    cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
-    centerScreenFrontInner();
-
-    displayTwoWayTunnels(percentToNumBeats(16));
-    drawVertDirtySineOutside(percentToNumBeats(16));
-
-    fadeInCenter(cues[currentCue].startT, 2);
+    fullGlory(-1);
+    fadeInTopScreens(cues[currentCue].startT, 1.5);
+    fadeInOutsideScreens(cues[currentCue].startT, 1.5);
     break;
   case 3:
-    displayLines(pink);
-    centerScreenFrontInner();
-
-    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
-    hasResetRects = false;
-    resetSpaceRects(false);
+    accordian();
     break;
-  case 4: 
-    displayLines(pink);
-    cubesFront();
-    cyclingRects = true;
-    displaySpaceRects(5, 1, pink, blue, cyan);
-
+  case 4:
+    quietTime();
     break;
-  case 5:
-    displayLinesCenterFocus(pink);
-    resetSpaceRects(false);
-    centerScreenFrontInner();
-
-    displayCenterSpaceRects(5, -1, blue, cyan, pink);
+  case 5: 
+    fullGlory(-1);
+    fadeInTopScreens(cues[currentCue].startT, 1.5);
     break;
   case 6:
-    displayLines(pink);
-    cubesFront();
-    displaySpaceRects(5, -1, pink, blue, cyan); 
-    hasResetRects = false;
+    fullGlory(0);
     break;
   case 7:
-    displayLines(pink);
-    centerScreenFrontInner();
-
-    displayLineBounceCenter(0.01, 50, cyan, pink, 5);
-    hasResetRects = false;
-    resetSpaceRects(false);
-
-    fadeOutCenter(cues[currentCue+1].startT - .5, .5);
+    accordian();
+    fadeInCenter(cues[currentCue].startT, 2);
     break;
   case 8:
-    displayLinesCenterFocus(pink);
+    quietTime();
 
-    cubesFront();
-    displaySpaceRects(5, 0, pink, blue, cyan);
-    //centerScreenFrontInner();
-    //displayTwoWayTunnels();
-    //fadeInCenter(cues[currentCue].startT, 2);
-    //  break;
-    //case 9: // tee tahh
-    //  displayLines(pink);
-    //  cubesFront();
-    //  displaySpaceRects(5, 1, pink, blue, cyan);
-
-    fadeOutAllScreens(cues[currentCue + 1].startT - 4, 4);
-    fadeOutAllLines(4, pink);
     break;
-
+  case 9:
+    fullGlory(-1);
+    fadeInOutsideScreens(cues[currentCue].startT, 1.5);
+    break;
+  case 10:
+    fullGlory(-1);
+    break;
+  case 11:
+    centerGlory();
+    break;
+  case 12:
+    centerGlory();
+    break;
+  case 13:
+    accordian();
+    break;
+  case 14:
+    accordian();
+    fadeOutAllScreens(cues[currentCue + 1].startT - 4, 4);
+    break;
+  case 15:
+    drawSolidAll(color(0));
+    fadeOutLinesCenterFocus(2, pink);
+    break;
   default:     
     displayLines(color(0));
     drawSolidAll(color(0));
     break;
   }
+}
+
+void centerGlory() {
+  displayLinesCenterFocus(pink);
+  resetSpaceRects(false);
+  centerScreenFrontInner();
+  displayCenterSpaceRects(5, -1, blue, cyan, pink);
+  cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+
+  platformSides();
+}
+
+void platformSides() {
+  if (!personOnPlatform) drawVertDirtyOutside(percentToNumBeats(16));
+  else drawVertDirtyOutsideHand();
+}
+
+void glory() {
+  displayLines(pink);
+  cubesFront();
+  cyclingRects = true;
+  displaySpaceRects(5, -1, pink, blue, cyan, false);
+}
+
+void accordian() {
+  displayLinesCenterFocus(pink);
+  cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+  centerScreenFrontInner();
+  displayTwoWayTunnels(percentToNumBeats(16));
+
+  platformSides();
+}
+
+void fullGlory(int mode) {
+  displayLines(pink);
+  cubesFront();
+  cycleShapeFFTTop(getColorOnBeat(pink, blue, cyan));
+  displaySpaceRects(5, mode, pink, blue, cyan, false); 
+
+  platformSides();
+}
+
+void quietTime() {
+  displayLinesCenterFocus(pink);
+  centerScreenFrontInner();
+  displayLineBounceCenter(0.01, 50, cyan, pink, 5);
+  drawSolidTop(color(0));
+
+  if (personOnPlatform) drawVertDirtyOutsideHand();
 }
 
 //void initFifty() {
@@ -1555,11 +1718,11 @@ void displayEllon() {
   centerScreenFrontAll();
   switch(currentCue) {
   case 0:
-    centerScreen.drawImage(currentImages.get(0), 0, 0);
+    drawDave();
     fadeInAllScreens(cues[currentCue].startT, 4);
     break;
   case 1:
-    centerScreen.drawImage(currentImages.get(0), 0, 0);
+    drawDave();
     fadeOutAllScreens(cues[currentCue].startT, 3);
     break;
   default:
@@ -1567,6 +1730,27 @@ void displayEllon() {
     drawSolidAll(color(0));
     break;
   }
+}
+
+void drawDave() {
+  PImage p =  currentImages.get(0);
+  PGraphics s = centerScreen.s;
+  s.beginDraw();
+  s.background(0);
+  float factor = 0.9;
+  int imgw = p.width;
+  int imgh = p.height;
+  if (imgw > imgh) {
+    int h = int(1.0*s.width/imgw*imgh);
+    int y = (s.height - h)/2;
+    s.image(p, 0, y, s.width*factor, h*factor);
+  } else {
+    int w = int(1.0* s.height/imgh*imgw);
+    int x = (s.width - w)/2;
+    s.image(p, x, 0, w*factor, s.height*factor);
+  }
+
+  s.endDraw();
 }
 
 void initEgrets() {
@@ -1666,28 +1850,40 @@ void displayEgrets() {
 }
 
 void initIntro() {
-  println("why");
   cues = new Cue[3];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(2, 'v', 0.0, 0);
-  cues[2] = new Cue(240, 'v', 0.0, 0);
+  cues[0] = new Cue(4, 'v', 0, 0);
+  cues[1] = new Cue(60*4+20-4, 'v', 0.0, 0);
+  cues[2] = new Cue(60*4+20, 'v', 0.0, 0);
+
+  //initSquiggle(screens[0].s);
+  initDrip(screens[0].s);
 }
+
 void deconstructIntro() {
+  particles_a = null;
+  particles_b = null;
+  particles_c = null;
 }
 
 void displayIntro() {
-  if (!personOnPlatform) sphereScreen.blackOut();
-  else drawEye();
+  //if (!personOnPlatform) sphereScreen.blackOut();
+  //else drawEye();
 
-  switch(currentCue) {
-  case 0:    
-    pulsing(0, 1);
-    break;
-  default:
-    displayLines(color(0));
-    drawSolidAll(color(0));
-    break;
-  }
+  //switch(currentCue) {
+  //case 0:    
+  //  //displaySquiggleParticlesAll();
+  //  displayDripParticlesAll();
+  //  pulsing( color(255), percentToNumBeats(16));
+  //  break;
+  //case 1:
+  //  //displaySquiggleParticlesAll();
+  //  displayDripParticlesAll();
+  //  break;
+  //default:
+  displayLines(color(0));
+  drawSolidAll(color(0));
+  //  break;
+  //}
 }
 
 //////////////////////////////////////////////////////////////////////////////////

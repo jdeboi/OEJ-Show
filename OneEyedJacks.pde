@@ -68,7 +68,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
   
-  changeScene(DIRTY);
+  changeScene(CRUSH);
 }
 
 void draw() {
@@ -89,6 +89,14 @@ void draw() {
   checkClickTrack();
 
   drawControls();
+  
+  pushMatrix();
+  translate(0, 0, 3);
+  if (lightning) {
+    fill(lightningColor);
+    rect(0, 0, width, height);
+  }
+  popMatrix();
 }
 
 void playShow() {
@@ -104,7 +112,7 @@ void playShow() {
 void keyPressed() {
 
   if (key == 'c') controlsON = !controlsON;
-  else if (key == 'p') personOnPlatform = !personOnPlatform;
+  else if (key == 'p') changePlatform();
 
   if (bracketDown) {
     if (key == '0') changeScene(9);
