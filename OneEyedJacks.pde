@@ -12,7 +12,6 @@ int EGRETS = 13;
 int LOLLIES = 12;
 int CRUSH = 3;
 int RITE = 11;
-int ELO = 14;
 int SONG = 9;
 int LARGE_CENTER = 0;
 //////////
@@ -68,7 +67,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
   
-  changeScene(CRUSH);
+  changeScene(DELTA);
 }
 
 void draw() {
@@ -96,6 +95,14 @@ void draw() {
     fill(lightningColor);
     rect(0, 0, width, height);
   }
+  popMatrix();
+  
+  textSize(50);
+  noStroke();
+  fill(255);
+   pushMatrix();
+  translate(0, 0, 3);
+  text(frameRate, 50, 50);
   popMatrix();
 }
 
@@ -135,6 +142,7 @@ void keyPressed() {
   } else if (key == '/') {
     slashDown = true;
   }
+  
 }
 
 void keyReleased() {

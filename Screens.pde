@@ -10,12 +10,12 @@ import deadpixel.keystone.*;  // to modify keystone lib and then make a jar file
 
 // conclusion: max video resolution can be is 1280x720
 // reducing some, like to 920x540, will save some processing
-int screenW = 400;
-int screenH = 400;
+int screenW = 600;
+int screenH = 600;
 
 int sphereW = 400;
-int topScreenW = 350;
-int topScreenH = 200;
+int topScreenW = 600;
+int topScreenH = 500;
 //////
 Keystone ks;
 Keystone ksC;
@@ -316,7 +316,7 @@ void renderScreens() {
   if (renderCubes) {
     for (int i = 0; i < numScreens; i++) {
       pushMatrix();
-      translate(0, 0, screens[i].zIndex);
+      if (!mappingON) translate(0, 0, screens[i].zIndex);
       surfaces[i].render(screens[i].s);
       popMatrix();
     }
@@ -324,14 +324,14 @@ void renderScreens() {
 
   if (centerScreen != null) {
     pushMatrix();
-    translate(0, 0, centerScreen.zIndex);
+    if (!mappingON) translate(0, 0, centerScreen.zIndex);
     centerSurface.render(centerScreen.s);
     popMatrix();
   }
 
   // screens above mask
   pushMatrix();
-  translate(0, 0, topScreens[0].zIndex);
+  if (!mappingON) translate(0, 0, topScreens[0].zIndex);
   for (int i = 0; i < 2; i++) {
     topSurfaces[i].render(topScreens[i].s);
   }

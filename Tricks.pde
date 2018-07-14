@@ -8,7 +8,9 @@ void changePlatform() {
   sphereScreen.drawSolid(0);
 }
 
-
+float getRotHandsDelta() {
+  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/6, PI/6),  -PI/6, PI/6);
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // CRUSH Z
@@ -375,13 +377,14 @@ void drawSymbolsLeftRightSmoothImageHand(PGraphics s, int screenNum, int w) {
   }
 }
 
-
+//////////////////// the big constellations
 void moveConstellationLinesHand() {
   float per = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
   for (int i = 0; i < constellationLines.length; i++) {
     constellationLines[i].move(per*7);
   }
 }
+
 
 void drawConstellationLinesHand() {
   moveConstellationLinesHand();
@@ -391,6 +394,14 @@ void drawConstellationLinesHand() {
     s.background(0);
     drawConstellationLines(s, i);
     s.endDraw();
+  }
+}
+
+///////////////// network, baby constellations
+void updateNodeConstellationHand() {
+  float per = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveHand(per);
   }
 }
 

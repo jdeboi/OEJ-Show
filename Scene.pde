@@ -165,6 +165,8 @@ class Scene {
         println("next");
         nextSong();
       }
+      
+      previousCue = currentCue;
     }
   }
 

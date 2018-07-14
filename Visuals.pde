@@ -69,6 +69,27 @@ void haromCenter(color c, int sw, int sz) {
   noFill();
   harom(centerX+sz/2, centerY+sz/2, centerX-sz/2, centerY+sz/2, 6, (sin(0.0005*millis()%(2*PI))+1)/2);
 }
+void haromTop(color c, int sw) {
+  int padding = 30;
+  float ax = topScreens[0].s.width-padding;
+  float bx = padding;
+  float ay = topScreens[0].s.height-padding;
+  float by = ay;
+  if (topScreens[0].s.width > topScreens[0].s.height) {
+    int diff =  topScreens[0].s.width - topScreens[0].s.height;
+    ax = topScreens[0].s.width/2 + diff/2;
+    bx = topScreens[0].s.width/2 - diff/2;
+  }  
+  for (Screen sc : topScreens) {
+    PGraphics s = sc.s;
+    s.beginDraw();
+    s.background(0);
+    s.strokeWeight(sw);
+    s.stroke(c);
+    haromScreen(s, ax, ay, bx, by, 6, (sin(0.0005*millis()%(2*PI))+1)/2);
+    s.endDraw();
+  }
+}
 
 float t=0.001;
 void harom(float ax, float ay, float bx, float by, int level, float ratio) {
@@ -184,8 +205,9 @@ void updateNodeConstellation(PGraphics s, int maxY) {
     nodes[i].move(s, maxY);
   }
 }
+
 void displayNodeConstellation(PGraphics s) {
-  int dis = 75;
+  int dis = 100;
   for (int i=0; i<nodes.length; i++) {
     nodes[i].display(s);
     for (int j = 0; j < nodes.length; j++) {
@@ -217,7 +239,25 @@ void displayNodeConstellationMain() {
   }
 }
 
+void displayNodeConstellationsSphere() {
+  sphereScreen.s.beginDraw();
+  sphereScreen.s.background(0);
+  sphereScreen.s.noFill();
+  sphereScreen.s.strokeWeight(10);
+  sphereScreen.s.ellipse(sphereScreen.s.width/2, sphereScreen.s.height/2, sphereScreen.s.width, sphereScreen.s.width);
+  displayNodeConstellation(sphereScreen.s);
+  sphereScreen.s.mask(tempSphere); 
+  sphereScreen.s.endDraw();
+}
 
+void displayNodeConstellationsTop() {
+  for (int i = 0; i < 2; i++) {
+    topScreens[i].s.beginDraw();
+    topScreens[i].s.background(0);
+    displayNodeConstellation(topScreens[i].s);
+    topScreens[i].s.endDraw();
+  }
+}
 class Node {
   PVector pos, vel;
   int sym = int(random(6));
@@ -262,6 +302,14 @@ class Node {
 
     if (this.pos.y > maxY) this.pos.y = 0;
     else if (this.pos.y < 0) this.pos.y = maxY;
+  }
+  void moveHand(float per) {
+    this.pos.add(new PVector(per*8, vel.y));
+    if (this.pos.x > screenW) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = screenW;
+
+    if (this.pos.y > screenH) this.pos.y = 0;
+    else if (this.pos.y < 0) this.pos.y = screenH;
   }
   void move(int minY, int maxY) {
     this.pos.add(vel);
@@ -342,46 +390,53 @@ void displayNervous2Screens() {
 // WAVY CIRCLE
 //////////////////////////////////////////////////////////////////////////////////
 //https://www.openprocessing.org/sketch/399221
-color c1 = #191970;
-color c2 = #ECF0F1;
-int count = 19;
-float r = 120;
-float d = 8.25;
-int MAX = 330;
+
+
 
 void initWavyCircle() {
 }
 
-void displayWavyCircle() {
+void displayWavyCircleSphere() {
+  displayWavyCircle(sphereScreen.s);
+}
+void displayWavyCircleAll() {
   for (Screen s : screens) {
-    s.s.beginDraw();
-    s.s.smooth();
-    //s.s.background(c1);
-    s.s.ellipseMode(RADIUS);
-    s.s.noStroke();
-
-    s.s.fill(c1, 100);
-    s.s.rect(0, 0, screenW, screenH);
-    s.s.fill(c2, 100);
-
-    s.s.pushMatrix();
-    s.s.translate(screenW/ 2, screenH / 2);
-    for (int n = 1; n < count; n++) {
-      for (float a = 0; a <= 360; a += 1) {
-        float progress = constrain(map(frameCount%MAX, 0+n*d, MAX+(n-count)*d, 0, 1), 0, 1);
-        float ease = -0.5*(cos(progress * PI) - 1);
-        float phase = 0 + 2*PI*ease + PI + radians(map(frameCount%MAX, 0, MAX, 0, 360));
-        float x = map(a, 0, 360, -r, r);
-        float y = r * sqrt(1 - pow(x/r, 2)) * sin(radians(a) + phase);
-        s.s.ellipse(x, y, 1.5, 1.5);
-      }
-    }
-    s.s.popMatrix();
+    displayWavyCircle(s.s);
   }
 }
 
+void displayWavyCircle(PGraphics s) {
+  color c1 = 0;
+  color c2 = color(255);
+  int count = 8; // 19
+  float r = s.width/2;
+  float d = 8.25;
+  int MAX = 330;
+  s.beginDraw();
+  s.smooth();
+  //s.s.background(c1);
+  s.ellipseMode(RADIUS);
+  s.noStroke();
 
+  s.fill(c1, 100);
+  s.rect(0, 0, s.width, s.height);
+  s.fill(c2, 100);
 
+  s.pushMatrix();
+  s.translate(s.width/ 2, s.height / 2);
+  for (int n = 1; n < count; n++) {
+    for (float a = 0; a <= 360; a += 5) {
+      float progress = constrain(map(frameCount%MAX, 0+n*d, MAX+(n-count)*d, 0, 1), 0, 1);
+      float ease = -0.5*(cos(progress * PI) - 1);
+      float phase = 0 + 2*PI*ease + PI + radians(map(frameCount%MAX, 0, MAX, 0, 360));
+      float x = map(a, 0, 360, -r, r);
+      float y = r * sqrt(1 - pow(x/r, 2)) * sin(radians(a) + phase);
+      s.ellipse(x, y, 3, 3);
+    }
+  }
+  s.popMatrix();
+  s.endDraw();
+}
 //////////////////////////////////////////////////////////////////////////////////
 // TESSERACT
 //////////////////////////////////////////////////////////////////////////////////
@@ -400,7 +455,7 @@ void displayTesseract2Screens(float speed) {
 
 int tessMode = 0;
 void updateTesseractBeat(float speed) {
-  if (currentCycle > previousCycle && currentCycle%8 == 1) tessMode++;
+  if (currentCycle > previousCycle && (currentCycle-1)%8 == 0) tessMode++;
   if (tessMode%6 == 0) tesseract.turn(0, 1, .01);
   else if (tessMode%6 == 1) tesseract.turn(0, 2, speed);
   else if (tessMode%6 == 2) tesseract.turn(1, 2, speed);
@@ -414,6 +469,12 @@ void displayTesseract(PGraphics s) {
   s.background(0);
   displayTesseractNoBack(s);
   s.endDraw();
+}
+
+void displayTesseractTop() {
+  updateTesseractBeat(.01);
+  displayTesseract(topScreens[0].s);
+  displayTesseract(topScreens[1].s);
 }
 
 void displayTesseractNoBack(PGraphics s) {
@@ -816,8 +877,7 @@ void displayTerrainAllCrush() {
     if (index == i || i == index + 1) {
       displayTerrain(screens[i].s, i);
       display4FaceLines(white, i);
-    }
-    else {
+    } else {
       screens[i].drawSolid(0);
       display4FaceLines(0, i);
     }
@@ -946,8 +1006,8 @@ class pathfinder {
   float diameter;
   pathfinder(PGraphics s) {
     location = new PVector(s.width/2, s.height);
-    velocity = new PVector(0, -1);
-    diameter = 32;
+    velocity = new PVector(0, -3);
+    diameter = 15;
   }
   pathfinder(pathfinder parent) {
     location = parent.location.copy();
@@ -989,13 +1049,19 @@ void updateTreeBranches() {
   for (int i=0; i<paths.length; i++) {
     paths[i].update();
   }
-  if (currentCycle > previousCycle && currentCycle%16 == 0) resetTreeBranchesAll();
 }
 void displayTreeBranchesOuter() {
-  for (int j = 0; j < 4; j +=3) {
+  for (int j = 0; j < 4; j+=3) {
     PGraphics s = screens[j].s;
     s.beginDraw();
-    displayTreeBranches(s, j);
+    s.ellipseMode(CENTER);
+    s.fill(55);
+    s.noStroke();
+    for (int i=0; i<paths.length; i++) {
+      PVector loc = paths[i].location;
+      float diam = paths[i].diameter;
+      s.ellipse(loc.x, loc.y, diam, diam);
+    }
     s.endDraw();
   }
 }
@@ -1034,7 +1100,7 @@ void displayTreeBranchesInner() {
     PGraphics s = screens[j].s;
     s.beginDraw();
     s.ellipseMode(CENTER);
-    s.fill(55);
+    s.fill(255);
     s.noStroke();
     for (int i=0; i<paths.length; i++) {
       PVector loc = paths[i].location;
@@ -2493,7 +2559,10 @@ void displayDivisionOfIntensityOuter(float per, int sqX, int sqY, int z) {
   displayDivisionOfIntensity(screens[0].s, per, sqX, sqY, z);
   displayDivisionOfIntensity(screens[3].s, per, sqX, sqY, z);
 }
-
+void displayDivisionOfIntensityTop(float per, int sqX, int sqY) {
+  displayDivisionOfIntensity(topScreens[0].s, per, sqX, sqY, 0);
+  displayDivisionOfIntensity(topScreens[1].s, per, sqX, sqY, 0);
+}
 void displayDivisionOfIntensity(PGraphics s, float per, int sqX, int sqY) {
   displayDivisionOfIntensity(s, per, sqX, sqY, 0);
 }
@@ -3922,4 +3991,16 @@ void setLightning() {
       lightningColor = int(random(50, 200));
     }
   }
+}
+
+void displaySpiralSphere() {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.background(0);
+  s.translate(s.width/2, s.height/2);
+  s.rotateZ(millis()/5000.0);
+  s.translate(-s.width/2, -s.height/2);
+  s.image(sphereImg, 0, 0, s.width, s.height);
+  s.mask(tempSphere);
+  s.endDraw();
 }

@@ -146,10 +146,13 @@ class OEJCave {
   void drawCaveScreens() {
     updateDrip();
     updateRandom();
-
+    checkMovement();
+    checkRainbow();
+    
     drawCaveFlatGrid(0, screens[0].s);
     drawCave(1, screens[1].s);
-    drawCaveFlatGrid(2, screens[2].s);
+    //drawCaveFlatGrid(2, screens[2].s);
+    drawCave(2, screens[2].s);
     drawCaveFlatGrid(3, screens[3].s);
   }
 
@@ -205,7 +208,7 @@ class OEJCave {
     //s.translate(-s.width/2, -s.height/2, 400);
     s.translate(0, 0, 400);
 
-    // draw feature6
+    // draw features
     s.strokeWeight(1);
     s.stroke(255, 0, 255);
     s.fill(255);
@@ -216,13 +219,12 @@ class OEJCave {
     s.strokeWeight(1);
     //s.colorMode(RGB);
     //s.stroke(0, 255, 255);
-    //s.fill(0);
+    s.fill(0);
     drawGrids(screenNum, s);
     s.popMatrix();
 
 
-    checkMovement();
-    checkRainbow();
+    
 
     s.endDraw();
   }
@@ -492,7 +494,7 @@ class OEJCave {
 
   void setCastLightStroke(PGraphics s, Feature feat, int screenNum, int i) {
 
-    if (screenNum == 1) {
+    if (screenNum == 1 || screenNum == 2) {
       colorMode(HSB, 255);
       lerpC[0] = color(255);
       lerpC[1] = 0;
@@ -534,9 +536,10 @@ class OEJCave {
     s.fill(feat.getLerpColor(screenNum/2, i));
   }
 
+  // CAST_LIGHT CHANGE SCREEN NUM
   void lightGridTopBot(PGraphics s, int screenNum, int i, int cols) {
     int spacing = 15;
-    if (screenNum == 1) {
+    if (screenNum == 1 || screenNum == 2) {
       int brCol = int(map(mouseY, height, height/2, -spacing, cols+spacing));
       int br = 0;
       if (i <= brCol)  br = constrain(int(map(i, brCol - spacing, brCol, 0, 255)), 0, 255);

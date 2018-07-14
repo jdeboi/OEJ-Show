@@ -65,11 +65,11 @@ void initMusic() {
 }
 
 //void initFFT() {
-  //minim = new Minim(this);
-  //songFile = minim.loadFile("music/moon.mp3", 1024);
-  //myAudioFFT = new FFT(songFile.bufferSize(), songFile.sampleRate());
-  //myAudioFFT.linAverages(myAudioRange);
-  //myAudioFFT.window(FFT.GAUSS);
+//minim = new Minim(this);
+//songFile = minim.loadFile("music/moon.mp3", 1024);
+//myAudioFFT = new FFT(songFile.bufferSize(), songFile.sampleRate());
+//myAudioFFT.linAverages(myAudioRange);
+//myAudioFFT.window(FFT.GAUSS);
 //}
 
 //void initBeat() {
@@ -213,30 +213,18 @@ void initTheremin() {
     theremin[i] = loadImage("images/theremin/" + i + ".jpg");
   }
 }
+
 void cycleHandsFFT() {
+  cycleHandsFFT(0);
+}
+
+void cycleHandsFFT(float rotH) {
   int j = 0;
   for (Screen sc : screens) {
-    sc.s.beginDraw();
-    sc.s.stroke(255);
-    sc.s.background(0);
-    sc.s.blendMode(SCREEN);
-    sc.s.noFill();
-    sc.s.strokeWeight(3);
-    sc.s.rectMode(CENTER);
-
-    int imgW = 400;
-    
-    // 4 forward
-    // 2 back
-    // repeat
     int num = (currentCycle + j)% 6;
     if (num > 4) num = 8 - num;
     PImage p = hands[num];
-    int imgH = int(p.height *  imgW*1.0/p.width);
-    sc.drawImage(p, screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
-    //if (currentCycle%hands.length == j) sc.drawImage(hands[0], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
-    //else  sc.drawImage(hands[4], screenW/2 -imgW/2, screenH/2 - imgH/2, imgW, imgH);
-    sc.s.rectMode(CORNERS);
+    drawRotateImageDelta(sc.s, p, rotH);
     sc.s.endDraw();
     j++;
   }
