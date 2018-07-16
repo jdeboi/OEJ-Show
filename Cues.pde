@@ -139,13 +139,6 @@ void caveFast() {
     }
   }
 }
-void initCycles() {
-  initVid("scenes/cycles/movies/vid1.mp4");
-  cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length()/1000 - 1, 'v', 0.0, 0);
-}
 
 
 void deconstructCycles() {
@@ -1086,22 +1079,22 @@ void displayMoon() {
   case 0:    
     displayMoveSpaceAll(STATIC_STARS, 0.75);
 
-    pulsing(color(255, 0, 0), percentToNumBeats(8));
+    pulsing(white, percentToNumBeats(8));
     break;
   case 1: 
     displayMoveSpaceAll(STATIC_STARS, 0.86);
 
-    pulsing(color(255, 0, 0), percentToNumBeats(8));
+    pulsing(white, percentToNumBeats(8));
     break;
   case 2:
     displayMoveSpaceAll(DIVERGE_HORIZ_LINE, 0.86);
 
-    pulsing(color(255, 0, 0), percentToNumBeats(8));
+    pulsing(white, percentToNumBeats(8));
     break;
   case 3: 
     displayMoveSpaceAll(DIAG_EXIT_VERT, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(white);
     break;
   case 4: 
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, 0.66);
@@ -1231,10 +1224,12 @@ PGraphics temp, temp2;
 int lastCueDelaunay = -2;
 
 void displayLollies() {
-  if (!personOnPlatform) sphereScreen.drawSolid(0);
+  initializeTriangulation(currentCue);
+
+  if (!personOnPlatform) displayLolliesSphere();
   else drawEye();
 
-  initializeTriangulation(currentCue);
+
 
   if (currentCue == 0)  cycleCubeDelaunay(pink, pink);
   else if (currentCue < 16) {
@@ -1251,18 +1246,29 @@ void displayLollies() {
 }
 
 
+void initCycles() {
+  initVid("scenes/cycles/movies/vid1.mov", "scenes/cycles/movies/vid1.mov");
+  cues = new Cue[3];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(3, 'm', 0.0, 0);
+  cues[2] = new Cue(songFile.length()/1000 - 1, 'v', 0.0, 0);
+}
+
 
 void displayCycles() {
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
 
   switch(currentCue) {
-  case 0:
-    mirrorVidCenter(vid1, -100, 0);
-    break;
+    //case 0:
+    //  mirrorVidCenter(vid1, -100, 0);
+    //  break;
   case 1:
-    drawSolidAll(color(0));
-    drawImageAll(currentImages.get(0), 0, 0);
+    int x = (vid1.width - screenW*2)/2;
+    screens[1].drawImage(vid1, -x, 0);
+    screens[2].drawImage(vid1, -screenW-x, 0);
+    topScreens[0].drawImage(vid2, -x, 0);
+    topScreens[1].drawImage(vid2, -screenW-x, 0);
     break;
   default:
     displayLines(color(0));
@@ -1555,50 +1561,52 @@ void quietTime() {
 //  //displayLines(color(255, 0, 255));
 //}
 
+FlockingClass fc;
+
 void initWiz() {
   //initVid("scenes/wizrock/movies/1.mp4");
-  cues = new Cue[11];
+  cues = new Cue[12];
   cues[0] = new Cue(0, 'v', 0, 0); // intro
-  cues[1] = new Cue(213, 'v', 0.0, 0);  // same as 1
-  //cues[2] = new Cue(25.5, 'v', 0.0, 0); // 2
-  cues[2] = new Cue(39, 'v', 0.0, 0);  // same as 1
-  //cues[4] = new Cue(52, 'v', 0.0, 0);  // 2
-  cues[3] = new Cue(65, 'v', 0.0, 0);  // "YOUU SUCCESS ..."
-  // cues[6] = new Cue(78, 'v', 0.0, 0);
-  cues[4] = new Cue(90.8, 'v', 0.0, 0);  // "paper cuts"
-  cues[5] = new Cue(104, 'v', 0.0, 0);
-  cues[6] = new Cue(117, 'v', 0.0, 0); // "hero"
-  //cues[10] = new Cue(130, 'v', 0.0, 0);
-  cues[7] = new Cue(143, 'v', 0.0, 0); // "YOUU SUCCESS ..."
-  cues[8] = new Cue(168.9, 'v', 0.0, 0); // "paper cuts"
-  cues[9] = new Cue(194, 'v', 0.0, 0); //
-  cues[9] = new Cue(200, 'v', 0.0, 0); //
-  cues[10] = new Cue(235, 'v', 0.0, 0);
+  cues[1] = new Cue(3.54, 'v', 0, 0); // // start
+  cues[2] = new Cue(16.6, 'v', 0, 0);  // voice comes in, change color
+  cues[3] = new Cue(42.55, 'v', 0, 0); // change color
+  cues[4] = new Cue(55.5, 'v', 0, 0); 
+  cues[5] = new Cue(68.4, 'v', 0, 0); // big paper cuts
+  cues[6] = new Cue(94.4, 'v', 0, 0); 
+  cues[7] = new Cue(107.4, 'v', 0, 0); // back to orig
+  cues[8] = new Cue(133.3, 'v', 0, 0); // big
+  cues[9] = new Cue(172.2, 'v', 0, 0); // something diff?
+  cues[10] = new Cue(185.2, 'v', 0, 0); // back
+  cues[11] = new Cue(213, 'v', 0, 0);  // fading outs
 
-
-  //loadKeystone(0);
-  //initNodes(screens[0].s);
-  //initTesseract();
-  //initSquiggle(centerScreen.s);
-  //initDrip(centerScreen.s);
-  initDots(100);
-  initAllFlowyWaves();
-
+  //initDots(100);
+  //initAllFlowyWaves();
   //initNodesMain();
-  initSymbols();
+  //initSymbols();
+
+  //initSquiggle(screens[0].s);
+  initDrip(screens[0].s);
+
+
+
+  fc = new FlockingClass(this);
 }
 
 void deconstructWiz() {
-  dotArray = null;
-  tempImg = null;
-  symbols = null;
+  //dotArray = null;
+  //tempImg = null;
+  //symbols = null;
+  particles_a = null;
+  particles_b = null;
+  particles_c = null;
+  fc = null;
 }
 
 boolean resetSquiggleLines = false;
 
 void displayWiz() {
   if (!personOnPlatform) {
-    gradientSphere(red, cyan, blue);
+    //gradientSphere(red, cyan, blue);
   } else {
     drawEye();
     //handsHorizFaceLines(cyan);
@@ -1606,61 +1614,71 @@ void displayWiz() {
   }
 
   cubesFront();
-  //tessPink();
-  //wizPinkVidConst();
-  //cubesFront();
 
   //updateNodeConstellationMain();
   //displayNodeConstellationMain();
 
-  if (currentCue < cues.length -1) displayFlowyWavesWiz();
-  else {
-    displayLines(color(0));
+  switch(currentCue) {
+  case 0:
+    //drawSolidAllCubes(color(255));
+    break;
+  case 1:
+    fc.displayFlockAll(fc.NOISE_MODE);
+    fc.updatePhysics(fc.NOISE_MODE);
+    break;
+  case 2:
+    bounceFlocking(fc.NOISE_MODE);
+    //displaySquiggleParticlesAll();
+  //  displayDripParticlesAll();
+    break;
+  case 3:
+    if (currentCue != previousCue) {
+      fc.currentBackgroundC = color(0, 255, 255);
+    }
+    bounceFlocking(fc.NOISE_MODE);
+    break;
+  case 4:
+    bounceFlocking(fc.NOISE_MODE);
+    break;
+  case 5:
+    if (currentCue != previousCue) {
+      fc.currentBackgroundC = color(255);
+      drawSolidAllCubes(fc.currentBackgroundC);
+    }
+    fc.displayFlockAll(fc.FLOCKING_MODE);
+    fc.updatePhysics(fc.FLOCKING_MODE);
+    break;
+  case 6: 
+    bounceFlocking(fc.FLOCKING_MODE);
+    break;
+  case 7:
+    bounceFlocking(fc.NOISE_MODE);
+    break;
+  case 8:
+    bounceFlocking(fc.FLOCKING_MODE);
+    break;
+  case 9:
+    if (currentCue != previousCue) {
+      fc.currentBackgroundC = 0;
+      fc.newNoiseWht();
+    }
+    bounceFlocking(fc.NOISE_MODE);
+    break;
+  case 10:
+    if (currentCue != previousCue) fc.newNoise();
+    bounceFlocking(fc.NOISE_MODE);
+    break;
+  default:
     drawSolidAll(color(0));
+    break;
   }
-
-  //switch(currentCue) {
-  //case 0:
-  //  break;
-  //case 1:
-  //centerScreenFrontAll();
-  //displaySquiggleParticles(centerScreen.s);
-  //displayDripParticles(centerScreen.s);
-  //  //resetSquiggleLines = true;
-  //  break;
-  //  //case 1:
-  // 
-  //  //break;
-  //case 2:
-  //  sineWaveVert(red, blue, percentToNumBeats(8), 0.8);
-  //  break;
-  //case 3:
-  //  growShrinkBlockEntire(white, red, yellow, blue, percentToNumBeats(8));
-  //  break;
-  //case 4:
-  //  pulseVertLongCenterBeat(red, percentToNumBeats(8));
+}
 
 
-  //  break;
-  //case 5:
-  //  linesGradientFaceCycle(red, black); 
-  //  break;
-  //case 6: 
-  //  displayCycleSingleFaceLines(white, -1); 
-  //  break;
-  //case 7:
-  //  snakeFaceAll(red, percentToNumBeats(8), 2);
-  //  break;
-  //case 8:
-  //  pulsing(blue, percentToNumBeats(8));
-  //  break;
-  //case 9:
-  //  transit(white, red, yellow, blue, percentToNumBeats(4));
-  //  break;
-  //default:
-  //  drawSolidAll(color(0));
-  //  break;
-  //}
+void bounceFlocking(int mode) {
+  //if (currentCycle != previousCycle && (currentCycle-1)%8 == 0) fc.newNoise();
+  fc.displayFlockAll(mode);
+  fc.updatePhysics(mode);
 }
 
 void tessPink() {
@@ -1873,15 +1891,9 @@ void initIntro() {
   cues[0] = new Cue(4, 'v', 0, 0);
   cues[1] = new Cue(60*4+20-4, 'v', 0.0, 0);
   cues[2] = new Cue(60*4+20, 'v', 0.0, 0);
-
-  //initSquiggle(screens[0].s);
-  initDrip(screens[0].s);
 }
 
 void deconstructIntro() {
-  particles_a = null;
-  particles_b = null;
-  particles_c = null;
 }
 
 void displayIntro() {

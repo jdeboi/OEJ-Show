@@ -14,6 +14,8 @@ int CRUSH = 3;
 int RITE = 11;
 int SONG = 9;
 int LARGE_CENTER = 0;
+int DIRTY = 2;
+int CYCLES = 4;
 //////////
 
 import gifAnimation.*;
@@ -46,7 +48,7 @@ int TILE_VID = 6;
 int VID_ACROSS = 7;
 int VID_MIRROR = 8;
 int CUBE_MODE = 9;
-int DIRTY = 2;
+
 
 
 void setup() {
@@ -66,8 +68,8 @@ void setup() {
   initColors();
   initEye();
   sphereEdgeInit();
-  
-  changeScene(DELTA);
+
+  changeScene(WIZ);
 }
 
 void draw() {
@@ -88,19 +90,19 @@ void draw() {
   checkClickTrack();
 
   drawControls();
-  
-  pushMatrix();
-  translate(0, 0, 3);
-  if (lightning) {
-    fill(lightningColor);
-    rect(0, 0, width, height);
-  }
-  popMatrix();
-  
+
+  //pushMatrix();
+  //translate(0, 0, 3);
+  //if (lightning) {
+  //  fill(lightningColor);
+  //  rect(0, 0, width, height);
+  //}
+  //popMatrix();
+
   textSize(50);
   noStroke();
   fill(255);
-   pushMatrix();
+  pushMatrix();
   translate(0, 0, 3);
   text(frameRate, 50, 50);
   popMatrix();
@@ -120,7 +122,8 @@ void keyPressed() {
 
   if (key == 'c') controlsON = !controlsON;
   else if (key == 'p') changePlatform();
-
+  else if (key == 'e') mappingON =!mappingON;
+  else if (key == 'f') attractMode =! attractMode;
   if (bracketDown) {
     if (key == '0') changeScene(9);
     else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);
@@ -142,7 +145,6 @@ void keyPressed() {
   } else if (key == '/') {
     slashDown = true;
   }
-  
 }
 
 void keyReleased() {

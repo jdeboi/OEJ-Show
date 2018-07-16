@@ -2,7 +2,7 @@ import ddf.minim.*;
 //import ddf.minim.analysis.*;
 
 
-boolean backingTracks = true;
+boolean backingTracks = false;
 int cueDelay = 0;
 //int cueDelay = 2300;
 
@@ -60,7 +60,8 @@ PImage[] symbols;
 
 void initMusic() {
   minim = new Minim(this);
-  if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3");
+  if (currentScene.song.equals("WizRock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
+  else if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3");
   else songFile = minim.loadFile("music/backing/intro.mp3");
 }
 

@@ -100,7 +100,7 @@ class OEJCave {
 
   int rainbowIndex = 0;
 
-  Timer minTimer, eightSecTimer, tenSecTimer;
+  //Timer minTimer, eightSecTimer, tenSecTimer;
   boolean tenSecEffect = false;
   boolean cycleSettings = false;
 

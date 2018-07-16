@@ -8,6 +8,10 @@ void changePlatform() {
   sphereScreen.drawSolid(0);
 }
 
+float getFractalTreeAngle() {
+  //(mouseX / (float) s.width) * 90f;
+  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/3, PI/3),  -PI/3, PI/3);
+}
 float getRotHandsDelta() {
   return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/6, PI/6),  -PI/6, PI/6);
 }

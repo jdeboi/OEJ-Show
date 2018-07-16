@@ -1131,9 +1131,11 @@ void resetTreeBranchesAll() {
 //////////////////////////////////////////////////////////////////////////////////
 // TREE BRANCHES
 //////////////////////////////////////////////////////////////////////////////////
-float thetaFTree; 
+
 void displayFractalTreeAll(int mode) {
   int j = 0;
+  int trunkLen = 80;
+  int branchLen = 150;
   for (Screen sc : screens) {
     PGraphics s = sc.s;
     s.beginDraw();
@@ -1142,19 +1144,18 @@ void displayFractalTreeAll(int mode) {
     s.strokeWeight(2);
     s.pushMatrix();
     // Let's pick an angle 0 to 90 degrees based on the mouse position
-    float a = (mouseX / (float) s.width) * 90f;
-    if (mode == 1) a = 40*sin(frameCount/100.0 + j * 0.35); // (mouseX / (float) s.width) * 90f 
+    //if (mode == 1) a = 40*sin(frameCount/100.0 + j * 0.35); // (mouseX / (float) s.width) * 90f 
     // Convert it to radians
-    thetaFTree = radians(a);
+    float thetaTree = getFractalTreeAngle() + j * 0.3;
     // Start the tree from the bottom of the screen
     s.translate(s.width/2, s.height);
     // Draw a line 120 pixels
-    s.line(0, 0, 0, -120);
+    s.line(0, 0, 0, -trunkLen);
     // Move to the end of that line
-    s.translate(0, -120);
+    s.translate(0, -trunkLen);
     // Start the recursive branching!
     //s.scale(3);
-    branch(s, 120);
+    branch(s, branchLen, thetaTree);
     s.popMatrix();
     s.endDraw();
     j++;
@@ -1163,37 +1164,38 @@ void displayFractalTreeAll(int mode) {
 
 void displayFractalTreeSong() {
   for (int j = 0; j < 6; j++) {
-    if (j == 0 || j == 3) displayFractalTree(screens[j].s, color(255));
-    else if (j == 1 || j == 2) displayFractalTree(screens[j].s, color(55));
-    else  displayFractalTree(topScreens[j-4].s, color(255));
+    if (j == 0 || j == 3) displayFractalTree(screens[j].s, j, color(255));
+    else if (j == 1 || j == 2) displayFractalTree(screens[j].s, j, color(55));
+    else  displayFractalTree(topScreens[j-4].s, j, color(255));
   }
 }
 
-void displayFractalTree(PGraphics s, color c) {
+void displayFractalTree(PGraphics s, int screenNum, color c) {
+  int trunkLen = 80;
+  int branchLen = 150;
   s.beginDraw();
   s.background(0);
   s.stroke(c);
   s.blendMode(BLEND);
   s.strokeWeight(2);
   s.pushMatrix();
-  // Let's pick an angle 0 to 90 degrees based on the mouse position
-  float a = (mouseX / (float) s.width) * 90f;
+
   //if (mode == 1) a = 40*sin(frameCount/100.0 + j * 0.35); // (mouseX / (float) s.width) * 90f 
   // Convert it to radians
-  thetaFTree = radians(a);
+  float thetaFTree = getFractalTreeAngle() + screenNum * 0.3;
   // Start the tree from the bottom of the screen
   s.translate(s.width/2, s.height);
   // Draw a line 120 pixels
-  s.line(0, 0, 0, -120);
+  s.line(0, 0, 0, -trunkLen);
   // Move to the end of that line
-  s.translate(0, -120);
+  s.translate(0, -trunkLen);
   // Start the recursive branching!
   //s.scale(3);
-  branch(s, 120);
+  branch(s, branchLen, thetaFTree);
   s.popMatrix();
   s.endDraw();
 }
-void branch(PGraphics s, float h) {
+void branch(PGraphics s, float h, float thetaFTree) {
   // Each branch will be 2/3rds the size of the previous one
   h *= 0.66;
 
@@ -1204,7 +1206,7 @@ void branch(PGraphics s, float h) {
     s.rotate(thetaFTree);   // Rotate by theta
     s.line(0, 0, 0, -h);  // Draw the branch
     s.translate(0, -h); // Move to the end of the branch
-    branch(s, h);       // Ok, now call myself to draw two new branches!!
+    branch(s, h, thetaFTree);       // Ok, now call myself to draw two new branches!!
     s.popMatrix();     // Whenever we get back here, we "pop" in order to restore the previous matrix state
 
     // Repeat the same thing, only branch off to the "left" this time!
@@ -1212,7 +1214,7 @@ void branch(PGraphics s, float h) {
     s.rotate(-thetaFTree);
     s.line(0, 0, 0, -h);
     s.translate(0, -h);
-    branch(s, h);
+    branch(s, h, thetaFTree);
     s.popMatrix();
   }
 }
@@ -2896,9 +2898,11 @@ class ParticleDrip {
   ParticleDrip(PGraphics s, boolean isSquiggle) {
     this.isSquiggle = isSquiggle;
     this.vel = new PVector(0, 0);
-    this.dir = new PVector(0, 0);
+    
     this.pos = new PVector(random(0, s.width), random(0, s.height));
     this.life = random(0, maxLife);
+    
+    this.dir = new PVector(0, 0);
     this.flip = int(random(0, 2)) * 2 - 1;
     this.color1 = this.color2 = color(255, 0, 0);
 
@@ -4002,5 +4006,16 @@ void displaySpiralSphere() {
   s.translate(-s.width/2, -s.height/2);
   s.image(sphereImg, 0, 0, s.width, s.height);
   s.mask(tempSphere);
+  s.endDraw();
+}
+
+void displayLolliesSphere() {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.background(0);
+  if (dt != null) {
+    for (Triangle t : dt.triangles) t.display(s);
+    s.mask(tempSphere);
+  }
   s.endDraw();
 }

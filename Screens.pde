@@ -331,11 +331,13 @@ void renderScreens() {
 
   // screens above mask
   pushMatrix();
-  if (!mappingON) translate(0, 0, topScreens[0].zIndex);
-  for (int i = 0; i < 2; i++) {
-    topSurfaces[i].render(topScreens[i].s);
-  }
+  //if (!mappingON) 
+  //translate(0, 0, -5); // topScreens[0].zIndex);
+  //for (int i = 0; i < 2; i++) {
+  //  topSurfaces[i].render(topScreens[i].s);
+  //}
 
+  translate(0, 0, topScreens[0].zIndex);
   sphereSurface.render(sphereScreen.s);
 
   popMatrix();
