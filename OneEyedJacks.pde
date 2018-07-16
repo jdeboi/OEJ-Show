@@ -98,14 +98,6 @@ void draw() {
   //  rect(0, 0, width, height);
   //}
   //popMatrix();
-
-  textSize(50);
-  noStroke();
-  fill(255);
-  pushMatrix();
-  translate(0, 0, 3);
-  text(frameRate, 50, 50);
-  popMatrix();
 }
 
 void playShow() {
@@ -177,6 +169,15 @@ void drawControls() {
     drawSongLabel();
     drawPlayer();
     cp5.show();
+    popMatrix();
+
+    // draw framerate
+    textSize(50);
+    noStroke();
+    fill(255);
+    pushMatrix();
+    translate(200, 0, 3);
+    text(frameRate, 50, 50);
     popMatrix();
   } else hideControls();
 }

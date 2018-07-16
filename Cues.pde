@@ -1585,7 +1585,7 @@ void initWiz() {
   //initSymbols();
 
   //initSquiggle(screens[0].s);
-  initDrip(screens[0].s);
+  //initDrip(screens[0].s);
 
 
 
@@ -1596,9 +1596,9 @@ void deconstructWiz() {
   //dotArray = null;
   //tempImg = null;
   //symbols = null;
-  particles_a = null;
-  particles_b = null;
-  particles_c = null;
+  //particles_a = null;
+  //particles_b = null;
+  //particles_c = null;
   fc = null;
 }
 
@@ -1629,7 +1629,7 @@ void displayWiz() {
   case 2:
     bounceFlocking(fc.NOISE_MODE);
     //displaySquiggleParticlesAll();
-  //  displayDripParticlesAll();
+    //displayDripParticlesAll();
     break;
   case 3:
     if (currentCue != previousCue) {
@@ -1644,6 +1644,7 @@ void displayWiz() {
     if (currentCue != previousCue) {
       fc.currentBackgroundC = color(255);
       drawSolidAllCubes(fc.currentBackgroundC);
+      fc.shapeMode = 1;
     }
     fc.displayFlockAll(fc.FLOCKING_MODE);
     fc.updatePhysics(fc.FLOCKING_MODE);
@@ -1676,7 +1677,7 @@ void displayWiz() {
 
 
 void bounceFlocking(int mode) {
-  //if (currentCycle != previousCycle && (currentCycle-1)%8 == 0) fc.newNoise();
+  if (currentCycle != previousCycle && (currentCycle-1)%16 == 0) fc.newNoise();
   fc.displayFlockAll(mode);
   fc.updatePhysics(mode);
 }

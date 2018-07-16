@@ -2708,7 +2708,7 @@ ParticleDrip [] particles_a, particles_b, particles_c, particlesDrip;
 int nums;
 float maxLife = 10;
 float noiseScale = 200;
-float  simulationSpeed = 0.2;
+float  simulationSpeed = 2;
 int fadeFrame = 0;
 
 int padding_top = 100;
@@ -2819,7 +2819,7 @@ void displayDrip(PGraphics s) {
 
   for (int i = 0; i < nums; i++) {
     float iterations = map(i, 0, nums, 5, 1);
-    float radius = map(i, 0, nums, 1, 3);
+    float radius = map(i, 0, nums, 10, 15);
 
     particlesDrip[i].move(s, iterations);
 
@@ -2869,16 +2869,18 @@ void displaySquiggle(PGraphics s) {
   s.noStroke();
   s.smooth();
   for (int i = 0; i < nums; i++) {
-    float radius = map(i, 0, nums, 2, 3);
+    float radius = map(i, 0, nums, 5, 18);
     float alpha = map(i, 0, nums, 0, 250);
 
-    s.fill(69, 33, 124, alpha);
+    s.fill(cyan, alpha);
     particles_a[i].display(s, radius);
 
-    s.fill(7, 153, 242, alpha);
+
+    fill(red, alpha);
     particles_b[i].display(s, radius);
 
-    s.fill(255, 255, 255, alpha);
+
+    fill(white, alpha);
     particles_c[i].display(s, radius);
   }
 }
@@ -2893,15 +2895,15 @@ class ParticleDrip {
   color color2;
   color c;
   boolean isSquiggle;
-  float speed = 0.06;
+  float speed = 1;
 
   ParticleDrip(PGraphics s, boolean isSquiggle) {
     this.isSquiggle = isSquiggle;
     this.vel = new PVector(0, 0);
-    
+
     this.pos = new PVector(random(0, s.width), random(0, s.height));
     this.life = random(0, maxLife);
-    
+
     this.dir = new PVector(0, 0);
     this.flip = int(random(0, 2)) * 2 - 1;
     this.color1 = this.color2 = color(255, 0, 0);

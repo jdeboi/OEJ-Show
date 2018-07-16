@@ -16,6 +16,10 @@ float getRotHandsDelta() {
   return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/6, PI/6),  -PI/6, PI/6);
 }
 
+PVector getBoidLocation() {
+  return new PVector(map(mouseX, 0, width, 0, screenW*4), constrain(map(mouseY, height/2, height, 0, screenH), 0, screenH));
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 // CRUSH Z
 //////////////////////////////////////////////////////////////////////////////////

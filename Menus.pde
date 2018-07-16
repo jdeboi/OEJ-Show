@@ -126,15 +126,15 @@ void initControls() {
     .addItems(l)
     ;
 
-  l = Arrays.asList("GIF_ALL", "GIF_ACROSS", "IMG_ALL", "IMG_ACROSS", "FFT", "TILE_VID", "VID_ACROSS", "VID_MIRROR");
-  cp5.addScrollableList("modeList")
-    .setPosition(150, ymen)
-    .setColorBackground(color(105, 10, 0))
-    .setSize(150, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
+//  l = Arrays.asList("GIF_ALL", "GIF_ACROSS", "IMG_ALL", "IMG_ACROSS", "FFT", "TILE_VID", "VID_ACROSS", "VID_MIRROR");
+//  cp5.addScrollableList("modeList")
+//    .setPosition(150, ymen)
+//    .setColorBackground(color(105, 10, 0))
+//    .setSize(150, 100)
+//    .setBarHeight(20)
+//    .setItemHeight(20)
+//    .addItems(l)
+//    ;
 
   l = Arrays.asList("0", "1");
   cp5.addScrollableList("keystoneList")
@@ -163,9 +163,9 @@ public void controlEvent(ControlEvent theEvent) {
   //n = 0;
 }
 
-void modeList(int n) {
-  mode = n + 1;
-}
+//void modeList(int n) {
+//  mode = n + 1;
+//}
 
 void movieList(int n) {
   initVid("_testing/movies/" + testingMovies[n]);

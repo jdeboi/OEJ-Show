@@ -21,13 +21,16 @@ class FlockingClass {
   float noiseStrength = 10;
   float noiseZRange = 0.4;
   float noiseZVelocity = 0.01;
-  float overlayAlpha = 2;
+  float overlayAlpha = 5;
 
   float agentAlpha = 90;
   float strokeWidthAgents = 3;
   int drawMode = 1;
   color agentC1, agentC2;
   color currentBackgroundC = 0;
+  
+  int shapeMode = 0;
+
   //boolean acceleratingAgents = true;
 
   FlockingClass(PApplet p) {
@@ -36,6 +39,7 @@ class FlockingClass {
     //box2d.createWorld();
     //box2d.setGravity(0, -10); //// We are setting a custom gravity
     agentC1 = color(255);
+    agentC2 = color(255);
     flock = new Flock();
     for (int i = 0; i < 150; i++) {
       flock.addBoid(new Boid(random(screenW*4), random(screenH)));
@@ -53,7 +57,7 @@ class FlockingClass {
 
   void displayFlock(PGraphics s, int screenNum, int mode) {
     s.beginDraw();
-    s.fill(0, overlayAlpha);
+    s.fill(currentBackgroundC, overlayAlpha);
     s.noStroke();
     s.rect(0, 0, s.width, s.height);
     flock.display(s, screenNum, mode);
@@ -109,7 +113,7 @@ class FlockingClass {
 
     // Calculate a force to push particle away from repeller
     PVector attract(Boid b, int index) {
-      location.set(map(mouseX, 0, width, 0, screenW*4), screenH/2);
+      location.set(getBoidLocation());
       PVector spot = new PVector(location.x, location.y); //screelocation.y);
       PVector dir = PVector.sub(spot, b.location);  
       dir.normalize();                           // Normalize vector (distance doesn't matter here, we just want this vector for direction)
@@ -130,6 +134,7 @@ class FlockingClass {
     colorMode(HSB, 255);
     agentC1 = color(random(255), 255, 255);
     agentC2 = color(random(255), 255, 255);
+    currentBackgroundC = color(hue(agentC1), 255, 100);
     colorMode(RGB, 255);
   }
 
@@ -137,7 +142,7 @@ class FlockingClass {
 
   class Boid {
 
-    PVector location, locationOld;
+    PVector location, locationOld, rotation;
     PVector velocity;
     PVector acceleration;
     float r;
@@ -145,12 +150,16 @@ class FlockingClass {
     float maxspeed;    // Maximum speed
     Boolean wingUp = false;
     int wingCount;
-    Boolean noBoundaries = false;
+    Boolean noBoundaries = true;
     Boolean landed = false;
 
     float stepSize;
     float angle;
     float noiseZ;
+
+    //int shapeMode = int(random(3));
+    int lineLen = int(random(20, 300));
+    float rotRan = random(0, PI);
 
     Boid(float x, float y) {
       r = 6.0;
@@ -186,9 +195,9 @@ class FlockingClass {
     }
 
     void displayBoid(PGraphics s, int screenNum, int mode) {
-      renderNoise(s, screenNum);
-      //if (mode == FLOCKING_MODE) renderBoid(s, screenNum);
-      //else if (mode == NOISE_MODE) renderNoise(s, screenNum);
+      //renderNoise(s, screenNum);
+      if (mode == FLOCKING_MODE) renderNoise(s, screenNum);
+      else if (mode == NOISE_MODE) renderNoise(s, screenNum);
     }
 
     void applyForce(PVector force) {
@@ -259,12 +268,22 @@ class FlockingClass {
 
     void renderNoise(PGraphics s, int screenNum) { 
       //s.stroke(lerpColor(agentC1, color(0, 0, 255), this.stepSize/5), agentAlpha);
-      //s.strokeWeight(strokeWidthAgents * this.stepSize);
+
       float r = strokeWidthAgents * this.stepSize * 3;
       s.noStroke();
       s.fill(lerpColor(agentC1, agentC2, this.stepSize/5), agentAlpha);
       //s.fill(255, agentAlpha);
-      s.ellipse(this.location.x - screenW*screenNum, this.location.y, r, r);
+
+      if (shapeMode == 0) s.ellipse(this.location.x - screenW*screenNum, this.location.y, r, r);
+      else {
+        s.strokeWeight(strokeWidthAgents * this.stepSize);
+        s.stroke(lerpColor(agentC1, agentC2, this.stepSize/5), agentAlpha);
+        s.pushMatrix();
+        s.translate(this.location.x - screenW*screenNum, this.location.y);
+        s.rotateZ(millis()/1000.0 + rotRan);
+        s.line(0, 0, lineLen, 0);
+        s.popMatrix();
+      }
 
       //s.strokeWeight(20);
       //s.line(this.locationOld.x - screenW*screenNum, this.locationOld.y, this.location.x, this.locationOld.y); // screenW*screenNum, this.locationOld.y, this.location.x- screenW*screenNum, this.location.y);
