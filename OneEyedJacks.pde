@@ -69,7 +69,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(WIZ);
+  changeScene(VIOLATE);
 }
 
 void draw() {
@@ -115,7 +115,7 @@ void keyPressed() {
   if (key == 'c') controlsON = !controlsON;
   else if (key == 'p') changePlatform();
   else if (key == 'e') mappingON =!mappingON;
-  else if (key == 'f') attractMode =! attractMode;
+  else if (key == 'f') if (fc!=null) fc.explodeFlocking();
   if (bracketDown) {
     if (key == '0') changeScene(9);
     else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);

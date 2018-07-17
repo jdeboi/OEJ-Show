@@ -112,7 +112,7 @@ class OEJCave {
   }
 
   void displayCaveLeftRightBounce() {
-    if (currentCycle > previousCycle) {
+    if (currentCycle > previousCycle  || currentCue > previousCue) {
       if (currentCycle %2 == 0) {
         colorSettings[0] = GRAD1;
         colorSettings[1] = GRAD1;
@@ -126,7 +126,7 @@ class OEJCave {
   }
 
   void displayCaveAllBounce() {
-    if (currentCycle > previousCycle) changeGradAll();
+    if (currentCycle > previousCycle || currentCue > previousCue) changeGradAll();
   }
 
   void changeGradAll() {
@@ -148,7 +148,7 @@ class OEJCave {
     updateRandom();
     checkMovement();
     checkRainbow();
-    
+
     drawCaveFlatGrid(0, screens[0].s);
     drawCave(1, screens[1].s);
     //drawCaveFlatGrid(2, screens[2].s);
@@ -224,7 +224,7 @@ class OEJCave {
     s.popMatrix();
 
 
-    
+
 
     s.endDraw();
   }
@@ -244,7 +244,6 @@ class OEJCave {
       }
     } else if (featureMovementSetting == CRISSCROSS) {
       bounceIndex++;
-
       if (bounceIndex > maxCrisscross) {
         bounceIndex = 0;
         changeMovementSetting(0);
@@ -763,7 +762,8 @@ class OEJCave {
       switch(colorSettings[screenNum]) {
       case STARTUP_STROKE:
         setBlackFill(screenNum, s, i);
-        if (rainbowIndex < 0) gradientSetAllStrokeSat(s, i, 125, 180, 255+rainbowIndex);
+        if (personOnPlatform) gradientSetAllStrokePlatform(s, i, 125, 180, getCaveHand());
+        else if (rainbowIndex < 0) gradientSetAllStrokeSat(s, i, 125, 180, 255+rainbowIndex);
         else gradientSetAllStroke(s, i, 125, 180);
         break;
       case CAST_LIGHT:
@@ -885,7 +885,7 @@ class OEJCave {
       }
 
       if (featureMovementSetting == BOUNCE) bounce();
-      else if (featureMovementSetting == CRISSCROSS) crisscross();//crisscross(percentToNumBeats(8));
+      else if (featureMovementSetting == CRISSCROSS) crisscross(percentToNumBeats(8));
       else if (featureMovementSetting == SPAWNING) {
         if (int(random(500))==5) melting = true;
       }
@@ -962,51 +962,53 @@ class OEJCave {
       }
     }
 
-    void crisscross() {
-      int xScale = 3; // 10
-      int zScale = 2; // 5;
-      int maxBounce = maxCrisscross/4; // 50
-      if (bounceIndex < maxBounce) {
-        if (x < (wt+translateX)/2) bounceXIndex -= bounceDirection*xScale;
-        else bounceXIndex += bounceDirection*xScale;
-        bounceYIndex = 0;
-        bounceZIndex = 0;
-      } else if (bounceIndex < maxBounce*2) {
-        if (x < (wt+translateX)/2) bounceZIndex += bounceDirection*zScale;
-        else bounceZIndex -= bounceDirection*zScale;
-      } else if (bounceIndex < maxBounce*3) {
-        if (x < (wt+translateX)/2) bounceXIndex += bounceDirection*xScale;
-        else bounceXIndex -= bounceDirection*xScale;
-      } else if (bounceIndex < maxBounce*4-2) {
-        if (x < (wt+translateX)/2) bounceZIndex -= bounceDirection*zScale;
-        else bounceZIndex += bounceDirection*zScale;
-      }
-    }
-    //void crisscross(float per) {
-    //  per *=5;
-    //  int maxX = 250;
-    //  int maxZ = 250;
-    //  //int maxBounce = maxCrisscross/4; // 50
-    //  float midX = (wt+translateX)/2;
-    //  if (per < 1) {
-    //    if (x > midX) bounceXIndex = map(per, 0, 1, 0, -maxX);
-    //    else bounceXIndex = map(per, 0, 1, 0, maxX);
+    //void crisscross() {
+    //  int xScale = 3; // 10
+    //  int zScale = 2; // 5;
+    //  int maxBounce = maxCrisscross/4; // 50
+    //  if (bounceIndex < maxBounce) {
+    //    if (x < (wt+translateX)/2) bounceXIndex -= bounceDirection*xScale;
+    //    else bounceXIndex += bounceDirection*xScale;
     //    bounceYIndex = 0;
     //    bounceZIndex = 0;
-    //  } else if (per < 2) {
-    //    if (x > midX) bounceZIndex  = map(per, 1, 2, 0, maxZ);
-    //    else bounceZIndex  = map(per, 1, 2, 0, -maxZ);
-    //  } else if (per < 3) {
-    //    if (x > midX)  bounceXIndex = map(per, 2, 3, -maxX, 0);
-    //    else bounceXIndex = map(per, 2, 3, maxX, 0);
-    //  } else if (per < 4) {
-    //    if (x > midX) bounceZIndex = map(per, 3, 4, maxZ, 0);
-    //    else bounceZIndex = map(per, 3, 4, -maxZ, 0);
-    //  } else {
-    //    bounceXIndex = 0;
-    //    bounceZIndex = 0;
+    //  } else if (bounceIndex < maxBounce*2) {
+    //    if (x < (wt+translateX)/2) bounceZIndex += bounceDirection*zScale;
+    //    else bounceZIndex -= bounceDirection*zScale;
+    //  } else if (bounceIndex < maxBounce*3) {
+    //    if (x < (wt+translateX)/2) bounceXIndex += bounceDirection*xScale;
+    //    else bounceXIndex -= bounceDirection*xScale;
+    //  } else if (bounceIndex < maxBounce*4-2) {
+    //    if (x < (wt+translateX)/2) bounceZIndex -= bounceDirection*zScale;
+    //    else bounceZIndex += bounceDirection*zScale;
     //  }
     //}
+    void crisscross(float per) {
+      per *=5;
+      int maxX = 350;
+      int maxZ = 150;
+      //int maxBounce = maxCrisscross/4; // 50
+      float midX = (wt+translateX)/2;
+      if (per < 1) {
+        if (x < midX) bounceXIndex = map(per, 0, 1, 0, maxX);
+        else bounceXIndex = map(per, 0, 1, 0, -maxX);
+        bounceYIndex = 0;
+        bounceZIndex = 0;
+      } else if (per < 2) {
+        if (x < midX) bounceZIndex  = map(per, 1, 2, 0, maxZ);
+        else bounceZIndex  = map(per, 1, 2, 0, -maxZ);
+      } else if (per < 3) {
+        if (x < midX)  bounceXIndex = map(per, 2, 3, maxX, 0);
+        else bounceXIndex = map(per, 2, 3, -maxX, 0);
+      } else if (per < 4) {
+        if (x < midX) bounceZIndex = map(per, 3, 4, maxZ, 0);
+        else bounceZIndex = map(per, 3, 4, -maxZ, 0);
+      } else {
+        bounceXIndex = 0;
+        bounceZIndex = 0;
+        bounceIndex = 0;
+        changeMovementSetting(0);
+      }
+    }
 
 
 
@@ -1040,6 +1042,24 @@ class OEJCave {
       float h;
       if (z > -500) h = startHue;
       else h = map(z, -500, -3500, startHue, endHue);
+
+      float f;
+      if (index > ySteps/2) f = 0;
+      else {
+        if (ySteps/2 > 0) f = map(index, 0, ySteps/2, 255, 0);
+        else f = 0;
+      }
+      s.stroke(h, f, 255);
+    }
+
+    void gradientSetAllStrokePlatform(PGraphics s, int index, int startHue, int endHue, float lr) {
+      s.colorMode(HSB, 255);
+      float h;
+      lr *= 2;
+      if (lr > 1) lr = map(lr, 1, 2, 1, 0);
+      float per = (map(z, -500, -3500, 0, 1) + lr);
+      if (per > 1) per = map(per, 1, 2, 1, 0);
+      h = lerpColor(startHue, endHue, per);
 
       float f;
       if (index > ySteps/2) f = 0;
@@ -1289,6 +1309,17 @@ class OEJCave {
       }
     }
 
+    //void drawSphereGrid(PGraphics s) {
+    //  for (int i = 0; i < rows-1; i++ ) {
+    //    s.colorMode(HSB, 255);
+    //    s.beginShape(QUAD_STRIP);
+    //    for (int j = 0; j < cols-1; j++) {
+    //      drawFlatGrid(0, s, i, j);
+    //    }
+    //    s.endShape();
+    //  }
+    //}
+
     public void drawLeftGrid(int screenNum, PGraphics s, int i, int j) {
       float b = 2;
       float a = 50;
@@ -1410,29 +1441,62 @@ class OEJCave {
 
       int startSat = 255;
       if (gridMode == ground) {
-        if (rainbowIndex < 0) startSat = 255 + rainbowIndex; // also left
-        else startSat = 255;
-        if (i < 15) s.stroke(125, startSat, 255);
-        else {
-          f = map(i, 15, g.rows-1, 125, 180);
-          s.stroke(f, startSat, 225);
+        if (personOnPlatform) {
+
+          float lr = getCaveHand();
+          float per = (map(i, 15, g.rows-1, 0, 1) + lr);
+          if (per > 1) per = map(per, 1, 2, 1, 0);
+          float h = map(per, 0, 1, 125, 180);
+          //f = map(i, 15, g.rows-1, 125, 180);
+          s.stroke(h, startSat, 225);
+        } else {
+          if (rainbowIndex < 0) startSat = 255 + rainbowIndex; // also left
+          else startSat = 255;
+          if (i < 15) s.stroke(125, startSat, 255);
+          else {
+            f = map(i, 15, g.rows-1, 125, 180);
+            s.stroke(f, startSat, 225);
+          }
         }
       } else if (gridMode == ceiling) {
-        if (rainbowIndex < 0) startSat += rainbowIndex;
-        if (i < 15) {
-          s.stroke(125, startSat, 255);
+        if (personOnPlatform) {
+          if (i < 15) s.stroke(125, startSat, 255);
+          else {
+            float lr = getCaveHand();
+            float per = (map(i, 15, g.rows-1, 0, 1) + lr);
+            if (per > 1) per = map(per, 1, 2, 1, 0);
+            float h = map(per, 0, 1, 125, 180);
+            //f = map(i, 15, g.rows-1, 125, 180);
+            s.stroke(h, startSat, 225);
+          }
         } else {
-          f = map(i, 15, g.rows-1, 125, 180);
-          s.stroke(f, startSat, 225);
+          if (rainbowIndex < 0) startSat += rainbowIndex;
+          if (i < 15) {
+            s.stroke(125, startSat, 255);
+          } else {
+            f = map(i, 15, g.rows-1, 125, 180);
+            s.stroke(f, startSat, 225);
+          }
         }
       } else {
-        if (rainbowIndex < 0) startSat += rainbowIndex;
-        int startG = int(35*25.0/g.cellSize);  
-        if (j < startG) {
-          s.stroke(125, startSat, 255, alpha);
+        if (personOnPlatform) {
+
+          float lr = getCaveHand();
+          int startG = int(35*25.0/g.cellSize);
+          float per = (map(j, startG, g.cols-1, 0, 1) + lr);
+          if (per > 1) per = map(per, 1, 2, 1, 0);
+          float h = map(per, 0, 1, 125, 180);
+          //f = map(i, 15, g.rows-1, 125, 180);
+          s.stroke(h, startSat, 225);
         } else {
-          f = map(j, startG, g.cols-1, 125, 180);
-          s.stroke(f, startSat, 225, alpha);
+          if (rainbowIndex < 0) startSat += rainbowIndex;
+          int startG = int(35*25.0/g.cellSize);  
+          if (j < startG) {
+            s.stroke(125, startSat, 255, alpha);
+          } else {
+            f = map(j, startG, g.cols-1, 125, 180);
+            s.stroke(f, startSat, 225, alpha);
+          }
         }
       }
       break;
@@ -1569,5 +1633,24 @@ class OEJCave {
       colorSwap = 0;
       isMoving = true;
     }
+  }
+
+  void drawSphereGrid() {
+    PGraphics s = sphereScreen.s;
+    s.beginDraw();
+    s.background(0);
+    grids[0].drawFlatCave(0, s, true);
+    s.mask(tempSphere);
+    s.endDraw();
+  }
+
+  color getSphereColor() {
+    colorMode(HSB, 255);
+    int mode = colorSettings[0];
+    if (mode == CAST_LIGHT) return color(255);
+    else if (mode == CAST_LIGHT_SIDE) return color(50, 255, 255);
+    else if (mode == STARTUP_STROKE || mode == ICE) return color(125, 255, 255);
+    else if (mode == RAINBOW_PULSE || mode == RAINBOW_FILL) return color(0, 255, 255);
+    else return lerpC[1];
   }
 }

@@ -10,14 +10,39 @@ void changePlatform() {
 
 float getFractalTreeAngle() {
   //(mouseX / (float) s.width) * 90f;
-  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/3, PI/3),  -PI/3, PI/3);
+  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -PI/3, PI/3), -PI/3, PI/3);
 }
 float getRotHandsDelta() {
-  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW,  -PI/6, PI/6),  -PI/6, PI/6);
+  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -PI/6, PI/6), -PI/6, PI/6);
 }
 
 PVector getBoidLocation() {
   return new PVector(map(mouseX, 0, width, 0, screenW*4), constrain(map(mouseY, height/2, height, 0, screenH), 0, screenH));
+}
+
+float galaxyInc = 0.02;
+float directionGalaxy = galaxyInc;
+float galaxyLocation = 0;
+void galaxyMove() {
+  if (galaxyShader != null) {
+
+    if (mouseX > width/2) directionGalaxy = galaxyInc;
+    else if (mouseX < width/2) directionGalaxy = -galaxyInc;
+    galaxyLocation += directionGalaxy;
+
+    galaxyShader.set("time", galaxyLocation);
+    //if (mouseX < width/2) galaxyShader.set("time", map(mouseX, 0, width/2, 20, 24) - millis()/2000.0);
+    //else galaxyShader.set("time", map(mouseX, width/2, width, 24, 28) + millis()/2000.0);
+  }
+}
+
+void galaxyMoveContinuous() {
+  galaxyLocation += galaxyInc;
+  galaxyShader.set("time", galaxyLocation);
+}
+
+float getCaveHand() {
+  return constrain(map(mouseX, width/2 - mxW, width/2 + mxW, 0, 1), 0, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -29,16 +54,18 @@ int getZCrushHand() {
 
 // an old idea
 void pinkTint() {
-    //int index = constrain(int(mouseX*1.0/width*4), 0, 3);
-    //display4FaceLines(pink, index);
-    //PGraphics s = screens[index].s;
-    //s.beginDraw();
-    //s.fill(pink, 50);
-    //s.blendMode(SCREEN);
-    //s.noStroke();
-    //s.rect(0, 0, s.width, s.height);
-    //s.endDraw();
+  //int index = constrain(int(mouseX*1.0/width*4), 0, 3);
+  //display4FaceLines(pink, index);
+  //PGraphics s = screens[index].s;
+  //s.beginDraw();
+  //s.fill(pink, 50);
+  //s.blendMode(SCREEN);
+  //s.noStroke();
+  //s.rect(0, 0, s.width, s.height);
+  //s.endDraw();
 }
+
+
 //////////////////////////////////////////////////////////////////////////////////
 // DIRTY LINES
 //////////////////////////////////////////////////////////////////////////////////

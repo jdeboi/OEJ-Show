@@ -2,7 +2,7 @@ import ddf.minim.*;
 //import ddf.minim.analysis.*;
 
 
-boolean backingTracks = false;
+boolean backingTracks = true;
 int cueDelay = 0;
 //int cueDelay = 2300;
 

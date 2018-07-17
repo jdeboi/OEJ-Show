@@ -1,15 +1,8 @@
 // The Nature of Code, Daniel Shiffman
-// http://natureofcode.com
-//import shiffman.box2d.*;
-//import org.jbox2d.collision.shapes.*;
-//import org.jbox2d.common.*;
-//import org.jbox2d.dynamics.*;
+
 Boolean attractMode = false;
 class FlockingClass {
-  //Box2DProcessing box2d; // A reference to our box2d world
-  //Surface surface; // An object to store information about the uneven surface
   Flock flock;
-  //Repeller repeller;
   Attractor attractor;
 
   int boidMode = 0;
@@ -28,7 +21,7 @@ class FlockingClass {
   int drawMode = 1;
   color agentC1, agentC2;
   color currentBackgroundC = 0;
-  
+
   int shapeMode = 0;
 
   //boolean acceleratingAgents = true;
@@ -65,13 +58,17 @@ class FlockingClass {
     s.endDraw();
   }
 
+  void explodeFlocking() {
+    flock.explodeFlock();
+  }
+  
   void updatePhysics(int mode) {
     flock.run(mode);
     if (mode == FLOCKING_MODE) {
       //box2d.step(); // We must always step through time!
       if (attractMode) {
         flock.applyAttractor(attractor);
-        flock.applyAttractor(attractor);
+        //flock.applyAttractor(attractor);
       }
     }
   }
@@ -186,11 +183,11 @@ class FlockingClass {
       if (mode == NOISE_MODE) {
         updateNoise(noiseScaleAgent, noiseStrength, noiseZVelocity);
       } else if (mode == FLOCKING_MODE) {
-        if (!landed) {
+        //if (!landed) {
           flock(boids);
           updateBoid();
           borders();
-        }
+        //}
       }
     }
 
@@ -212,7 +209,7 @@ class FlockingClass {
       PVector coh = cohesion(boids);   // Cohesion
       //PVector scat = scatter(boids);   // Scatter
       // Arbitrarily weight these forces
-      sep.mult(1.5);
+      sep.mult(5.0);
       ali.mult(1.0);
       coh.mult(1.0);
       // Add the force vectors to acceleration
@@ -231,6 +228,10 @@ class FlockingClass {
       // Reset accelertion to 0 each cycle
       acceleration.mult(0);
       this.locationOld = this.location.copy();
+    }
+    
+    void explodeBoid() {
+      velocity.mult(-5); // = seek(new PVector(mouseX, mouseY)).mult(-1);
     }
 
     void updateNoise(float noiseScaleAgent, float noiseStrength, float noiseZVelocity) {
@@ -510,6 +511,13 @@ class FlockingClass {
     int getSize() {
       return boids.size();
     }
+    
+    void explodeFlock() {
+      attractMode = !attractMode;
+      for (Boid b : boids) {
+        b.explodeBoid();
+      }
+    }
 
     void run(int mode) {
       for (Boid b : boids) {
@@ -541,4 +549,30 @@ class FlockingClass {
       }
     }
   }
+
+  void flockingSphere() {
+    PGraphics s = sphereScreen.s;
+    s.beginDraw();
+    s.fill(currentBackgroundC, overlayAlpha);
+    s.ellipse(s.width/2, s.height/2, s.width, s.width);
+
+    int[] ballW = {10, 35, 20, 10, 45, 20, 10, 30,  10}; // 10, 30};
+    float[] ballR = {0.2, -PI*.1, PI/2, 2, -1, PI, PI/3, -.4, 2*PI, -PI*.7, 1.5*PI, 0.1};
+    int d = 0;
+    int spacing = 0;
+    for (int i = 0; i < ballW.length; i++) {
+      d += ballW[i] + spacing;
+      s.pushMatrix();
+      s.translate(s.width/2, s.height/2);
+      int b = i%2==0?1:-1;
+      s.rotate(-b*millis()/1000.0 + ballR[i]);
+      s.translate(d, 0);
+      s.noStroke();
+      s.fill(lerpColor(agentC1, agentC2, .2*i));
+      s.ellipse(0, 0, ballW[i], ballW[i]);
+      s.popMatrix();
+    }
+    s.endDraw();
+  }
+  
 }

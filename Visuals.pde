@@ -1303,6 +1303,7 @@ void set2ScreensBlend(int mode) {
     screens[i].s.endDraw();
   }
 }
+
 void displayLineBounce(PGraphics s, int spacing, color c1, color c2, int sw) {
   s.beginDraw();
   s.background(0);
@@ -1314,25 +1315,26 @@ void displayLineBounce(PGraphics s, int spacing, color c1, color c2, int sw) {
   //int bottomY = h-50;
   int bottomY = h;
   int centerY = bottomY/2;
-  s.image(currentImages.get(0), 0, 0);
-  for (int i = 0; i<w; i+=spacing) {
-    // 0 -> 1, not 0 -> 2h
-    color c = lerpColor(c1, c2, map(i, 0, w, 0, 1));
-    s.stroke(c);
-    float yMove = bottomY/2-sin(angleBottom)*bottomY/2;
-    s.line(centerX, bottomY, i, yMove); // bottom lines
-    yMove = bottomY/2+sin(angleBottom)*bottomY/2;
-    s.line(centerX, 0, i, yMove);         // top lines
-  }
-  for (int i = 0; i<=bottomY; i+=spacing) {
+  //s.image(currentImages.get(0), 0, 0);
+  s.filter(galaxyShader);
+  //for (int i = 0; i<w; i+=spacing) {
+  //  // 0 -> 1, not 0 -> 2h
+  //  color c = lerpColor(c1, c2, map(i, 0, w, 0, 1));
+  //  s.stroke(c);
+  //  float yMove = bottomY/2-sin(angleBottom)*bottomY/2;
+  //  s.line(centerX, bottomY, i, yMove); // bottom lines
+  //  yMove = bottomY/2+sin(angleBottom)*bottomY/2;
+  //  s.line(centerX, 0, i, yMove);         // top lines
+  //}
+  //for (int i = 0; i<=bottomY; i+=spacing) {
 
-    float xMove = centerX/2 + sin(angleBottom)*centerX/2;
-    s.line(0, i, xMove, centerY);        // left to right lines
+  //  float xMove = centerX/2 + sin(angleBottom)*centerX/2;
+  //  s.line(0, i, xMove, centerY);        // left to right lines
 
-    xMove = w-sin(angleBottom)*w/4 - w/4;
-    // between w and w/2
-    s.line(xMove, centerY, w, i);
-  }
+  //  xMove = w-sin(angleBottom)*w/4 - w/4;
+  //  // between w and w/2
+  //  s.line(xMove, centerY, w, i);
+  //}
   s.endDraw();
 }
 
@@ -2017,13 +2019,13 @@ void initSpaceRects() {
   }
 }
 
-boolean hasResetRects = true;
-void resetSpaceRects(boolean zoomIn) {
-  if (!hasResetRects) {
-    hasResetRects = true;
+
+void resetSpaceRects() {
+  if (currentCue != previousCue) {
     for (int r = 0; r < spaceRects.length; r++) {
-      if (zoomIn) spaceRects[r].pos.set(0, 0, -endPSpaceRects+rectSpacing*r-1200); // not going to work with cycling
-      else spaceRects[r].pos.set(0, 0, endPSpaceRects+rectSpacing*r);
+      //if (zoomIn) spaceRects[r].pos.set(0, 0, -endPSpaceRects+rectSpacing*r-1200); // not going to work with cycling
+      //else 
+      spaceRects[r].pos.set(0, 0, endPSpaceRects+rectSpacing*r);
     }
   }
 }
@@ -2052,8 +2054,22 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3, boolean i
     s.beginDraw();
     s.blendMode(ADD);
     s.background(0);
-    s.image(currentImages.get(0), -(i-1)*screenW, 0);
+    //s.image(currentImages.get(0), -(i-1)*screenW, 0);
+    s.filter(galaxyShader);
     s.image(temp, 0, 0);
+    
+    s.endDraw();
+  }
+}
+
+void galaxyMoveOuter() {
+  for (int i = 0; i < 4; i+=3) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.blendMode(ADD);
+    s.background(0);
+    //s.image(currentImages.get(0), -(i-1)*screenW, 0);
+    s.filter(galaxyShader);
     s.endDraw();
   }
 }
@@ -2081,7 +2097,8 @@ void displayTwoScreenCascade() {
     s.beginDraw();
     s.blendMode(ADD);
     s.background(0);
-    s.image(currentImages.get(0), -(j-1)*screenW, 0);
+    //s.image(currentImages.get(0), -(j-1)*screenW, 0);
+    s.filter(galaxyShader);
     s.image(temp, 0, 0);
     s.endDraw();
   }
@@ -2113,7 +2130,8 @@ void displayTwoWayTunnels(float per) {
     s.beginDraw();
     s.blendMode(ADD);
     s.background(0);
-    s.image(currentImages.get(0), 0, 0);
+    //s.image(currentImages.get(0), 0, 0);
+    s.filter(galaxyShader);
     s.image(temp2, 0, 0);
     s.endDraw();
   }
@@ -2260,7 +2278,8 @@ void displayCenterSpaceRects(int sw, int mode, color c1, color c2, color c3) {
     s.beginDraw();
     s.blendMode(ADD);
     s.background(0);
-    s.image(currentImages.get(0), 0, 0);
+    //s.image(currentImages.get(0), 0, 0);
+    s.filter(galaxyShader);
     s.image(temp2, 0, 0);
     s.endDraw();
   }
@@ -2315,7 +2334,13 @@ class SpaceRect {
     }
     s.translate(pos.x, pos.y, pos.z);
     float dw = map(pos.z, frontPSpaceRects, endPSpaceRects, 0, 14*numRects);
-    if (pos.z > endPSpaceRects) s.rect(0, 0, s.width-dw, s.height-dw);
+    if (pos.z > endPSpaceRects) {
+      s.rect(0, 0, s.width-dw, s.height-dw);
+      s.translate(0, 0, -5);
+      s.rect(0, 0, s.width-dw, s.height-dw);
+      s.translate(0, 0, -15);
+      s.rect(0, 0, s.width-dw, s.height-dw);
+    }
     s.popMatrix();
   }
   void displayTopSides(PGraphics s) {
@@ -3752,6 +3777,7 @@ void drawVertDirtyOutside(float per) {
     PGraphics s = screens[i].s;
     s.beginDraw();
     s.background(0);
+    //s.filter(galaxyShader);
     if (i == 0) drawVertLinesScreen(s, 8, 50, per, cyan, -1);
     else drawVertLinesScreen(s, 8, 50, per, cyan, 1);
     s.endDraw();
@@ -3759,13 +3785,17 @@ void drawVertDirtyOutside(float per) {
 }
 
 void drawVertDirtyOutsideSpeed(float speed) {
-  for (int i = 0; i < 4; i+= 3) {
-    PGraphics s = screens[i].s;
+  drawSolidOuter(0);
+  int j = 0;
+  if (mouseX > width/2) j = 3;
+  //for (int i = 0; i < 4; i+= 3) {
+    PGraphics s = screens[j].s;
     s.beginDraw();
     s.background(0);
+    //s.filter(galaxyShader);
     drawVertLinesScreen(s, 8, 50, cyan, pink, percentToNumBeats(8), speed);
     s.endDraw();
-  }
+  //}
 }
 
 void drawVertDirtySineOutside(float per) {
@@ -4002,6 +4032,20 @@ void setLightning() {
 void displaySpiralSphere() {
   PGraphics s = sphereScreen.s;
   s.beginDraw();
+  s.noTint();
+  s.background(0);
+  s.translate(s.width/2, s.height/2);
+  s.rotateZ(millis()/5000.0);
+  s.translate(-s.width/2, -s.height/2);
+  s.image(sphereImg, 0, 0, s.width, s.height);
+  s.mask(tempSphere);
+  s.endDraw();
+}
+
+void displaySpiralSphere(color c) {
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.tint(c);
   s.background(0);
   s.translate(s.width/2, s.height/2);
   s.rotateZ(millis()/5000.0);
