@@ -104,6 +104,7 @@ class Scene {
 
     else {
       if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
+      else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
       else songFile = minim.loadFile("music/backing/" + shortName + ".wav");
     }
 

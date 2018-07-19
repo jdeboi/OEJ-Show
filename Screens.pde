@@ -92,6 +92,14 @@ class Screen {
     s.endDraw();
   }
 
+  void drawImageMirror(PImage img, int x, int y, int w, int h) {
+    s.beginDraw();
+    s.pushMatrix();
+    s.scale(-1.0, 1.0);
+    s.image(img, -screenW+x, y, w, h);
+    s.popMatrix();
+    s.endDraw();
+  }
   //void drawFFTBars() {
   //  s.beginDraw();
   //  s.background(0);

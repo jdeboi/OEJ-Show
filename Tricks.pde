@@ -445,8 +445,9 @@ void updateNodeConstellationHand() {
 //////////////////////////////////////////////////////////////////////////////////
 PImage iris;
 PShape eyeball;
+PShape sphereBall;
 void initEye() {
-  iris = loadImage("images/iris.png");
+  iris = loadImage("images/sphere/iris_rain.png");
   noStroke();
   eyeball = createShape(SPHERE, sphereScreen.s.width*.43); 
   eyeball.setTexture(iris);

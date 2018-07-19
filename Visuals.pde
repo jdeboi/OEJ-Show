@@ -213,7 +213,7 @@ void displayNodeConstellation(PGraphics s) {
     for (int j = 0; j < nodes.length; j++) {
       if (i != j && nodes[i].connect(nodes[j], dis)) {
         s.stroke(255);
-        s.strokeWeight(2);
+        s.strokeWeight(3);
         s.line(nodes[i].pos.x, nodes[i].pos.y, nodes[j].pos.x, nodes[j].pos.y);
       }
     }
@@ -2057,7 +2057,7 @@ void displaySpaceRects(int sw, int mode, color c1, color c2, color c3, boolean i
     //s.image(currentImages.get(0), -(i-1)*screenW, 0);
     s.filter(galaxyShader);
     s.image(temp, 0, 0);
-    
+
     s.endDraw();
   }
 }
@@ -3093,71 +3093,109 @@ void moveConstellationLines(int speed) {
   }
 }
 
+void rotateSphereBall() {
+  //sphereConstellationDraw();
+  
+  PGraphics s = sphereScreen.s;
+  s.beginDraw();
+  s.background(0);
+  s.translate(s.width/2, s.height/2);
+  s.rotateY(millis()/4000.0);
+  s.shape(sphereBall);
+  s.endDraw();
+ 
+}
+
+void initSphereBallRite() {
+  sphereBall = createShape(SPHERE, sphereScreen.s.width*.43); 
+  sphereBall.setTexture(loadImage("images/sphere/constspheresm.png"));
+}
+
+void initSphereBallDelta() {
+  sphereBall = createShape(SPHERE, sphereScreen.s.width*.43); 
+  sphereBall.setTexture(loadImage("images/sphere/plutomap.jpg"));
+}
+
 class ConstellationLine {
 
-  ArrayList<PVector> points;
-  int x, y;
-  float angle;
+  ArrayList<PVector> points; 
+  int x, y; 
+  float angle; 
 
   ConstellationLine(int x, int y) {
-    this.x = x;
-    this.y = y;
-    this.angle = random(2 * PI);
-    points = new ArrayList<PVector>();
-    points.add(new PVector(0, 0));
+    this.x = x; 
+    this.y = y; 
+    this.angle = random(2 * PI); 
+    points = new ArrayList<PVector>(); 
+    points.add(new PVector(0, 0)); 
     randomPoints();
   }
 
-  void display(PGraphics o, int screenNum) {
-    int dotS = 10;
-    o.pushMatrix();
-    o.stroke(255);
-    o.strokeWeight(3);
-    o.fill(255);
-    o.translate(x-screenW*screenNum, y);
-    o.rotateZ(this.angle);
-    angle += .001;
+  void displayInPlace(PGraphics o, int xp, int yp) {
+    int dotS = 10; 
+    o.pushMatrix(); 
+    o.stroke(255); 
+    o.strokeWeight(3); 
+    o.fill(255); 
+    o.translate(xp, yp); 
     for (int i = 0; i < points.size()-1; i++) {
-      o.ellipse(points.get(i).x, points.get(i).y, dotS, dotS);
+      o.ellipse(points.get(i).x, points.get(i).y, dotS, dotS); 
       o.line(points.get(i).x, points.get(i).y, points.get(i+1).x, points.get(i+1).y);
     }
-    o.ellipse(points.get(points.size()-1).x, points.get(points.size()-1).y, dotS, dotS);
+    o.ellipse(points.get(points.size()-1).x, points.get(points.size()-1).y, dotS, dotS); 
+    o.popMatrix();
+  }
+
+  void display(PGraphics o, int screenNum) {
+    int dotS = 10; 
+    o.pushMatrix(); 
+    o.stroke(255); 
+    o.strokeWeight(3); 
+    o.fill(255); 
+    o.translate(x-screenW*screenNum, y); 
+    o.rotateZ(this.angle); 
+    angle += .001; 
+    for (int i = 0; i < points.size()-1; i++) {
+      o.ellipse(points.get(i).x, points.get(i).y, dotS, dotS); 
+      o.line(points.get(i).x, points.get(i).y, points.get(i+1).x, points.get(i+1).y);
+    }
+    o.ellipse(points.get(points.size()-1).x, points.get(points.size()-1).y, dotS, dotS); 
     o.popMatrix();
   }
 
   void move(float speed) {
-    this.x += speed;
-    if (this.x > screenW*4 + 300) this.x = -300;
+    this.x += speed; 
+    if (this.x > screenW*4 + 300) this.x = -300; 
     else if (this.x < -300) this.x = screenW*4 + 300;
   }
 
   void randomPoints() {
-    int numPoints = int(random(3, 5));
-    int p = 1;
-    float xp = 0;
-    float yp = 0;
-    float ang = 0;
+    int numPoints = int(random(3, 5)); 
+    int p = 1; 
+    float xp = 0; 
+    float yp = 0; 
+    float ang = 0; 
     while (p <= numPoints) {
-      p++;
-      float len = random(100, 200);
+      p++; 
+      float len = random(100, 200); 
       if (p == 3) {
-        int join = millis()%3;
+        int join = millis()%3; 
         if (join == 0) {
-          xp = points.get(1).x;
+          xp = points.get(1).x; 
           yp = points.get(1).y;
         } else if (join == 1) {
-          xp = points.get(0).x;
+          xp = points.get(0).x; 
           yp = points.get(0).y;
         } else {
-          int num = int(random(1, 8));
-          float newAng = num * (2 * PI) / 8;
-          xp += len * cos(newAng);
+          int num = int(random(1, 8)); 
+          float newAng = num * (2 * PI) / 8; 
+          xp += len * cos(newAng); 
           yp += len * sin(newAng);
         }
       } else {
-        int num = int(random(1, 8));
-        float newAng = num * (2 * PI) / 8;
-        xp += len * cos(newAng);
+        int num = int(random(1, 8)); 
+        float newAng = num * (2 * PI) / 8; 
+        xp += len * cos(newAng); 
         yp += len * sin(newAng);
       }
       points.add(new PVector(xp, yp));
@@ -3167,10 +3205,10 @@ class ConstellationLine {
 
 void displaySymbolLines() {
   for (int j = 1; j < 3; j++) {
-    PGraphics s = screens[j].s;
-    s.beginDraw();
-    s.background(0);
-    s.blendMode(LIGHTEST);
+    PGraphics s = screens[j].s; 
+    s.beginDraw(); 
+    s.background(0); 
+    s.blendMode(LIGHTEST); 
     if (millis()/3000%3 == 0) {
       for (int i = 0; i < 4; i++) {
         displaySymbolLine(s, random(s.width/3, s.width/4*3), 30 + random(50)); //s.width/2 + s.width/5 * sin(millis()/500.0 + i), 30 + random(50));
@@ -3186,8 +3224,8 @@ void displaySymbolLines() {
 
 
 void displaySymbolLine(PGraphics s, float x, float y) {
-  int sz = 30;
-  int padding = 5;
+  int sz = 30; 
+  int padding = 5; 
   for (int i = 0; i < symbols.length; i++) {
     s.image(symbols[i], x, y + i*( sz + padding), sz, sz);
   }
@@ -3199,26 +3237,26 @@ void displaySymbolLine(PGraphics s, float x, float y) {
 //////////////////////////////////////////////////////////////////////////////////
 //https://github.com/robu3/delaunay
 // https://www.openprocessing.org/sketch/385808
-ArrayList<PVector> pts;
-DelaunayTriangulator dt;
+ArrayList<PVector> pts; 
+DelaunayTriangulator dt; 
 
 void Triangulate() {
-  dt = new DelaunayTriangulator();
-  dt.points = pts.toArray(new PVector[pts.size()]);
+  dt = new DelaunayTriangulator(); 
+  dt.points = pts.toArray(new PVector[pts.size()]); 
   dt.triangles = dt.Calculate();
 }
 
 void initializeTriangulation(int cuenum) {
   if (cuenum != lastCueDelaunay) {
-    lastCueDelaunay = cuenum;
-    pts = new ArrayList<PVector>();
-    pts.add( new PVector( 0, 0 ) );
-    pts.add( new PVector( screenW, 0 ) );
-    pts.add( new PVector( screenW, screenH ) );
-    pts.add( new PVector( 0, screenH ) );
+    lastCueDelaunay = cuenum; 
+    pts = new ArrayList<PVector>(); 
+    pts.add( new PVector( 0, 0 ) ); 
+    pts.add( new PVector( screenW, 0 ) ); 
+    pts.add( new PVector( screenW, screenH ) ); 
+    pts.add( new PVector( 0, screenH ) ); 
     // add a certain nb of pts proportionally to the size of the canvas
     // ~~ truncates a floating point number and keeps the integer part, like floor()
-    int n = int ( screenW / 300.0 * screenH / 300.0 );
+    int n = int ( screenW / 300.0 * screenH / 300.0 ); 
     for ( int i = 0; i < n; i ++ ) {
       pts.add( new PVector( int(random( screenW )), int(random( screenH )) ) );
     }
@@ -3228,8 +3266,8 @@ void initializeTriangulation(int cuenum) {
 }
 
 public class DelaunayTriangulator {
-  PVector[] points;
-  ArrayList<Triangle> triangles;
+  PVector[] points; 
+  ArrayList<Triangle> triangles; 
 
   // sort points in clockwise order (in place)
   // insertion sort
@@ -3238,12 +3276,12 @@ public class DelaunayTriangulator {
     // sort in clockwise order
     // left -> right
     for (int i = 1; i < pts.length; i++) {
-      PVector p = pts[i];
-      int pos = i;
+      PVector p = pts[i]; 
+      int pos = i; 
 
       while (pos > 0 && IsCcw(p, pts[pos - 1], center)) {
         // larger value shifts up
-        pts[pos] = pts[pos - 1];
+        pts[pos] = pts[pos - 1]; 
         // insert position moves down
         pos = pos - 1;
       }
@@ -3259,8 +3297,8 @@ public class DelaunayTriangulator {
   // NOTE: not currently in use
 
   private boolean IsCcw(PVector a, PVector b, PVector center) {
-    PVector diffA = PVector.sub(center, a);
-    PVector diffB = PVector.sub(center, b);
+    PVector diffA = PVector.sub(center, a); 
+    PVector diffB = PVector.sub(center, b); 
 
     if (diffA.x >= 0 && diffB.x < 0) {
       return true;
@@ -3271,7 +3309,7 @@ public class DelaunayTriangulator {
 
     // (0, 0, 1) is the perpendicular vector
     // it is the vector perpendicular to the xy plane
-    float dot = PVector.dot(diffA.cross(diffB), new PVector(0, 0, 1));
+    float dot = PVector.dot(diffA.cross(diffB), new PVector(0, 0, 1)); 
     if (dot < 0) {
       return true;
     } else if (dot > 0) {
@@ -3287,13 +3325,13 @@ public class DelaunayTriangulator {
   // this used as a starting reference for the algorithm
   public Triangle GetSuperTriangle() {
     // find min & max x and y values
-    float xMin = points[0].x;
-    float yMin = points[0].y;
-    float xMax = xMin;
-    float yMax = yMin;
+    float xMin = points[0].x; 
+    float yMin = points[0].y; 
+    float xMax = xMin; 
+    float yMax = yMin; 
 
     for (int i = 0; i < points.length; i++) {
-      PVector p = points[i];
+      PVector p = points[i]; 
       if (p.x < xMin) {
         xMin = p.x;
       }
@@ -3309,17 +3347,17 @@ public class DelaunayTriangulator {
     }
 
     // build triangle that contains the min and max values
-    float dx = xMax - xMin;
-    float dy = yMax - yMin;
-    float dMax = dx > dy ? dx : dy;
-    float xMid = (xMin + xMax) / 2f;
-    float yMid = (yMin + yMax) / 2f;
+    float dx = xMax - xMin; 
+    float dy = yMax - yMin; 
+    float dMax = dx > dy ? dx : dy; 
+    float xMid = (xMin + xMax) / 2f; 
+    float yMid = (yMin + yMax) / 2f; 
 
     Triangle superTri = new Triangle(
       new PVector(xMid - 2f * dMax, yMid - dMax), 
       new PVector(xMid, yMid + 2f * dMax), 
       new PVector(xMid + 2f * dMax, yMid - dMax)
-      );
+      ); 
 
     return superTri;
   }
@@ -3329,30 +3367,30 @@ public class DelaunayTriangulator {
   public ArrayList<Triangle> Calculate()
   {
     // the buffer of current triangles
-    ArrayList<Triangle> triangleBuffer = new ArrayList<Triangle>();
+    ArrayList<Triangle> triangleBuffer = new ArrayList<Triangle>(); 
 
     // final collection of completed triangles
-    ArrayList<Triangle> completed = new ArrayList<Triangle>();
+    ArrayList<Triangle> completed = new ArrayList<Triangle>(); 
 
     // add the super triangle
-    Triangle superTriangle = GetSuperTriangle();
-    triangleBuffer.add(superTriangle);
+    Triangle superTriangle = GetSuperTriangle(); 
+    triangleBuffer.add(superTriangle); 
 
     // add each point
-    PVector point;
-    ArrayList<Edge> edgeBuffer = new ArrayList<Edge>();
+    PVector point; 
+    ArrayList<Edge> edgeBuffer = new ArrayList<Edge>(); 
     for (int i = 0; i < points.length; i++) {
-      point = points[i];
-      edgeBuffer.clear();
+      point = points[i]; 
+      edgeBuffer.clear(); 
 
       // iterate over all current triangles (in reverse)
       // checking to see if the current point is included
       // in a triangles circumcircle
       for (int j = triangleBuffer.size() - 1; j >= 0; j--) {
-        Triangle tri = triangleBuffer.get(j);
+        Triangle tri = triangleBuffer.get(j); 
 
-        PVector circumcenter = tri.GetCircumcenter();
-        float rad = circumcenter.dist(tri.points[0]);
+        PVector circumcenter = tri.GetCircumcenter(); 
+        float rad = circumcenter.dist(tri.points[0]); 
 
         if (circumcenter.x + rad < point.x) {
           // triangle is complete
@@ -3363,9 +3401,9 @@ public class DelaunayTriangulator {
         if (circumcenter.dist(point) < rad) {
           // inside
           // add edges to buffer and remove the triangle
-          edgeBuffer.add(new Edge(tri.points[0], tri.points[1]));
-          edgeBuffer.add(new Edge(tri.points[1], tri.points[2]));
-          edgeBuffer.add(new Edge(tri.points[2], tri.points[0]));
+          edgeBuffer.add(new Edge(tri.points[0], tri.points[1])); 
+          edgeBuffer.add(new Edge(tri.points[1], tri.points[2])); 
+          edgeBuffer.add(new Edge(tri.points[2], tri.points[0])); 
           triangleBuffer.remove(j);
         }
       }
@@ -3374,12 +3412,12 @@ public class DelaunayTriangulator {
       // check for duplicate edges
       // if found, remove them
       for (int j = 0; j < edgeBuffer.size() - 1; j++) {
-        Edge edgeA = edgeBuffer.get(j);
+        Edge edgeA = edgeBuffer.get(j); 
         if (edgeA != null) {
           for (int k = j + 1; k < edgeBuffer.size(); k++) {
-            Edge edgeB = edgeBuffer.get(k);
+            Edge edgeB = edgeBuffer.get(k); 
             if (edgeA.IsEqual(edgeB)) {
-              edgeBuffer.set(j, null);
+              edgeBuffer.set(j, null); 
               edgeBuffer.set(k, null);
             }
           }
@@ -3389,13 +3427,13 @@ public class DelaunayTriangulator {
       // build new triangles from
       // the remaining edges
       for (int j = 0; j < edgeBuffer.size(); j++) {
-        Edge edge = edgeBuffer.get(j);
+        Edge edge = edgeBuffer.get(j); 
         if (edge == null) {
           continue;
         }
 
         // make sure to order points in a clockwise fashion
-        Triangle tri = new Triangle(edge.p1, edge.p2, point);
+        Triangle tri = new Triangle(edge.p1, edge.p2, point); 
         triangleBuffer.add(tri);
       }
     }
@@ -3409,7 +3447,7 @@ public class DelaunayTriangulator {
     }
 
     // set local triangles collection
-    triangles = triangleBuffer;
+    triangles = triangleBuffer; 
 
     return triangleBuffer;
   }
@@ -3420,8 +3458,8 @@ public class DelaunayTriangulator {
 }
 
 class Edge {
-  public PVector p1;  
-  public PVector p2;  
+  public PVector p1; 
+  public PVector p2; 
 
   public boolean IsEqual(Edge other) {
     if (other == null) {
@@ -3432,7 +3470,7 @@ class Edge {
   }
 
   public Edge(PVector a, PVector b) {
-    p1 = a;
+    p1 = a; 
     p2 = b;
   }
 }
@@ -3440,14 +3478,14 @@ class Edge {
 void drawDelaunayTriCube(int index) {
 
   for (int j = index*2; j < (index+1)*2; j++) {
-    PGraphics s = screens[j].s;
-    s.beginDraw();
+    PGraphics s = screens[j].s; 
+    s.beginDraw(); 
     if (dt != null)
       if (j % 2 == 0) {
-        s.pushMatrix();
-        s.scale(-1, 1);
-        s.translate(-screenW, 0);
-        for (Triangle t : dt.triangles) t.display(s);
+        s.pushMatrix(); 
+        s.scale(-1, 1); 
+        s.translate(-screenW, 0); 
+        for (Triangle t : dt.triangles) t.display(s); 
         s.popMatrix();
       } else {
         for (Triangle t : dt.triangles) t.display(s);
@@ -3457,59 +3495,59 @@ void drawDelaunayTriCube(int index) {
 }
 
 void drawDelaunayTriAll() {
-  int j = 0;
+  int j = 0; 
   for (Screen s : screens) {
-    s.s.beginDraw();
+    s.s.beginDraw(); 
     if (dt != null)
       if (j == 1 || j == 3) {
-        s.s.pushMatrix();
-        s.s.scale(-1, 1);
-        s.s.translate(-screenW, 0);
-        for (Triangle t : dt.triangles) t.display(s.s);
+        s.s.pushMatrix(); 
+        s.s.scale(-1, 1); 
+        s.s.translate(-screenW, 0); 
+        for (Triangle t : dt.triangles) t.display(s.s); 
         s.s.popMatrix();
       } else {
         for (Triangle t : dt.triangles) t.display(s.s);
       }
-    j++;
+    j++; 
     s.s.endDraw();
   }
 }
 
 class Triangle {
-  PVector[] points;
+  PVector[] points; 
   // used for fill using lerpColor
-  float r = random(0.8);
-  color col = color(255);
+  float r = random(0.8); 
+  color col = color(255); 
   // used for drawing lines on triangles
   // number of lines to draw proportionnally to the triangle size
-  float n;    // direction point for the lines
-  int drawTo = (int)(Math.random()*3);
+  float n; // direction point for the lines
+  int drawTo = (int)(Math.random()*3); 
 
   // returns the circumcenter for the specified triangle
   // the circumcenter is the intersection of two perpendicular bisectors
   // for any given triangle
   public PVector GetCircumcenter(PVector a, PVector b, PVector c) {
     // determine midpoints (average of x & y coordinates)
-    PVector midAB = Midpoint(a, b);
-    PVector midBC = Midpoint(b, c);
+    PVector midAB = Midpoint(a, b); 
+    PVector midBC = Midpoint(b, c); 
 
     // determine slope
     // we need the negative reciprocal of the slope to get the slope of the perpendicular bisector
-    float slopeAB = -1 / Slope(a, b);
-    float slopeBC = -1 / Slope(b, c);
+    float slopeAB = -1 / Slope(a, b); 
+    float slopeBC = -1 / Slope(b, c); 
 
     // y = mx + b
     // solve for b
-    float bAB = midAB.y - slopeAB * midAB.x;
-    float bBC = midBC.y - slopeBC * midBC.x;
+    float bAB = midAB.y - slopeAB * midAB.x; 
+    float bBC = midBC.y - slopeBC * midBC.x; 
 
     // solve for x & y
     // x = (b1 - b2) / (m2 - m1)
-    float x = (bAB - bBC) / (slopeBC - slopeAB);
+    float x = (bAB - bBC) / (slopeBC - slopeAB); 
     PVector circumcenter = new PVector(
       x, 
       (slopeAB * x) + bAB
-      );
+      ); 
 
     return circumcenter;
   }
@@ -3521,14 +3559,14 @@ class Triangle {
 
   // Returns true if p is in the circumcircle of this triangle
   public boolean CircumcircleContains(PVector p) {
-    PVector center = GetCircumcenter();
-    float rad = center.dist(points[0]);
+    PVector center = GetCircumcenter(); 
+    float rad = center.dist(points[0]); 
     return center.dist(p) <= rad;
   }
 
   // Returns the points in points contained in the circumcircle
   public ArrayList<PVector> GetContainedPoints(PVector[] points) {
-    ArrayList<PVector> contained = new ArrayList<PVector>();
+    ArrayList<PVector> contained = new ArrayList<PVector>(); 
     for (int i = 0; i < points.length; i++) {
       if (CircumcircleContains(points[i])) {
         contained.add(points[i]);
@@ -3582,74 +3620,74 @@ class Triangle {
 
   // constructor using vectors
   public Triangle(PVector a, PVector b, PVector c) {
-    color cyan = color(0, 255, 255);
-    color blue = color(0, 0, 255);
-    color lime = color(70, 255, 0);
-    color pink = color(255, 0, 155);
-    points = new PVector[3];
-    points[0] = a;
-    points[1] = b;
-    points[2] = c;
-    n = getD(points[0], points[1], points[2]);
-    color[] colors = {cyan, pink, blue, lime};
+    color cyan = color(0, 255, 255); 
+    color blue = color(0, 0, 255); 
+    color lime = color(70, 255, 0); 
+    color pink = color(255, 0, 155); 
+    points = new PVector[3]; 
+    points[0] = a; 
+    points[1] = b; 
+    points[2] = c; 
+    n = getD(points[0], points[1], points[2]); 
+    color[] colors = {cyan, pink, blue, lime}; 
     col = colors[int(random(4))];
   }
 
   public void display(PGraphics s) {
 
 
-    s.noStroke();
+    s.noStroke(); 
     //s.fill( lerpColor( color(255), color(0), this.r ) );
-    s.fill(col);
+    s.fill(col); 
 
-    s.triangle( points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y );
+    s.triangle( points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y ); 
 
     switch( this.drawTo ) {
-    case 0:
-      drawLines(s, points[0], points[1], points[2] );
-      break;
-    case 1:
-      drawLines(s, points[2], points[0], points[1] );
-      break;
-    case 2:
-      drawLines(s, points[1], points[0], points[2] );
+    case 0 : 
+      drawLines(s, points[0], points[1], points[2] ); 
+      break; 
+    case 1 : 
+      drawLines(s, points[2], points[0], points[1] ); 
+      break; 
+    case 2 : 
+      drawLines(s, points[1], points[0], points[2] ); 
       break;
     }
 
-    s.stroke( color(0) );
-    s.strokeJoin( BEVEL );
-    s.strokeWeight( 15 );
-    s.noFill();
+    s.stroke( color(0) ); 
+    s.strokeJoin( BEVEL ); 
+    s.strokeWeight( 15 ); 
+    s.noFill(); 
     s.triangle( points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y );
-  };
+  }; 
   float getD(PVector p1, PVector p2, PVector p3) {
-    return (dist( p1.x, p1.y, ( p2.x + p2.x )*1.0 / 2, ( p3.y + p3.y )*1.0 / 2 ) / random( 25, 50 ) ) + 1 ;
+    return (dist( p1.x, p1.y, ( p2.x + p2.x )*1.0 / 2, ( p3.y + p3.y )*1.0 / 2 ) / random( 25, 50 ) ) + 1;
   }
   void drawLines(PGraphics s, PVector from, PVector to1, PVector to2 ) {
-    float c =  -.05 + .7*cos( frameCount *1.0 / 360 * TWO_PI ) / 2;
+    float c =  -.05 + .7*cos( frameCount *1.0 / 360 * TWO_PI ) / 2; 
 
     for ( int i = 1; i <= this.n; i++ ) {
       PVector p1 = new PVector( 
         lerp( from.x, to1.x, ( i - 1 )*1.0 / this.n ), 
         lerp( from.y, to1.y, ( i - 1 )*1.0 / this.n )
-        );
+        ); 
       PVector  p2 = new PVector(
         lerp( from.x, to2.x, ( i - 1 )*1.0 / this.n ), 
         lerp( from.y, to2.y, ( i - 1 )*1.0 / this.n )
-        );
+        ); 
       PVector  p3 = new PVector(
         lerp( from.x, to2.x, ( i - 0.5 + c )*1.0 / this.n ), 
         lerp( from.y, to2.y, ( i - 0.5 + c )*1.0 / this.n )
-        );
+        ); 
       PVector  p4 = new PVector( 
         lerp( from.x, to1.x, ( i - 0.5 + c )*1.0 / this.n ), 
         lerp( from.y, to1.y, ( i - 0.5 + c )*1.0 / this.n )
-        );
+        ); 
 
       //line( p1.x, p1.y, p2.x, p2.y );
 
-      s.noStroke();
-      s.fill( color(0) );
+      s.noStroke(); 
+      s.fill( color(0) ); 
       s.quad( p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y );
     }
   }
@@ -3660,29 +3698,29 @@ class Triangle {
 //////////////////////////////////////////////////////////////////////////////////
 
 void ellipseRun(PGraphics s, float w, float sp, float per, color c1, color c2) {
-  s.noStroke();
+  s.noStroke(); 
   for (int i = s.width*2; i > 0; i-= (sp+w)) {
-    s.noFill();
-    s.strokeWeight(w/2);
+    s.noFill(); 
+    s.strokeWeight(w/2); 
 
 
-    float newW = map(per, 0, 1, 0, s.width*2);
-    newW += i;
-    newW %= s.width*2;
-    s.stroke(lerpColor(c1, c2, newW/ s.width));
+    float newW = map(per, 0, 1, 0, s.width*2); 
+    newW += i; 
+    newW %= s.width*2; 
+    s.stroke(lerpColor(c1, c2, newW/ s.width)); 
     s.ellipse(s.width/2, s.height/2, newW, newW);
   }
 }
 void splitRect(PGraphics s, color c1, color c2) {
-  int mode = (currentCycle-1)/4%4;
-  s.fill(c2);
-  s.noStroke();
+  int mode = (currentCycle-1)/4%4; 
+  s.fill(c2); 
+  s.noStroke(); 
   if (mode > 0) {
     for (int x = 0; x <= pow(2, mode); x++) {
-      s.pushMatrix();
+      s.pushMatrix(); 
       //s.translate(10*sin(percentToNumBeats(8)*2*PI), 0);
       for (int y = 0; y <= pow(2, mode); y++) {
-        if (y%2 ==0) s.rect(x*s.width/pow(2, mode)*2, y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
+        if (y%2 ==0) s.rect(x*s.width/pow(2, mode)*2, y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode)); 
         else s.rect(x*s.width/pow(2, mode)*2 + s.width/pow(2, mode), y*s.height/pow(2, mode), s.width/pow(2, mode), s.height/pow(2, mode));
       }
       s.popMatrix();
@@ -3692,165 +3730,165 @@ void splitRect(PGraphics s, color c1, color c2) {
 
 void cycleCubeMovingStripes(int lw, int lsp, float per, color c1, color c2, color l1, color l2) {
   if ((currentCycle-1)/4 % 2 == 0) {
-    drawVertLinesScreen(screens[0].s, lw, lsp, per, c1, 0);
-    colorMode(HSB);
-    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
-    drawVertLinesScreen(screens[1].s, lw, lsp, per, c, 0);
-    colorMode(RGB);
-    screens[2].blackOut();
-    screens[3].blackOut();
+    drawVertLinesScreen(screens[0].s, lw, lsp, per, c1, 0); 
+    colorMode(HSB); 
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70); 
+    drawVertLinesScreen(screens[1].s, lw, lsp, per, c, 0); 
+    colorMode(RGB); 
+    screens[2].blackOut(); 
+    screens[3].blackOut(); 
     displayCubeLines(l1, 0);
   } else {
-    drawVertLinesScreen(screens[2].s, lw, lsp, per, c2, 0);
-    colorMode(HSB);
-    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
-    drawVertLinesScreen(screens[3].s, lw, lsp, per, c, 0);
-    colorMode(RGB);
-    screens[0].blackOut();
-    screens[1].blackOut();
+    drawVertLinesScreen(screens[2].s, lw, lsp, per, c2, 0); 
+    colorMode(HSB); 
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70); 
+    drawVertLinesScreen(screens[3].s, lw, lsp, per, c, 0); 
+    colorMode(RGB); 
+    screens[0].blackOut(); 
+    screens[1].blackOut(); 
     displayCubeLines(0, l2);
   }
 }
 
 void cycleCubeDelaunay(color l1, color l2) {
   if ((currentCycle-1)/4 % 2 == 0) {
-    drawDelaunayTriCube(0);
-    screens[2].blackOut();
-    screens[3].blackOut();
+    drawDelaunayTriCube(0); 
+    screens[2].blackOut(); 
+    screens[3].blackOut(); 
     displayCubeLines(l1, 0);
   } else {
-    drawDelaunayTriCube(1);
-    screens[0].blackOut();
-    screens[1].blackOut();
+    drawDelaunayTriCube(1); 
+    screens[0].blackOut(); 
+    screens[1].blackOut(); 
     displayCubeLines(0, l2);
   }
 }
 
 void cycleCubeLight(color c1, color c2, color l1, color l2) {
   if ((currentCycle-1)/4 % 2 == 0) {
-    PGraphics s = screens[0].s;
-    s.beginDraw();
-    s.background(c1);
-    s.noStroke();
-    s.fill(c2);
-    s.rect(0, 0, s.width, s.height/2);
-    s.fill(c1);
-    s.ellipse(s.width/2, s.height/2, s.width/2, s.width/2);
-    s.fill(c2);
-    s.arc(s.width/2, s.height/2, s.width/2, s.width/2, 0, PI);
-    s.endDraw();
-    colorMode(HSB);
-    color c = color(hue(c1), saturation(c1), brightness(c2) - 70);
-    screens[1].drawSolid(c);
-    colorMode(RGB);
-    screens[2].blackOut();
-    screens[3].blackOut();
+    PGraphics s = screens[0].s; 
+    s.beginDraw(); 
+    s.background(c1); 
+    s.noStroke(); 
+    s.fill(c2); 
+    s.rect(0, 0, s.width, s.height/2); 
+    s.fill(c1); 
+    s.ellipse(s.width/2, s.height/2, s.width/2, s.width/2); 
+    s.fill(c2); 
+    s.arc(s.width/2, s.height/2, s.width/2, s.width/2, 0, PI); 
+    s.endDraw(); 
+    colorMode(HSB); 
+    color c = color(hue(c1), saturation(c1), brightness(c2) - 70); 
+    screens[1].drawSolid(c); 
+    colorMode(RGB); 
+    screens[2].blackOut(); 
+    screens[3].blackOut(); 
     displayCubeLines(l1, 0);
   } else {
-    screens[2].drawSolid(c2);
-    colorMode(HSB);
-    color c = color(hue(c2), saturation(c2), brightness(c2) - 70);
-    screens[3].drawSolid(c);
-    colorMode(RGB);
-    screens[0].blackOut();
-    screens[1].blackOut();
+    screens[2].drawSolid(c2); 
+    colorMode(HSB); 
+    color c = color(hue(c2), saturation(c2), brightness(c2) - 70); 
+    screens[3].drawSolid(c); 
+    colorMode(RGB); 
+    screens[0].blackOut(); 
+    screens[1].blackOut(); 
     displayCubeLines(0, l2);
   }
 }
 
 void drawHorizLinesGradientScreen(PGraphics s, int lh, int lsp, float per, color c1, color c2) {
-  s.noStroke();
-  int extra = (lh + 2*lsp);
+  s.noStroke(); 
+  int extra = (lh + 2*lsp); 
   for (int i = 0; i < s.height + extra; i += (lh + lsp)) {
 
-    float y = map(per, 0, 1, -extra, s.height);
+    float y = map(per, 0, 1, -extra, s.height); 
 
-    y += i;
-    if (y >= s.height) y -= (extra + s.height);
-    s.fill(lerpColor(c1, c2, y/s.height));
+    y += i; 
+    if (y >= s.height) y -= (extra + s.height); 
+    s.fill(lerpColor(c1, c2, y/s.height)); 
     s.rect(0, y, s.width, lh);
   }
 }
 
 void drawVertDirtyOutside(float per) {
   for (int i = 0; i < 4; i+= 3) {
-    PGraphics s = screens[i].s;
-    s.beginDraw();
-    s.background(0);
+    PGraphics s = screens[i].s; 
+    s.beginDraw(); 
+    s.background(0); 
     //s.filter(galaxyShader);
-    if (i == 0) drawVertLinesScreen(s, 8, 50, per, cyan, -1);
-    else drawVertLinesScreen(s, 8, 50, per, cyan, 1);
+    if (i == 0) drawVertLinesScreen(s, 8, 50, per, cyan, -1); 
+    else drawVertLinesScreen(s, 8, 50, per, cyan, 1); 
     s.endDraw();
   }
 }
 
 void drawVertDirtyOutsideSpeed(float speed) {
-  drawSolidOuter(0);
-  int j = 0;
-  if (mouseX > width/2) j = 3;
+  drawSolidOuter(0); 
+  int j = 0; 
+  if (mouseX > width/2) j = 3; 
   //for (int i = 0; i < 4; i+= 3) {
-    PGraphics s = screens[j].s;
-    s.beginDraw();
-    s.background(0);
-    //s.filter(galaxyShader);
-    drawVertLinesScreen(s, 8, 50, cyan, pink, percentToNumBeats(8), speed);
-    s.endDraw();
+  PGraphics s = screens[j].s; 
+  s.beginDraw(); 
+  s.background(0); 
+  //s.filter(galaxyShader);
+  drawVertLinesScreen(s, 8, 50, cyan, pink, percentToNumBeats(8), speed); 
+  s.endDraw(); 
   //}
 }
 
 void drawVertDirtySineOutside(float per) {
   for (int i = 0; i < 4; i+= 3) {
-    PGraphics s = screens[i].s;
-    s.beginDraw();
-    s.background(0);
-    if (i == 0) drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, -1);
-    else drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, 1);
+    PGraphics s = screens[i].s; 
+    s.beginDraw(); 
+    s.background(0); 
+    if (i == 0) drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, -1); 
+    else drawVertLinesGradientScreen(s, 8, 50, sin(per * 2*PI + i + 0.02), cyan, pink, 1); 
     s.endDraw();
   }
 }
 
 void drawVertLinesGradientScreenAcross(PGraphics s, int lw, int lsp, int screenNum, float per, color c1, color c2, color c3) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
+  s.noStroke(); 
+  int extra = (lw + 2*lsp); 
   for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
 
-    float x = map(per, 0, 1, -extra, s.width);
+    float x = map(per, 0, 1, -extra, s.width); 
 
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.fill(getCycleColor(c1, c2, c3, (x+screenNum * screenW)/(screenW*4)));
+    x += i; 
+    if (x >= s.width) x -= (extra + s.width); 
+    s.fill(getCycleColor(c1, c2, c3, (x+screenNum * screenW)/(screenW*4))); 
     s.rect(x, 0, lw, s.height);
   }
 }
 
 void drawVertLinesGradientScreen(PGraphics s, int lw, int lsp, float per, color c1, color c2, int direction) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
+  s.noStroke(); 
+  int extra = (lw + 2*lsp); 
   for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
 
-    float x = 0;
-    if (direction > 0) x = map(per, 0, 1, -extra, s.width);
-    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width);
-    x += i;
-    if (x >= s.width) x -= (extra + s.width);
-    s.fill(lerpColor(c1, c2, x/s.width));
+    float x = 0; 
+    if (direction > 0) x = map(per, 0, 1, -extra, s.width); 
+    else if (direction < 0) x = map(1-per, 0, 1, -extra, s.width); 
+    x += i; 
+    if (x >= s.width) x -= (extra + s.width); 
+    s.fill(lerpColor(c1, c2, x/s.width)); 
     s.rect(x, 0, lw, s.height);
   }
 }
 
 void drawVertLinesScreen(PGraphics s, int lw, int lsp, color c1, color c2, float per, float speed) {
-  s.noStroke();
-  int extra = (lw + 2*lsp);
+  s.noStroke(); 
+  int extra = (lw + 2*lsp); 
   for (int i = 0; i < s.width + extra; i += (lw + lsp)) {
 
-    float x = 0;
-    if (speed > 0) x = map(per, 0, 1, -extra, s.width);
-    else if (speed < 0) x = map(1-per, 0, 1, -extra, s.width);
-    x *= abs(speed)  * 2;
-    x += i;
+    float x = 0; 
+    if (speed > 0) x = map(per, 0, 1, -extra, s.width); 
+    else if (speed < 0) x = map(1-per, 0, 1, -extra, s.width); 
+    x *= abs(speed)  * 2; 
+    x += i; 
 
-    if (x >= s.width) x -= (extra + s.width);
-    s.fill(lerpColor(c1, c2, x/s.width));
+    if (x >= s.width) x -= (extra + s.width); 
+    s.fill(lerpColor(c1, c2, x/s.width)); 
     s.rect(x, 0, lw, s.height);
   }
 }
@@ -3860,45 +3898,45 @@ void drawVertLinesScreen(PGraphics s, int lw, int lsp, float per, color c, int d
 
 void drawVertLinesGradientAll(int lw, int lsp, float per, color c1, color c2, int direction) {
   for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2, direction);
+    screens[j].s.beginDraw(); 
+    screens[j].s.background(0); 
+    drawVertLinesGradientScreen(screens[j].s, lw, lsp, per, c1, c2, direction); 
     screens[j].s.endDraw();
   }
 }
 
 void drawVertLinesGradientAcrossAll(int lw, int lsp, float per, color c1, color c2, color c3) {
   for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    drawVertLinesGradientScreenAcross(screens[j].s, lw, lsp, j, per, c1, c2, c3);
+    screens[j].s.beginDraw(); 
+    screens[j].s.background(0); 
+    drawVertLinesGradientScreenAcross(screens[j].s, lw, lsp, j, per, c1, c2, c3); 
     screens[j].s.endDraw();
   }
 }
 
 void drawVertLinesAcrossAll(int lw, int lsp, float per, color c, int mode) {
-  color [] colors = {c, c, c, c};
+  color [] colors = {c, c, c, c}; 
   drawVertLinesAcrossAll(lw, lsp, per, colors, mode);
 }
 
 void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode) {
   for (int j = 0; j < screens.length; j++) {
-    screens[j].s.beginDraw();
-    screens[j].s.background(0);
-    screens[j].s.blendMode(SCREEN);
-    int direction = 0;
-    if (mode == 0) direction = 1;
-    else if (mode == 1) direction = -1;
+    screens[j].s.beginDraw(); 
+    screens[j].s.background(0); 
+    screens[j].s.blendMode(SCREEN); 
+    int direction = 0; 
+    if (mode == 0) direction = 1; 
+    else if (mode == 1) direction = -1; 
     else if (mode == 2) {
-      if (j == 0 || j == 1) direction = 1;
+      if (j == 0 || j == 1) direction = 1; 
       else direction = -1;
     } else if (mode == 3) {
-      if (j == 0 || j == 1) direction = -1;
+      if (j == 0 || j == 1) direction = -1; 
       else direction = 1;
     }
     //temp.beginDraw();
     //temp.background(0);
-    drawVertLinesScreen(screens[j].s, lw, lsp, per, colors[j], direction);
+    drawVertLinesScreen(screens[j].s, lw, lsp, per, colors[j], direction); 
     //temp.endDraw();
     //screens[j].s.image(currentImages.get(0), -screenW * j, 0);
     //screens[j].s.mask(temp);
@@ -3907,14 +3945,14 @@ void drawVertLinesAcrossAll(int lw, int lsp, float per, color[] colors, int mode
 }
 
 void sphereEdgeInit() {
-  tempSphere = createGraphics(sphereScreen.s.width, sphereScreen.s.height);
-  tempSphere.beginDraw();
-  tempSphere.background(0);
-  tempSphere.noStroke();
-  int startW = tempSphere.width - 50;
+  tempSphere = createGraphics(sphereScreen.s.width, sphereScreen.s.height); 
+  tempSphere.beginDraw(); 
+  tempSphere.background(0); 
+  tempSphere.noStroke(); 
+  int startW = tempSphere.width - 50; 
   for (int i = tempSphere.width; i >= startW; i--) {
-    float br = map(i, tempSphere.width, startW, 0, 255);
-    tempSphere.fill(br);
+    float br = map(i, tempSphere.width, startW, 0, 255); 
+    tempSphere.fill(br); 
     tempSphere.ellipse(tempSphere.width/2, tempSphere.height/2, i, i);
   }
   tempSphere.endDraw();
@@ -3922,49 +3960,49 @@ void sphereEdgeInit() {
 
 // getColorFW
 void gradientSphere(color c1, color c2, color c3) {
-  PGraphics s = sphereScreen.s;
-  s.beginDraw();
-  s.blendMode(BLEND);
+  PGraphics s = sphereScreen.s; 
+  s.beginDraw(); 
+  s.blendMode(BLEND); 
 
   //s.strokeWeight(1);
-  s.noStroke();
+  s.noStroke(); 
   for (int i = s.width; i > 0; i --) {
-    float per = map(i, s.width, 0, 0, 0.5);
+    float per = map(i, s.width, 0, 0, 0.5); 
     //per += millis()/4000.0;
     //per %= 1;
-    s.fill(paradiseStrokeReturn(per, c2, c1, c3));
+    s.fill(paradiseStrokeReturn(per, c2, c1, c3)); 
     s.ellipse(s.width/2, s.height/2, i, i);
   }
 
 
   //s.image(tempSphere, 0, 0, s.width, s.height);
-  s.mask(tempSphere);
-  s.blendMode(BLEND);
+  s.mask(tempSphere); 
+  s.blendMode(BLEND); 
   s.endDraw();
 }
 
 color getRandomColor(color c1, color c2, color c3, color c4) {
-  color [] colors = {c1, c2, c3, c4};
+  color [] colors = {c1, c2, c3, c4}; 
   return getRandomColor(colors);
 }
 
 color getRandomColor(color c1, color c2, color c3) {
-  color [] colors = {c1, c2, c3};
+  color [] colors = {c1, c2, c3}; 
   return getRandomColor(colors);
 }
 
 color getRandomColor(color [] colors) {
-  int r = int(random(colors.length));
+  int r = int(random(colors.length)); 
   return colors[r];
 }
 
 color getColorOnBeat(color c1, color c2, color c3, color c4) {
-  color [] colors = {c1, c2, c3, c4};
+  color [] colors = {c1, c2, c3, c4}; 
   return getColorOnBeat(colors);
 }
 
 color getColorOnBeat(color c1, color c2, color c3) {
-  color [] colors = {c1, c2, c3};
+  color [] colors = {c1, c2, c3}; 
   return getColorOnBeat(colors);
 }
 
@@ -3972,41 +4010,41 @@ color getColorOnBeat(color [] colors) {
   return colors[currentCycle % colors.length];
 }
 
-boolean thunder = false;
-boolean thundering = false;
-int lastThundering = 0;
-int lastThunder = 0;
-int thunderNum = 0;
-float ranTime = 0;
-int tTime = 20;
+boolean thunder = false; 
+boolean thundering = false; 
+int lastThundering = 0; 
+int lastThunder = 0; 
+int thunderNum = 0; 
+float ranTime = 0; 
+int tTime = 20; 
 
 void setThunder() {
   if (!thundering) {
     if (millis() - lastThundering > 1000 + ranTime) {
-      thundering = true;
+      thundering = true; 
       lastThundering = millis();
     }
   } else if (thundering) {
     if (!thunder) {
       if (thunderNum == 0) {
-        thunder = true;
-        lastThunder = millis();
-        thunderNum++;
+        thunder = true; 
+        lastThunder = millis(); 
+        thunderNum++; 
         tTime += 50;
       } else if (millis() - lastThunder > 50) {
-        thunder = true;
+        thunder = true; 
         lastThunder = millis();
       }
     } else if (thunder) {
       if (millis() - lastThunder > tTime) {
-        lastThunder = millis();
-        thunder = false;
-        thunderNum++;
+        lastThunder = millis(); 
+        thunder = false; 
+        thunderNum++; 
         if (thunderNum == 5) {
-          thundering = false;
-          thunderNum = 0;
-          tTime = 20;
-          lastThundering = millis();
+          thundering = false; 
+          thunderNum = 0; 
+          tTime = 20; 
+          lastThundering = millis(); 
           ranTime = random(500);
         }
       }
@@ -4014,53 +4052,53 @@ void setThunder() {
   }
 }
 
-boolean lightning = false;
-int lightningColor = 255;
-int lightningTime = 0;
+boolean lightning = false; 
+int lightningColor = 255; 
+int lightningTime = 0; 
 void setLightning() {
   if (lightning) {
     if (millis() - lightningTime > 100) lightning = false;
   } else {
     if (int(random(10)) == 0) {
-      lightning = true;
-      lightningTime = millis();
+      lightning = true; 
+      lightningTime = millis(); 
       lightningColor = int(random(50, 200));
     }
   }
 }
 
 void displaySpiralSphere() {
-  PGraphics s = sphereScreen.s;
-  s.beginDraw();
-  s.noTint();
-  s.background(0);
-  s.translate(s.width/2, s.height/2);
-  s.rotateZ(millis()/5000.0);
-  s.translate(-s.width/2, -s.height/2);
-  s.image(sphereImg, 0, 0, s.width, s.height);
-  s.mask(tempSphere);
+  PGraphics s = sphereScreen.s; 
+  s.beginDraw(); 
+  s.noTint(); 
+  s.background(0); 
+  s.translate(s.width/2, s.height/2); 
+  s.rotateZ(millis()/5000.0); 
+  s.translate(-s.width/2, -s.height/2); 
+  s.image(sphereImg, 0, 0, s.width, s.height); 
+  s.mask(tempSphere); 
   s.endDraw();
 }
 
 void displaySpiralSphere(color c) {
-  PGraphics s = sphereScreen.s;
-  s.beginDraw();
-  s.tint(c);
-  s.background(0);
-  s.translate(s.width/2, s.height/2);
-  s.rotateZ(millis()/5000.0);
-  s.translate(-s.width/2, -s.height/2);
-  s.image(sphereImg, 0, 0, s.width, s.height);
-  s.mask(tempSphere);
+  PGraphics s = sphereScreen.s; 
+  s.beginDraw(); 
+  s.tint(c); 
+  s.background(0); 
+  s.translate(s.width/2, s.height/2); 
+  s.rotateZ(millis()/5000.0); 
+  s.translate(-s.width/2, -s.height/2); 
+  s.image(sphereImg, 0, 0, s.width, s.height); 
+  s.mask(tempSphere); 
   s.endDraw();
 }
 
 void displayLolliesSphere() {
-  PGraphics s = sphereScreen.s;
-  s.beginDraw();
-  s.background(0);
+  PGraphics s = sphereScreen.s; 
+  s.beginDraw(); 
+  s.background(0); 
   if (dt != null) {
-    for (Triangle t : dt.triangles) t.display(s);
+    for (Triangle t : dt.triangles) t.display(s); 
     s.mask(tempSphere);
   }
   s.endDraw();

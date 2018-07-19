@@ -8,6 +8,7 @@ int DELTA = 8;
 int WIZ = 5;
 int VIOLATE = 6;
 int ELLON =10;
+int MOOD = 7;
 int EGRETS = 13;
 int LOLLIES = 12;
 int CRUSH = 3;
@@ -69,7 +70,8 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(VIOLATE);
+  changeScene(DELTA);
+  frameRate(30);
 }
 
 void draw() {

@@ -148,127 +148,144 @@ void caveFast() {
 
 
 void deconstructCycles() {
-  vid1 = null;
-  vid2 = null;
+  clearVids();
 }
 
 
 
 
 void initSong() {
-  cues = new Cue[16];
-  cues[0] = new Cue(1.67, 'v', 0, 0);
-  //cues[1] = new Cue(12.17, 'v', 0, 0);
-  cues[1] = new Cue(20.17, 'v', 0, 0);
-  cues[2] = new Cue(36.17, 'v', 0, 0);
-  cues[3] = new Cue(52.17, 'g', 0, 0);
-  cues[4] = new Cue(68.17, 'g', 0, 0);
-  cues[5] = new Cue(76.17, 'v', 0, 0);
-  cues[6] = new Cue(84.07, 'g', 0, 1);
-  cues[7] = new Cue(92, 'g', 0, 1);
-  cues[8] = new Cue(100.07, 'g', 0, 1);
-  cues[9] = new Cue(116.07, 'g', 0, 2);
-  cues[10] = new Cue(132.07, 'g', 0, 2);
-  cues[11] = new Cue(148.17, 'v', 0, 0);
-  cues[12] = new Cue(164.17, 'v', 0, 0);
-  cues[13] = new Cue(180.17, 'v', 0, 0);
-  cues[14] = new Cue(188.27, 'v', 0, 0);
-  cues[15] = new Cue(193.67, 'v', 0, 0);
+  initVid("scenes/song/movies/vid1.mov");
+  cues = new Cue[3];
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(getBarLenSeconds()*2, 'm', 0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0, 0);
 
-  currentGifs.get(3).loop();
-  currentGifs.get(4).loop();
-  currentGifs.get(currentGifs.size()-1).loop();
 
-  sphereImg = loadImage("images/sphere/grass.png");
+  //cues[0] = new Cue(1.67, 'v', 0, 0);
+  ////cues[1] = new Cue(12.17, 'v', 0, 0);
+  //cues[1] = new Cue(20.17, 'v', 0, 0);
+  //cues[2] = new Cue(36.17, 'v', 0, 0);
+  //cues[3] = new Cue(52.17, 'g', 0, 0);
+  //cues[4] = new Cue(68.17, 'g', 0, 0);
+  //cues[5] = new Cue(76.17, 'v', 0, 0);
+  //cues[6] = new Cue(84.07, 'g', 0, 1);
+  //cues[7] = new Cue(92, 'g', 0, 1);
+  //cues[8] = new Cue(100.07, 'g', 0, 1);
+  //cues[9] = new Cue(116.07, 'g', 0, 2);
+  //cues[10] = new Cue(132.07, 'g', 0, 2);
+  //cues[11] = new Cue(148.17, 'v', 0, 0);
+  //cues[12] = new Cue(164.17, 'v', 0, 0);
+  //cues[13] = new Cue(180.17, 'v', 0, 0);
+  //cues[14] = new Cue(188.27, 'v', 0, 0);
+  //cues[15] = new Cue(193.67, 'v', 0, 0);
 
-  initTreeBranchesAll();
+  //currentGifs.get(3).loop();
+  //currentGifs.get(4).loop();
+  //currentGifs.get(currentGifs.size()-1).loop();
+  //sphereImg = loadImage("images/sphere/grass.png");
+  //initTreeBranchesAll();
+
+
+  currentGifs.get(0).loop();
 }
 
 void deconstructSong() {
   sphereImg = null;
   paths = null;
+  clearVids();
 }
 
 void displaySong() {
-  if (!personOnPlatform) sphereScreen.drawImage(sphereImg, 0, 0, sphereScreen.s.width, sphereScreen.s.height); //sphereScreen.drawGif(currentGifs.get(currentGifs.size()-1), 0, 0, sphereScreen.s.width, sphereScreen.s.height);
-  else drawEye();
-
   switch(currentCue) {
   case 0:
-    branchAll();
-
     break;
   case 1:
-    branchAll();
+    movieSong();
     break;
   case 2:
-    branchAll();
-    break;
-  case 3: 
-
-    treeRun(-1);
-    //updateTreeBranches();
-    //displayTreeBranchesOuter();
-    drawSolidOuter(color(0));
-    drawSolidTop(color(0));
-    break;
-  case 4: 
-    resetBranchOnCue();
-    //drawSolidOuter(color(0));
-    //updateTreeBranches();
-    //displayTreeBranchesOuter();
-    treeRun(-1);
-    drawSolidOuter(color(0));
-    drawSolidTop(color(0));
-    break;
-  case 5: 
-    //drawSolidAllCubes(color(0));
-    branchAll();
-    //pulseLinesCenterBeat(white, percentToNumBeats(8));
-    break;
-  case 6: 
-    drawSolidOuter(color(0));
-    treeRun(3);
-    break;
-  case 7:
-    resetBranchOnCue();
-    branchTopOut();
-    treeRun(3);
-    break;
-  case 8: 
-    branchTopOut();
-    //drawSolidOuter(color(0));
-    treeRun(3);
-    break;
-  case 9: 
-    resetBranchOnCue();
-    //drawSolidOuter(color(0));
-    branchTopOut();
-    treeRun(-1);
-    break;
-  case 10: 
-
-    treeRun(-1);
-    break;
-  case 11: 
-    drawSolidAllCubes(color(0));
-    displayFractalTreeSong();
-    break;
-  case 12: 
-    displayFractalTreeSong();
-    break;
-  case 13: 
-    displayFractalTreeSong();
-    break;
-  case 14: 
-    displayFractalTreeSong();
-    fadeOutAllScreens(cues[currentCue].startT, 5);
-    break;
-  default:
-    displayLines(color(0));
-    drawSolidAll(color(0));
     break;
   }
+
+  //if (!personOnPlatform) sphereScreen.drawImage(sphereImg, 0, 0, sphereScreen.s.width, sphereScreen.s.height); //sphereScreen.drawGif(currentGifs.get(currentGifs.size()-1), 0, 0, sphereScreen.s.width, sphereScreen.s.height);
+  //else drawEye();
+
+  //switch(currentCue) {
+  //case 0:
+  //  branchAll();
+
+  //  break;
+  //case 1:
+  //  branchAll();
+  //  break;
+  //case 2:
+  //  branchAll();
+  //  break;
+  //case 3: 
+
+  //  treeRun(-1);
+  //  //updateTreeBranches();
+  //  //displayTreeBranchesOuter();
+  //  drawSolidOuter(color(0));
+  //  drawSolidTop(color(0));
+  //  break;
+  //case 4: 
+  //  resetBranchOnCue();
+  //  //drawSolidOuter(color(0));
+  //  //updateTreeBranches();
+  //  //displayTreeBranchesOuter();
+  //  treeRun(-1);
+  //  drawSolidOuter(color(0));
+  //  drawSolidTop(color(0));
+  //  break;
+  //case 5: 
+  //  //drawSolidAllCubes(color(0));
+  //  branchAll();
+  //  //pulseLinesCenterBeat(white, percentToNumBeats(8));
+  //  break;
+  //case 6: 
+  //  drawSolidOuter(color(0));
+  //  treeRun(3);
+  //  break;
+  //case 7:
+  //  resetBranchOnCue();
+  //  branchTopOut();
+  //  treeRun(3);
+  //  break;
+  //case 8: 
+  //  branchTopOut();
+  //  //drawSolidOuter(color(0));
+  //  treeRun(3);
+  //  break;
+  //case 9: 
+  //  resetBranchOnCue();
+  //  //drawSolidOuter(color(0));
+  //  branchTopOut();
+  //  treeRun(-1);
+  //  break;
+  //case 10: 
+
+  //  treeRun(-1);
+  //  break;
+  //case 11: 
+  //  drawSolidAllCubes(color(0));
+  //  displayFractalTreeSong();
+  //  break;
+  //case 12: 
+  //  displayFractalTreeSong();
+  //  break;
+  //case 13: 
+  //  displayFractalTreeSong();
+  //  break;
+  //case 14: 
+  //  displayFractalTreeSong();
+  //  fadeOutAllScreens(cues[currentCue].startT, 5);
+  //  break;
+  //default:
+  //  displayLines(color(0));
+  //  drawSolidAll(color(0));
+  //  break;
+  //}
 }
 void resetBranchOnCue() {
   if (currentCue > previousCue) {
@@ -334,41 +351,230 @@ void treeRun(int addonGif) {
 }
 
 void initCrush() {
-  //initVid("scenes/crush/movies/crush.mp4");
-  cues = new Cue[18];
+  initVid("scenes/crush/movies/crush.mp4", "scenes/crush/movies/crushpanels.mp4");
+
+  cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
-  cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
-  cues[3] = new Cue(27.2, 'v', 0.0, 0);
-  cues[4] = new Cue(28.4, 'g', 0.0, 0);
-  cues[5] = new Cue(37.6, 'g', 0.0, 0);    
+  cues[1] = new Cue(getBarLenSeconds()*2, 'm', 0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0 -1, 'm', 0, 0);
+  //cues[0] = new Cue(0, 'v', 0, 0);
+  //cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
+  //cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
+  //cues[3] = new Cue(27.2, 'v', 0.0, 0);
+  //cues[4] = new Cue(28.4, 'g', 0.0, 0);
+  //cues[5] = new Cue(37.6, 'g', 0.0, 0);    
 
-  cues[6] = new Cue(56.47, 'g', 0.0, 2);  // alternate cubes?
-  cues[7] = new Cue(61.2+4.7, 'g', 0.0, 2);    // alternate cubes?
-  cues[8] = new Cue(70.6+4.7, 'v', 20.0, 4);    // X
-  //cues[6] = new Cue('v', 0, 75);   // X
-  cues[9] = new Cue(80+4.7, 'g', 0.0, 3);   // xylophone
-  cues[10] = new Cue(98.8+4.7, 'g', 0.0, 5);
-  cues[11] = new Cue(105.9, 'g', 0.0, 6);
-  cues[12] = new Cue(124.7, 'g', 0.0, 2);
-  cues[13] = new Cue(143.6, 'g', 0.0, 4);
-  cues[14] = new Cue(157.6+4.7, 'v', 0.0, 0);
-  cues[15] = new Cue(2*60 + 56.6+4.7, 'g', 0.0, 1);
-  cues[16] = new Cue(3*60 + 15.3+4.7, 'v', 0.0, 0);
-  cues[17] = new Cue(3*60 + 24+4.7, 'v', 0.0, 0);
+  //cues[6] = new Cue(56.47, 'g', 0.0, 2);  // alternate cubes?
+  //cues[7] = new Cue(61.2+4.7, 'g', 0.0, 2);    // alternate cubes?
+  //cues[8] = new Cue(70.6+4.7, 'v', 20.0, 4);    // X
+  ////cues[6] = new Cue('v', 0, 75);   // X
+  //cues[9] = new Cue(80+4.7, 'g', 0.0, 3);   // xylophone
+  //cues[10] = new Cue(98.8+4.7, 'g', 0.0, 5);
+  //cues[11] = new Cue(105.9, 'g', 0.0, 6);
+  //cues[12] = new Cue(124.7, 'g', 0.0, 2);
+  //cues[13] = new Cue(143.6, 'g', 0.0, 4);
+  //cues[14] = new Cue(157.6+4.7, 'v', 0.0, 0);
+  //cues[15] = new Cue(2*60 + 56.6+4.7, 'g', 0.0, 1);
+  //cues[16] = new Cue(3*60 + 15.3+4.7, 'v', 0.0, 0);
+  //cues[17] = new Cue(3*60 + 24+4.7, 'v', 0.0, 0);
 
-  initSphereBoxRot();
-
+  //initSphereBoxRot();
   // initTerrainCenter();
-  resetAudioAmp();
+  //resetAudioAmp();
   //sphereImg = loadImage("images/sphere/1.jpg");
   //centerScreen = new Screen(screenW*2, screenH, -2);
   //centerScreenFrontInner();
-  initTerrain();
-  initTesseract();
+  //initTerrain();
+  //initTesseract();
+
+  currentGifs.get(0).loop();
 }
 
 void deconstructCrush() {
+  clearVids();
+}
+
+void displayCrush() {
+  //int zCrush = 0;
+  //if (!personOnPlatform) {
+  //  //displayRedPlanetSphere();
+  //  //zCrush = 0;
+  //} else {
+  //  drawEye();
+  //  //zCrush = getZCrushHand();
+  //}
+
+  maskGifSphere();
+
+  switch(currentCue) {
+  case 0:
+    break;
+  case 1:
+    movieCrush();
+    break;
+  case 2:
+    break;
+  }
+
+  //switch(currentCue) {
+  //case 0:
+  //  drawSolidAllCubes(0);
+  //  break;
+  //case 1: // spherebox
+  //  displayLinesInnerFaces(white);
+  //  displaySphereBoxCrush(zCrush);
+  //  fadeInCubes(cues[currentCue].startT, 2);
+  //  renderCubes = true;
+  //  break;
+  //case 2: // cube right
+  //  renderCubes = false;
+  //  drawSphereCrush(maskPoints[keystoneNum][3].x+150, 750, zCrush);
+
+  //  drawSolidAllCubes(black);
+  //  displayAllFaceLinesColor(0, 0, white, color(150));
+  //  break;
+  //case 3: // cube left
+  //  renderCubes = false;
+  //  drawSphereCrush(maskPoints[keystoneNum][1].x-150, 750, zCrush);
+  //  drawSolidAllCubes(black);
+  //  displayAllFaceLinesColor(white, color(150), 0, 0);
+  //  break;
+  //case 4: // oscillate outside, inside harom
+  //  renderCubes = true;
+  //  if (((currentCycle-1)/8)%2 == 0) {
+  //    displayLinesOutsideFaces(color(255), color(255));
+  //    drawSolidInner(0);
+  //    for (int i = 0; i < screens.length; i+=3) {
+  //      PGraphics s = screens[i].s;
+  //      s.beginDraw();
+  //      s.pushMatrix();
+  //      s.translate(0, 0, zCrush);
+  //      s.background(0);
+  //      haromS(s, white, 3);
+  //      s.popMatrix();
+  //      s.endDraw();
+  //    }
+  //  } else {
+  //    drawSolidOuter(0);
+  //    displayLinesInnerFaces(white);
+  //    for (int i = 1; i < 3; i++) {
+  //      PGraphics s = screens[i].s;
+  //      s.beginDraw();
+  //      s.background(0);
+  //      s.pushMatrix();
+  //      s.translate(0, 0, zCrush);
+  //      haromS(s, white, 3);
+  //      s.popMatrix();
+  //      s.endDraw();
+  //    }
+  //  }
+  //  //haromTop(white, 3); 
+
+  //  break;
+
+  //case 5: // all chill
+  //  //drawSolidTop(0);
+  //  drawGifAllCrush(zCrush);
+
+  //  break;
+  //case 6: // inner
+  //  displayLinesInnerFaces(white);
+  //  drawSolidOuter(0);
+
+  //  displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0, zCrush);
+  //  break;
+  //case 7:// puter
+  //  //displayDivisionOfIntensityTop(percentToNumBeats(8), 0, 0);
+
+  //  displayLinesOutsideFaces(color(255), color(255));
+  //  drawSolidInner(0);
+  //  displayDivisionOfIntensityOuter(percentToNumBeats(8), 0, 0, zCrush);
+  //  break;
+  //case 8:
+  //  drawSolidAllCubes(color(0));
+
+  //  //displayDivisionOfIntensityTop(percentToNumBeats(8), 0, 0);
+
+  //  if ((currentCycle -1)/8%2 == 0) {
+  //    displayAllFaceLinesColor(white, color(150), 0, 0);
+  //    displayDivisionOfIntensity(screens[0].s, percentToNumBeats(8), 0, 0, zCrush);
+  //    displayDivisionOfIntensity(screens[1].s, percentToNumBeats(8), 0, 0, zCrush);
+  //  } else {
+  //    displayAllFaceLinesColor(0, 0, white, color(150));
+  //    displayDivisionOfIntensity(screens[2].s, percentToNumBeats(8), 0, 0, zCrush);
+  //    displayDivisionOfIntensity(screens[3].s, percentToNumBeats(8), 0, 0, zCrush);
+  //  }
+  //  break;
+  //case 9:
+  //  drawSolidTop(0);
+  //  drawGifAllCrush(zCrush);
+  //  break;
+  //case 10: 
+  //  drawGifAllCrush(zCrush);
+  //  break;
+  //case 11: // spiral in groups of 2
+
+  //  drawSolidAllCubes(color(0));
+  //  int index = ((currentCycle -1)/4)%2;
+  //  if (index == 0) displayAllFaceLinesColor(white, 0, white, 0);
+  //  else displayAllFaceLinesColor(0, color(250), 0, color(150));
+  //  for (int i = 0; i < 2; i++) {
+  //    PGraphics s = screens[i*2 + index].s;
+  //    s.beginDraw();
+  //    s.blendMode(BLEND);
+  //    s.pushMatrix();
+  //    s.translate(0, 0, zCrush);
+  //    s.background(0);
+  //    s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+  //    s.popMatrix();
+  //    s.endDraw();
+  //  }
+  //  break;
+  //case 12: // 
+  //  drawGifAllCrush(zCrush);
+  //  break;
+  //case 13: // 
+  //  display4FaceLines(white, 1);
+  //  display4FaceLines(white, 2);
+  //  drawSolidOuter(0);
+  //  currentGifDrawInner(zCrush);
+  //  break;
+  //case 14:
+  //  //cycleAudioAmp(percentToNumBeats(4));
+  //  displayTerrainAllCrush();
+  //  break;
+  //case 15: // draw the threshold
+  //  displayLinesInnerFaces(white);
+  //  for (int i = 1; i < 3; i++) {
+  //    PGraphics s = screens[i].s;
+  //    s.beginDraw();
+  //    s.background(0);
+  //    s.pushMatrix();
+  //    s.translate(0, 0, zCrush);
+  //    s.blendMode(BLEND);
+  //    //s.background(color(180, 0, 80));
+  //    if (i == 1) {
+  //      s.pushMatrix();
+  //      s.scale(-1.0, 1.0);
+
+  //      s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+  //      s.popMatrix();
+  //    } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
+  //    s.filter(THRESHOLD, .2);
+  //    s.blendMode(BLEND);
+  //    s.popMatrix();
+  //    s.endDraw();
+  //  }
+  //  break;
+  //case 16:
+  //  displaySphereBoxCrush(zCrush);
+  //  fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
+  //  break;
+  //default:
+  //  displayLines(color(0));
+  //  drawSolidAll(color(0));
+  //  break;
+  //}
 }
 
 boolean blackOutPlanet = false;
@@ -376,181 +582,6 @@ void resetRedPlanet() {
   if (!blackOutPlanet) {
     sphereScreen.blackOut();
     blackOutPlanet = true;
-  }
-}
-
-
-void displayCrush() {
-  int zCrush = 0;
-  //cycleShapeFFTTop();
-  if (!personOnPlatform) {
-    displayRedPlanetSphere();
-    zCrush = 0;
-  } else {
-    drawEye();
-
-    zCrush = getZCrushHand();
-  }
-  //displayTesseractTop();
-
-  switch(currentCue) {
-  case 0:
-    drawSolidAllCubes(0);
-    break;
-  case 1: // spherebox
-    displayLinesInnerFaces(white);
-    displaySphereBoxCrush(zCrush);
-    fadeInCubes(cues[currentCue].startT, 2);
-    renderCubes = true;
-    break;
-  case 2: // cube right
-    renderCubes = false;
-    drawSphereCrush(maskPoints[keystoneNum][3].x+150, 750, zCrush);
-
-    drawSolidAllCubes(black);
-    displayAllFaceLinesColor(0, 0, white, color(150));
-    break;
-  case 3: // cube left
-    renderCubes = false;
-    drawSphereCrush(maskPoints[keystoneNum][1].x-150, 750, zCrush);
-    drawSolidAllCubes(black);
-    displayAllFaceLinesColor(white, color(150), 0, 0);
-    break;
-  case 4: // oscillate outside, inside harom
-    renderCubes = true;
-    if (((currentCycle-1)/8)%2 == 0) {
-      displayLinesOutsideFaces(color(255), color(255));
-      drawSolidInner(0);
-      for (int i = 0; i < screens.length; i+=3) {
-        PGraphics s = screens[i].s;
-        s.beginDraw();
-        s.pushMatrix();
-        s.translate(0, 0, zCrush);
-        s.background(0);
-        haromS(s, white, 3);
-        s.popMatrix();
-        s.endDraw();
-      }
-    } else {
-      drawSolidOuter(0);
-      displayLinesInnerFaces(white);
-      for (int i = 1; i < 3; i++) {
-        PGraphics s = screens[i].s;
-        s.beginDraw();
-        s.background(0);
-        s.pushMatrix();
-        s.translate(0, 0, zCrush);
-        haromS(s, white, 3);
-        s.popMatrix();
-        s.endDraw();
-      }
-    }
-    //haromTop(white, 3); 
-
-    break;
-
-  case 5: // all chill
-    //drawSolidTop(0);
-    drawGifAllCrush(zCrush);
-
-    break;
-  case 6: // inner
-    displayLinesInnerFaces(white);
-    drawSolidOuter(0);
-
-    displayDivisionOfIntensityInner(percentToNumBeats(8), 0, 0, zCrush);
-    break;
-  case 7:// puter
-    //displayDivisionOfIntensityTop(percentToNumBeats(8), 0, 0);
-
-    displayLinesOutsideFaces(color(255), color(255));
-    drawSolidInner(0);
-    displayDivisionOfIntensityOuter(percentToNumBeats(8), 0, 0, zCrush);
-    break;
-  case 8:
-    drawSolidAllCubes(color(0));
-
-    //displayDivisionOfIntensityTop(percentToNumBeats(8), 0, 0);
-
-    if ((currentCycle -1)/8%2 == 0) {
-      displayAllFaceLinesColor(white, color(150), 0, 0);
-      displayDivisionOfIntensity(screens[0].s, percentToNumBeats(8), 0, 0, zCrush);
-      displayDivisionOfIntensity(screens[1].s, percentToNumBeats(8), 0, 0, zCrush);
-    } else {
-      displayAllFaceLinesColor(0, 0, white, color(150));
-      displayDivisionOfIntensity(screens[2].s, percentToNumBeats(8), 0, 0, zCrush);
-      displayDivisionOfIntensity(screens[3].s, percentToNumBeats(8), 0, 0, zCrush);
-    }
-    break;
-  case 9:
-    drawSolidTop(0);
-    drawGifAllCrush(zCrush);
-    break;
-  case 10: 
-    drawGifAllCrush(zCrush);
-    break;
-  case 11: // spiral in groups of 2
-
-    drawSolidAllCubes(color(0));
-    int index = ((currentCycle -1)/4)%2;
-    if (index == 0) displayAllFaceLinesColor(white, 0, white, 0);
-    else displayAllFaceLinesColor(0, color(250), 0, color(150));
-    for (int i = 0; i < 2; i++) {
-      PGraphics s = screens[i*2 + index].s;
-      s.beginDraw();
-      s.blendMode(BLEND);
-      s.pushMatrix();
-      s.translate(0, 0, zCrush);
-      s.background(0);
-      s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
-      s.popMatrix();
-      s.endDraw();
-    }
-    break;
-  case 12: // 
-    drawGifAllCrush(zCrush);
-    break;
-  case 13: // 
-    display4FaceLines(white, 1);
-    display4FaceLines(white, 2);
-    drawSolidOuter(0);
-    currentGifDrawInner(zCrush);
-    break;
-  case 14:
-    //cycleAudioAmp(percentToNumBeats(4));
-    displayTerrainAllCrush();
-    break;
-  case 15: // draw the threshold
-    displayLinesInnerFaces(white);
-    for (int i = 1; i < 3; i++) {
-      PGraphics s = screens[i].s;
-      s.beginDraw();
-      s.background(0);
-      s.pushMatrix();
-      s.translate(0, 0, zCrush);
-      s.blendMode(BLEND);
-      //s.background(color(180, 0, 80));
-      if (i == 1) {
-        s.pushMatrix();
-        s.scale(-1.0, 1.0);
-
-        s.image(currentGifs.get(currentGif), -screenW, 0, screenW, screenH);//-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
-        s.popMatrix();
-      } else s.image(currentGifs.get(currentGif), 0, 0, screenW, screenH); //-300, screenW, currentGifs.get(currentGif).height * currentGifs.get(currentGif).width/screenW);
-      s.filter(THRESHOLD, .2);
-      s.blendMode(BLEND);
-      s.popMatrix();
-      s.endDraw();
-    }
-    break;
-  case 16:
-    displaySphereBoxCrush(zCrush);
-    fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
-    break;
-  default:
-    displayLines(color(0));
-    drawSolidAll(color(0));
-    break;
   }
 }
 
@@ -648,7 +679,8 @@ void initDelta() {
   initSymbols();
   initNodesSym(2);
 
-  sphereImg = loadImage("images/sphere/spiralblue.jpg");
+  //sphereImg = loadImage("images/sphere/spiralblue.jpg");
+  initSphereBallDelta();
 }
 
 void deconstructDelta() {
@@ -656,18 +688,21 @@ void deconstructDelta() {
   theremin = null;
   symbols = null;
   nodes = null;
+  sphereBall = null;
 }
 
 int previousBeatIndex = 0;
 int currentBeatIndex = 0;
 int numBeatsIndex = 0;
+
 void displayDelta() {
   color spiralColor = color(#4D27FF);
   float rotHands = 0;
 
   if (!personOnPlatform) {
     rotHands = 0;
-    displaySpiralSphere();
+    //displaySpiralSphere();
+    rotateSphereBall();
   } else {
     drawEye();
     drawWaveHands();
@@ -902,7 +937,7 @@ void initRite() {
   initConstellationLines();
 
   cubesFront();
-  sphereImg = loadImage("images/sphere/1.jpg");
+  initSphereBallRite();
 }
 
 void deconstructRite() {
@@ -914,6 +949,7 @@ void deconstructRite() {
   left = null; 
   right = null;
   handEyeClosing = null;
+  sphereBall = null;
 }
 
 void displayRite() {
@@ -921,19 +957,13 @@ void displayRite() {
   displayNodeConstellationsTop();
   if (!personOnPlatform) {
     updateNodeConstellation(screens[0].s, screenH);
-    //displayNodeConstellationsSphere();
-    displaySpiralSphere();
+    rotateSphereBall();
   } else {
     drawEye();
     updateNodeConstellationHand();
     //updateNodeConstellationMainHand();
     //displayNodeConstellationMain();
   }
-
-  //displayMothFlyAcross(percentToNumBeats(64));
-  //displayHandEyeAcrossAll(percentToNumBeats(64));
-  //drawConstellationLines();
-
 
   switch(currentCue) {
   case 0:
@@ -1065,6 +1095,7 @@ void initMoon() {
 
 void deconstructMoon() {
   starsSpace = null;
+  clearVids();
 }
 
 void displayMoon() {
@@ -1232,8 +1263,8 @@ int lastCueDelaunay = -2;
 void displayLollies() {
   initializeTriangulation(currentCue);
 
-  if (!personOnPlatform) displayLolliesSphere();
-  else drawEye();
+  //if (!personOnPlatform) displayLolliesSphere();
+  //else drawEye();
 
 
 
@@ -1253,28 +1284,33 @@ void displayLollies() {
 
 
 void initCycles() {
-  initVid("scenes/cycles/movies/vid1.mov", "scenes/cycles/movies/vid1.mov");
+  initVid("scenes/cycles/movies/vid1.mov");  // "scenes/cycles/movies/vid2.mov");
+
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(3, 'm', 0.0, 0);
+  cues[1] = new Cue(getBarLenSeconds()*2, 'm', 0, 0);
   cues[2] = new Cue(songFile.length()/1000 - 1, 'v', 0.0, 0);
+
+  currentGifs.get(0).loop();
+  currentGifs.get(1).loop();
+
+
+  initMaskGif();
 }
 
 
 void displayCycles() {
-  if (!personOnPlatform) sphereScreen.drawSolid(0);
-  else drawEye();
+  //if (!personOnPlatform) sphereScreen.drawSolid(0);
+  //else drawEye();
+
+
+  sphereScreen.drawImage(currentGifs.get(0), 0, 0, sphereScreen.s.width, sphereScreen.s.height);
+
+
 
   switch(currentCue) {
-    //case 0:
-    //  mirrorVidCenter(vid1, -100, 0);
-    //  break;
   case 1:
-    int x = (vid1.width - screenW*2)/2;
-    screens[1].drawImage(vid1, -x, 0);
-    screens[2].drawImage(vid1, -screenW-x, 0);
-    topScreens[0].drawImage(vid2, -x, 0);
-    topScreens[1].drawImage(vid2, -screenW-x, 0);
+    centerVidCycles();
     break;
   default:
     displayLines(color(0));
@@ -1811,10 +1847,13 @@ void wizPinkVidConst() {
 }
 
 void initMood() {
-  //initVid("scenes/cycles/movies/vid1.mp4");
+  initSphereVid("scenes/mood/movies/sphere.mp4");
+  initVid("scenes/mood/movies/vid1.mp4");
+  currentGifs.get(0).loop();
+
   cues = new Cue[3];
-  cues[0] = new Cue(0, 'm', 0, 0);
-  cues[1] = new Cue(5, 'v', 0.0, 0);
+  cues[0] = new Cue(0, 'v', 0, 0);
+  cues[1] = new Cue(3, 'm', 0.0, 0);
   cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0.0, 0);
 }
 
@@ -1824,12 +1863,15 @@ void deconstructMood() {
 }
 
 void displayMood() {
+  //displaySphereMovieCentered(.6);
+  displaySphereMovie(0, 0, sphereW, sphereW);
+
   switch(currentCue) {
   case 0:
     drawSolidAll(color(0));
     break;
   case 1:
-    drawSolidAll(color(0));
+    moodMovie();
     break;
   default:
     displayLines(color(0));
@@ -1920,7 +1962,6 @@ void deconstructEgrets() {
 }
 
 void displayEgrets() {
-  //cycleShapeFFTTop();
   //cycleShapeFFTCubes();
   if (!personOnPlatform) sphereScreen.drawSolid(0);
   else drawEye();
