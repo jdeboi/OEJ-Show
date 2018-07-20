@@ -246,15 +246,3 @@ ArrayList<Movie> loadMovies(String dir) {
   }
   return movies;
 }
-
-void addClickTimes() {
-  for (int i = 0; i < cues.length; i++) {
-    cues[i].startT += getClickTrackLenSeconds();
-  }
-}
-
-void addClickTimes(float t) {
-  for (int i = 0; i < cues.length; i++) {
-    cues[i].startT += t;
-  }
-}

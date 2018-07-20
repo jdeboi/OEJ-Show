@@ -483,9 +483,16 @@ float percentToNumBeats(float startT, int numBeats) {
   return constrain(perGroup, 0, 1);
 }
 
+void setCurrentCycle(float startT) {
+  float timePassed = songFile.position()/1000.0 - startT;
+  float bps = currentScene.tempo / 60.0;
+  float spb = 1.0 / bps;
+  
+  currentCycle = int(timePassed/spb)+1;
+}
 void setCurrentCycleCueClick() {
   float timePassedMinutes = (songFile.position()/1000.0/60); 
-  currentCycle = int(timePassedMinutes/currentScene.tempo);
+  currentCycle = int(timePassedMinutes/currentScene.tempo) + 1;
 }
 
 float percentToNextMeasure(float startT) {
@@ -498,16 +505,18 @@ float percentToNextBeat(float startT) {
 
 
 void checkBeatReady(float startT) {
-  float timePassed = songFile.position()/1000.0 - startT;
-  float bps = currentScene.tempo / 60.0;
-  float spb = 1.0 / bps;
+  //float timePassed = songFile.position()/1000.0 - startT;
+  //float bps = currentScene.tempo / 60.0;
+  //float spb = 1.0 / bps;
 
-  if (currentCycle == 0) {
-    if (timePassed > spb)
-      currentCycle++;
-  } else if (timePassed > currentCycle * spb) {
-    currentCycle++;
-  }
+  //if (currentCycle == 0) {
+  //  if (timePassed > spb)
+  //    currentCycle++;
+  //} else if (timePassed > currentCycle * spb) {
+  //  currentCycle++;
+  //}
+  
+  setCurrentCycle(startT);
 }
 
 
@@ -679,5 +688,17 @@ void printMeasureBeatsCurrentScene() {
   float bar = getBarLenSeconds();
   for (float i = 0; i < songFile.length()/1000.0; i+= bar) {
     println(i);
+  }
+}
+
+void addClickTimes() {
+  for (int i = 0; i < cues.length; i++) {
+    cues[i].startT += getClickTrackLenSeconds();
+  }
+}
+
+void addClickTimes(float t) {
+  for (int i = 0; i < cues.length; i++) {
+    cues[i].startT += t;
   }
 }

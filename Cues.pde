@@ -1237,24 +1237,25 @@ void displayMoon() {
 
 void initLollies() {
   cues = new Cue[18];
-  cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(7.5, 'v', 0.0, 0);
-  cues[2] = new Cue(21.8, 'v', 0.0, 0);
-  cues[3] = new Cue(36, 'v', 0.0, 0);
-  cues[4] = new Cue(50, 'v', 0.0, 0);
-  cues[5] = new Cue(64, 'v', 0.0, 0);
-  cues[6] = new Cue(78.8, 'v', 0.0, 0);
-  cues[7] = new Cue(92.8, 'v', 0.0, 0);
-  cues[8] = new Cue(107, 'v', 0.0, 0);
-  cues[9] = new Cue(121, 'v', 0.0, 0);
-  cues[10] = new Cue(135, 'v', 0.0, 0);
-  cues[11] = new Cue(149.8, 'v', 0.0, 0);
-  cues[12] = new Cue(164, 'v', 0.0, 0);
-  cues[13] = new Cue(178, 'v', 0.0, 0);
-  cues[14] = new Cue(192.5, 'v', 0.0, 0);
-  cues[15] = new Cue(206.7, 'v', 0.0, 0);
-  cues[16] = new Cue(213, 'v', 0.0, 0);
-  cues[17] = new Cue(216, 'v', 0.0, 0);
+  cues[0] = new Cue(3.6, 'v', 0, 0);
+  cues[1] = new Cue(10.67, 'v', 0, 0);
+  cues[2] = new Cue(24.89, 'v', 0, 0);
+  cues[3] = new Cue(39.11, 'v', 0, 0);
+  cues[4] = new Cue(53.33, 'v', 0, 0);
+  cues[5] = new Cue(67.56, 'v', 0, 0);
+  cues[6] = new Cue(81.78, 'v', 0, 0);
+  cues[7] = new Cue(96, 'v', 0, 0);
+  cues[8] = new Cue(110.22, 'v', 0, 0);
+  cues[9] = new Cue(124.44, 'v', 0, 0);
+  cues[10] = new Cue(138.67, 'v', 0, 0);
+  cues[11] = new Cue(152.89, 'v', 0, 0);
+  cues[12] = new Cue(167.11, 'v', 0, 0);
+  cues[13] = new Cue(181.33, 'v', 0, 0);
+  cues[14] = new Cue(195.56, 'v', 0, 0);
+  cues[15] = new Cue(209.78, 'v', 0, 0);
+  cues[16] = new Cue(216, 'v', 0, 0);
+  cues[17] = new Cue(218 , 'v', 0, 0);
+  //addClickTimes();
 
   initSymbols();
   temp = createGraphics(screenW, screenH);
@@ -1280,7 +1281,7 @@ void displayLollies() {
 
 
   if (currentCue == 0)  cycleCubeDelaunay(pink, pink);
-  else if (currentCue < 16) {
+  else if (currentCue >= 0 && currentCue < 16) {
     drawDelaunayTriAll();
     displayLines(pink);
   } else if (currentCue == 16) {
