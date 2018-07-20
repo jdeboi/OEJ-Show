@@ -70,13 +70,13 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(RITE);
+  changeScene(DIRTY);
   frameRate(30);
 }
 
 void draw() {
   blendMode(BLEND);
-  background(0);
+  background(255, 0, 0);
 
   if (mappingON) {
     checkEditing();
@@ -107,7 +107,9 @@ void playShow() {
   if (isPlaying) {
     currentScene.update();
     currentScene.display();
+    println("playing");
   } else {
+    println("not playing");
     blackoutScreens();
     if (betweenSongs) checkMidiStart();
   }

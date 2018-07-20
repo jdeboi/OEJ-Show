@@ -168,7 +168,7 @@ void initSong() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0, 0);
+  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
 
 
   //cues[0] = new Cue(1.67, 'v', 0, 0);
@@ -368,7 +368,7 @@ void initCrush() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(songFile.length()/1000.0 -1, 'm', 0, 0);
+  cues[2] = new Cue(getTrackLenSeconds()/1000.0 -1, 'm', 0, 0);
   //cues[0] = new Cue(0, 'v', 0, 0);
   //cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
   //cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
@@ -1084,7 +1084,7 @@ void initMoon() {
     cues[15] =  new Cue(256.8, 'v', 0.0, 0); 
     cues[16] =  new Cue(270, 'v', 0.0, 0); 
     cues[17] =  new Cue(280.9, 'v', 0.0, 0); 
-    cues[18] =  new Cue(songFile.length()/1000.0-0.5, 'v', 0.0, 0);// end
+    cues[18] =  new Cue(getTrackLenSeconds(), 'v', 0.0, 0);// end
   } else {
     cues = new Cue[18];
     //cues[0] = new Cue(0, 'v', 0, 0);
@@ -1311,7 +1311,7 @@ void initCycles() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(songFile.length()/1000 - 2, 'v', 0.0, 0);
+  cues[2] = new Cue(getTrackLenSeconds()-1, 'v', 0.0, 0);
 
   currentGifs.get(0).loop();
   currentGifs.get(1).loop();
@@ -1365,7 +1365,7 @@ void initDirty() {
   cues[13] = new Cue(198.62, 'v', 0, 0);
   cues[14] = new Cue(209.66, 'v', 0, 0);
   cues[15] = new Cue(217.93, 'v', 0, 0);
-  cues[16] = new Cue(songFile.length()/1000.0-0.5, 'v', 0, 0);
+  cues[16] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
 
   centerScreen = new Screen(screenW*2, screenH, -2);
   temp = createGraphics(screenW, screenH, P3D);
@@ -1393,7 +1393,7 @@ void displayDirty() {
     drawEye();
     galaxyMove();
   }
-
+  println("dirty");
   colorMode(RGB, 255);
   switch(currentCue) { 
   case 0:
@@ -1703,7 +1703,7 @@ void initWiz() {
   cues[6] = new Cue(172.48, 'v', 0, 0);
   cues[7] = new Cue(185.19, 'v', 0, 0);
   cues[8] = new Cue(198.7, 'v', 0, 0);
-  cues[9] = new Cue(songFile.length()/1000.0 -1, 'v', 0, 0);
+  cues[9] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
   //initDots(100);
   //initAllFlowyWaves();
   //initNodesMain();
@@ -1805,16 +1805,16 @@ void blackBoids() {
 
 void bleed() {
   fc.shapeMode = 0;
-  if (songFile.position()/1000.0 < 72) attractMode = false;
-  else if (songFile.position()/1000.0 < 81.3) attractMode = true;
-  else if (songFile.position()/1000.0 < 86) attractMode = false;
-  else if (songFile.position()/1000.0 < 88) attractMode = true;
-  else if (songFile.position()/1000.0 < 94) attractMode = false;
-  else if (songFile.position()/1000.0 < 100.3) attractMode = true;
-  else if (songFile.position()/1000.0 < 140) attractMode = false;
-  else if (songFile.position()/1000.0 < 146) attractMode = true;
-  else if (songFile.position()/1000.0 < 150) attractMode = false;
-  else if (songFile.position()/1000.0 < 153) attractMode = true;
+  if (getSongPositionSeconds() < 72) attractMode = false;
+  else if (getSongPositionSeconds() < 81.3) attractMode = true;
+  else if (getSongPositionSeconds() < 86) attractMode = false;
+  else if (getSongPositionSeconds() < 88) attractMode = true;
+  else if (getSongPositionSeconds() < 94) attractMode = false;
+  else if (getSongPositionSeconds() < 100.3) attractMode = true;
+  else if (getSongPositionSeconds() < 140) attractMode = false;
+  else if (getSongPositionSeconds() < 146) attractMode = true;
+  else if (getSongPositionSeconds() < 150) attractMode = false;
+  else if (getSongPositionSeconds() < 153) attractMode = true;
   else attractMode = false;
   //else if (songFile.position()/1000.0 < 162) attractMode = false;
   //else if (songFile.position()/1000.0 < 140) attractMode = true;
@@ -1883,7 +1883,7 @@ void initMood() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0.0, 0);
+  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0.0, 0);
 }
 
 void deconstructMood() {
@@ -1913,8 +1913,8 @@ void displayMood() {
 void initEllon() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(songFile.length()/1000.0-4, 'v', 0.0, 0);
-  cues[2] = new Cue(songFile.length()/1000.0-1, 'v', 0.0, 0);
+  cues[1] = new Cue(getTrackLenSeconds()-3, 'v', 0.0, 0);
+  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0.0, 0);
 
   centerScreen = new Screen(screenW*2, screenH, -2);
 }
@@ -2141,13 +2141,13 @@ class Cue {
     if (type == 'm') {
       pauseVids();
       if (vid1 != null) {
-        vid1.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
+        vid1.jump(getSongPositionSeconds() - startT + movieStartT);
       }
       if (vid2 != null) {
-        vid2.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
+        vid2.jump(getSongPositionSeconds() - startT + movieStartT);
       }
       if (sphereMovie != null) {
-        sphereMovie.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
+        sphereMovie.jump(getSongPositionSeconds() - startT + movieStartT);
       }
       playVids();
     }
@@ -2158,7 +2158,7 @@ void setCurrentCue() {
   int c = -1;
 
   for (Cue cue : cues) {
-    if (songFile.position() >= cue.startT*1000) {
+    if (getSongPositionSeconds() >= cue.startT*1000) {
       c++;
       if (c >= cues.length-1) {
         c = cues.length -1;
@@ -2233,11 +2233,11 @@ void displayCues() {
   for (Cue c : cues) {
     strokeWeight(1);
     noFill();
-    float position = map( c.startT, 0, songFile.length()/1000.0, xSpace, xSpace+vW );
-    float hue = map( c.startT, 0, songFile.length()/1000.0, 0, 255 );
+    float position = map( c.startT, 0, getTrackLenSeconds(), xSpace, xSpace+vW );
+    float hue = map( c.startT, 0, getTrackLenSeconds(), 0, 255 );
     colorMode(HSB, 255);
     stroke(hue, 255, 255);
-    if (c.startT < songFile.length()/1000.0) {
+    if (c.startT < getTrackLenSeconds()) {
       line( position, ySpace, position, ySpace+vH );
       text(j++, position, ySpace + vH/2);
     }

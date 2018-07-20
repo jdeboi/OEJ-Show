@@ -784,7 +784,7 @@ void startAudioAmp() {
 
 
 void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
-  float seconds = songFile.position()/1000.0;
+  float seconds = getSongPositionSeconds();
   // fade in audio amp 
   if (seconds < start + rampStart) audioLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
   // fade out audio amp
@@ -792,7 +792,7 @@ void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
 }
 
 void fadeAudioAmp(float start, float end, float rampStart, float rampEnd) {
-  float seconds = songFile.position()/1000.0;
+  float seconds = getSongPositionSeconds();
   // fade in audio amp 
   if (seconds < start + rampStart) audioAmpLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
   // fade out audio amp
@@ -857,7 +857,7 @@ void initZZoom() {
 }
 
 void zoomTerrain(float startT, float endT) {
-  float currentT = songFile.position()/1000.0;
+  float currentT = getSongPositionSeconds();
   zZoom = int(map(currentT, startT, endT, startingTerrain, endingTerrain));
   //zZoom += speed;
   zZoom = constrain(zZoom, startingTerrain, endingTerrain);
@@ -1625,7 +1625,7 @@ void drawMoonSphere(PImage moon) {
   s.translate(s.width/2, s.height/2);
   color moonColor = color(255);//color(255, 0, 0, 40);
   color noColor = color(0, 0);
-  float t = songFile.position()/(songFile.length()*1.0);
+  float t = getSongPositionSeconds()/(getTrackLenSeconds()*1.0);
   if (t < 0.5) { 
     float tt = map(t, 0, 0.5, 0, 1); 
 
@@ -1948,13 +1948,13 @@ void fadeInCenter(float startT, float  seconds) {
 }
 
 int getFadeOutAlpha(float startT, float seconds) {
-  float playSeconds = songFile.position()/1000.0;
+  float playSeconds = getSongPositionSeconds();
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
 }
 
 int getFadeInAlpha(float startT, float  seconds) {
-  float playSeconds = songFile.position()/1000.0;
+  float playSeconds = getSongPositionSeconds();
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
 }
@@ -2315,7 +2315,7 @@ class SpaceRect {
     int KINDA_TRIPPY = 1;
     int SORTA_TRIPPY = 2;
     int SEESAW = 3;
-    float timePassed = (songFile.position()/1000.0 - cues[currentCue].startT);
+    float timePassed = (getSongPositionSeconds() - cues[currentCue].startT);
     if (mode == NONE) rot.z = 0;
 
     else if (mode == SUPER_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, timePassed);

@@ -5,35 +5,21 @@ boolean isPlaying = false;
 
 void initScenes() {
 
-  //  When The Moon Comes = 80 4/4
-  //Subatomic = 87 4/4
-  //Crush Proof = 102 4/4
-  //Cycles = 81 3/4
-  //Papercuts = 151 4/4
-  //Cave Dwellers = 90 4/4
-  //Mood = 80 4/4
-  //Ellon = 112 4/4
-  //Deltawaves = 66.5 4/4
-  //Song For M = 60 4/4
-  //Rite Of Spring = 61 4/4
-  //Hypercube = 135 4/4
-  //Egrets = 122 4/4
-
-  scenes[0] = new Scene("Intro", "intro", 1, 60, 4, 0);
-  scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80, 4, 2);
-  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 2);
+  scenes[0] = new Scene("Intro", "intro", 1, 60, 4, 0, 261);
+  scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80, 4, 2, 289);
+  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 2, 219);
   //scenes[2] = new Scene("Fifty Fifty", "fifty", 3, 120, 4);
-  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 2);
-  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 3, 1);  //6/8
-  scenes[5] = new Scene("WizRock", "wizrock", 6, 151, 4, 2);
-  scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4, 2);
-  scenes[7] = new Scene("Mood #2", "mood", 8, 80, 4, 2);
-  scenes[8] = new Scene("Delta Waves", "delta", 9, 132.8, 4, 1);
-  scenes[9] = new Scene("Song for M", "song", 10, 60, 4, 2);
-  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 1);
-  scenes[11] = new Scene("Rite of Spring", "rite", 12, 61, 4, 2);
-  scenes[12] = new Scene("Lollies", "lollies", 13, 135, 4, 2);
-  scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4, 2);
+  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 2, 210);
+  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 3, 1, 192);  //6/8
+  scenes[5] = new Scene("WizRock", "wizrock", 6, 151, 4, 2, 229);
+  scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4, 2, 218);
+  scenes[7] = new Scene("Mood #2", "mood", 8, 80, 4, 2, 276);
+  scenes[8] = new Scene("Delta Waves", "delta", 9, 132.8, 4, 1, 211);
+  scenes[9] = new Scene("Song for M", "song", 10, 60, 4, 2, 203);
+  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 1, 202);
+  scenes[11] = new Scene("Rite of Spring", "rite", 12, 61, 4, 2, 197);
+  scenes[12] = new Scene("Lollies", "lollies", 13, 135, 4, 2, 210);
+  scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4, 2, 261);
   currentScene = scenes[0];
 }
 
@@ -64,21 +50,23 @@ class Scene {
   float tempo;
   int signature;
   int numClickBars;
+  int lengthSeconds;
 
-  Scene(String s, String sn, int o, float t, int sig, int bars) {
+  Scene(String s, String sn, int o, float t, int sig, int bars, int numSeconds) {
     song = s;
     shortName = sn;
     order = o;
     tempo = t;
     signature = sig;
     numClickBars = bars;
+    lengthSeconds = numSeconds;
   }
 
   void playScene() {
     betweenSongs = false;
     isPlaying = true;
     //timeStarted = millis();
-    songFile.play();
+    playSong();
     println(song + " is playing");
 
     if (currentCue != -1) cues[currentCue].initCue();
@@ -86,7 +74,7 @@ class Scene {
 
   void pauseScene() {
     isPlaying = false;
-    songFile.pause();
+    pauseSong();
     println(song + " paused");
 
     if (currentCue != -1) cues[currentCue].pauseCue();
@@ -100,20 +88,26 @@ class Scene {
     currentImages = loadImages("scenes/" + shortName + "/images/");
     currentCue = 0;
 
-    if (!backingTracks) songFile = minim.loadFile("music/fullsong/" + shortName + ".mp3");
+    
+    if (!backingTracks) songFile2 = minim.loadFile("music/fullsong/" + shortName + ".mp3");
 
     else {
-      //if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
-      //else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
-      //else 
-      println(shortName);
-      songFile = minim.loadFile("music/" + shortName + ".wav");
+      songFile2 = minim.loadFile("music/" + shortName + ".wav");
+      if (songFile2.length() > 300 * 1000) {
+        usingAudio = false;
+        noAudioPlayer = new NoAudioPlayer(lengthSeconds * 1000, tempo);
+      }
+      else {
+        usingAudio = true;
+        noAudioPlayer = null;
+      }
     }
+    
 
     //printMeasureBeatsCurrentScene();
 
-    songFile.cue(0);
-    songFile.pause();
+    cueAudio(0);
+    pauseSong();
     //initBeat();
 
     resetFade();
@@ -135,15 +129,14 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
-    
+
     platformOff();
   }
 
 
   void display() {
     if (isPlaying) {
-
-      //updateSpectrum();
+      println("displaying");
       checkBeatReady(0);
 
       setCurrentCue();
@@ -164,13 +157,13 @@ class Scene {
       else if (song.equals("Intro")) displayIntro();
       previousCycle = currentCycle;
 
-      //songFile.update();
+      if (noAudioPlayer != null) noAudioPlayer.update();
 
       if (currentCue == cues.length-1) {
         println("next");
         nextSong();
       }
-      
+
       previousCue = currentCue;
     }
   }
@@ -195,8 +188,8 @@ class Scene {
 
   void resetScene() {
     isPlaying = false;
-    songFile.pause();
-    songFile.cue(0);
+    pauseSong();
+    cueAudio(0);
     deconstruct();
     println(song + " has ended");
   }
