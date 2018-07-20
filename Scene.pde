@@ -103,9 +103,11 @@ class Scene {
     if (!backingTracks) songFile = minim.loadFile("music/fullsong/" + shortName + ".mp3");
 
     else {
-      if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
-      else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
-      else songFile = minim.loadFile("music/backing/" + shortName + ".wav");
+      //if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
+      //else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
+      //else 
+      println(shortName);
+      songFile = minim.loadFile("music/" + shortName + ".wav");
     }
 
     //printMeasureBeatsCurrentScene();
@@ -133,6 +135,8 @@ class Scene {
     else if (song.equals("Song for M")) initSong();
     else if (song.equals("Ellon")) initEllon();
     else if (song.equals("Egrets")) initEgrets();
+    
+    platformOff();
   }
 
 

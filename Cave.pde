@@ -125,6 +125,19 @@ class OEJCave {
     }
   }
 
+  void displayCaveLeftRightBounceHand() {
+    if (mouseX > width/2 && pmouseX <= width/2) {
+      colorSettings[2] = GRAD2;
+      colorSettings[3] = GRAD2;
+      randomizeLerpColorsPair(1);
+    } else if (mouseX < width/2 && pmouseX >= width/2) {
+      colorSettings[0] = GRAD1;
+      colorSettings[1] = GRAD1;
+      randomizeLerpColorsPair(0);
+    }
+  }
+
+
   void displayCaveAllBounce() {
     if (currentCycle > previousCycle || currentCue > previousCue) changeGradAll();
   }
@@ -292,6 +305,8 @@ class OEJCave {
     grids[0].drawFlatCave(screenNum, s, true);
     grids[1].drawFlatCave(screenNum, s, false);
     grids[0].drawFlatCave(screenNum, s, false);
+    grids[2].drawFlatCave(screenNum, s, false);
+    grids[3].drawFlatCave(screenNum, s, false);
   }
 
   void drawGrids(int screenNum, PGraphics s) {
@@ -1288,6 +1303,8 @@ class OEJCave {
           if (isFlat) drawFlatGrid(screenNum, s, i, j);
           else if (gridMode == ground) drawGround(screenNum, s, i, j);
           else if (gridMode == ceiling) drawCeiling(screenNum, s, i, j);
+          else if (gridMode == leftWall) drawLeftGrid(screenNum, s, i, j);
+          else if (gridMode == rightWall) drawRightGrid(screenNum, s, i, j);
         }
         s.endShape();
       }
@@ -1479,11 +1496,33 @@ class OEJCave {
             s.stroke(f, startSat, 225);
           }
         }
-      } else {
+      } else if (gridMode == flatWall) {
         if (personOnPlatform) {
-
+          if (i < 15) s.stroke(125, startSat, 255);
+          else {
+            float lr = getCaveHand();
+            float per = (map(i, 15, g.rows-1, 0, 1) + lr);
+            if (per > 1) per = map(per, 1, 2, 1, 0);
+            float h = map(per, 0, 1, 125, 180);
+            //f = map(i, 15, g.rows-1, 125, 180);
+            s.stroke(h, startSat, 225);
+          }
+        } else {
+          if (rainbowIndex < 0) startSat += rainbowIndex;
+          int startG = int(35*25.0/g.cellSize);  
+          if (j < startG) {
+            s.stroke(125, startSat, 255, alpha);
+          } else {
+            f = map(j, startG, g.cols-1, 125, 180);
+            s.stroke(f, startSat, 225, alpha);
+          }
+        }
+      } 
+      // left, right wall
+      else {
+        if (personOnPlatform) {
+          int startG = int(35*25.0/g.cellSize);  
           float lr = getCaveHand();
-          int startG = int(35*25.0/g.cellSize);
           float per = (map(j, startG, g.cols-1, 0, 1) + lr);
           if (per > 1) per = map(per, 1, 2, 1, 0);
           float h = map(per, 0, 1, 125, 180);

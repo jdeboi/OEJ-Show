@@ -60,9 +60,10 @@ PImage[] symbols;
 
 void initMusic() {
   minim = new Minim(this);
-  if (currentScene.song.equals("WizRock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
-  else if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3");
-  else songFile = minim.loadFile("music/backing/intro.mp3");
+  //if (currentScene.song.equals("WizRock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
+  //else if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3");
+  //else songFile = minim.loadFile("music/backing/intro.mp3");
+  songFile = minim.loadFile("music/intro.wav");
 }
 
 //void initFFT() {
@@ -487,7 +488,7 @@ void setCurrentCycle(float startT) {
   float timePassed = songFile.position()/1000.0 - startT;
   float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
-  
+
   currentCycle = int(timePassed/spb)+1;
 }
 void setCurrentCycleCueClick() {
@@ -515,7 +516,7 @@ void checkBeatReady(float startT) {
   //} else if (timePassed > currentCycle * spb) {
   //  currentCycle++;
   //}
-  
+
   setCurrentCycle(startT);
 }
 
@@ -701,4 +702,16 @@ void addClickTimes(float t) {
   for (int i = 0; i < cues.length; i++) {
     cues[i].startT += t;
   }
+}
+
+void skipSong(int amt) {
+  //songFile.pause();
+  //songFile.skip(amt);
+  int position = songFile.position() + amt;
+  songFile.cue(position);
+  setCurrentCue();
+  setCurrentCycleCueClick();
+  println("current cue: " + currentCue);
+  if (currentCue != -1) cues[currentCue].initCue();
+  
 }

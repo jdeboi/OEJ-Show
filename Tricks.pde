@@ -1,19 +1,15 @@
 
 boolean personOnPlatform = false;
-
+int eyeModePlatform = -1;
 int mxW = 100;
 
-void changePlatform() {
-  personOnPlatform = !personOnPlatform;
-  sphereScreen.drawSolid(0);
-}
 
 int getCaveHandSide() {
   return constrain(int(map(mouseX, width/2 - 150, width/2 + 150, 0, width)), 0, width);
 }
 
 int getCaveHandUpDown(int spacing, int cols) {
-  return int(map(mouseY, height, height/2, -spacing, cols+spacing));
+  return int(map(mouseX, width/2 - 150, width/2 + 150, -spacing, cols+spacing));
 }
 
 float getFractalTreeAngle() {
@@ -462,15 +458,69 @@ void initEye() {
 }
 
 void drawEye() {
-  PGraphics s = sphereScreen.s;
-  s.beginDraw();
-  s.background(0);
-  s.translate(s.width/2, s.height/2);
-  s.rotateX(constrain(map(mouseY, height, height/2, -PI/5, PI/4), -PI/5, PI/4));
-  s.rotateY(constrain(map(mouseX, width/2 - 100, width/2 + 100, PI/3.5, PI/1.5), PI/3.5, PI/1.5));
-  s.shape(eyeball);
-  s.endDraw();
+  checkEyeOn();
+  if (eyeModePlatform == FOLLOW_EYE) {
+    PGraphics s = sphereScreen.s;
+    s.beginDraw();
+    s.background(0);
+    s.translate(s.width/2, s.height/2);
+    float rx = constrain(map(mouseY, height, height/2, -PI/5, PI/4), -PI/5, PI/4);
+    float ry = constrain(map(mouseX, width/2 - 100, width/2 + 100, PI/3.5, PI/1.5), PI/3.5, PI/1.5);
+    //println(rx, ry);
+    s.rotateX(rx);
+    s.rotateY(ry);
+    s.shape(eyeball);
+    s.endDraw();
+  } else if (eyeModePlatform == AUDIENCE_EYE) {
+    PGraphics s = sphereScreen.s;
+    s.beginDraw();
+    s.background(0);
+    s.translate(s.width/2, s.height/2);
+    s.rotateX(-0.17907077 + .02*cos(millis()/200.0));
+    s.rotateY(1.4002528 + .02*sin(millis()/200.0));
+    s.shape(eyeball);
+    s.endDraw();
+  }
 }
+
+int NONE_EYE = -1;
+int FOLLOW_EYE = 0;
+int AUDIENCE_EYE = 1;
+int eyeTurnedOnTime = 0;
+
+
+void platformOn() {
+  sphereScreen.drawSolid(0);
+  personOnPlatform = true;
+  eyeTurnedOnTime = millis();
+  eyeModePlatform = AUDIENCE_EYE;
+}
+
+void platformOff() {
+  sphereScreen.drawSolid(0);
+  personOnPlatform = false;
+  eyeModePlatform = -1;
+}
+
+void togglePlatform() {
+  sphereScreen.drawSolid(0);
+  if (!personOnPlatform) {
+    personOnPlatform = true;
+
+    eyeTurnedOnTime = millis();
+    eyeModePlatform = AUDIENCE_EYE;
+  } else {
+    personOnPlatform = false;
+    eyeModePlatform = -1;
+  }
+}
+
+void checkEyeOn() {
+  if (millis() - eyeTurnedOnTime > 3000) {
+    eyeModePlatform = FOLLOW_EYE;
+  }
+}
+
 //GShader shader;
 //int idxShader = -1;
 
@@ -586,7 +636,23 @@ void handsHorizFaceLines(color c) {
   if (mouseY < height -100) display4FaceLines(c, face);
 }
 
+void handEgrets() {
+  drawSolidAllCubes(0);
+  int num = constrain(int(map(mouseX, width/2-mxW*2, width/2+mxW*2, 0, 4)), 0, 3);
+  color[] colors = {white, red, yellow, blue};
+  upDownRec(colors, num);
+}
 
+void upDownRec(color[] colors, int num) {
+  PGraphics s = screens[num].s;
+  s.beginDraw();
+  s.background(0);
+  s.noStroke();
+  s.fill(colors[num]);
+  float h = screenH/2 + screenH/2* sin(percentToNumBeats(8)*2*PI);
+  s.rect(0, screenH/2-h/2, screenW, h);
+  s.endDraw();
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 // TELEPORTING DOTS
@@ -672,19 +738,19 @@ class Dot {
     }
   }
 
-  void display() {
+  void display(PGraphics s, int screenNum) {
     if (this.isMoving) {
-      strokeWeight(this.displaySize);
-      //colorMode(HSB);
-      stroke(this.displayColor);
-      noFill();
-      beginShape();
-      vertex(this.startPointPosition.x, this.startPointPosition.y);
+      s.strokeWeight(this.displaySize);
+      //s.colorMode(HSB);
+      s.stroke(this.displayColor);
+      s.noFill();
+      s.beginShape();
+      s.vertex(this.startPointPosition.x-screenW*screenNum, this.startPointPosition.y);
       if (this.startPointRatio < this.relayPointRatio && this.relayPointRatio < this.endPointRatio) {
-        vertex(this.relayPointPosition.x, this.relayPointPosition.y);
+        s.vertex(this.relayPointPosition.x-screenW*screenNum, this.relayPointPosition.y);
       }
-      vertex(this.endPointPosition.x, this.endPointPosition.y);
-      endShape();
+      s.vertex(this.endPointPosition.x-screenW*screenNum, this.endPointPosition.y);
+      s.endShape();
       //} else {
       //  noStroke();
       //  fill(this.displayColor);
@@ -715,13 +781,15 @@ Dot createRandomDot() {
   newDot.displaySize = 4 * width / 640;
   newDot.displayColor = createRandomColor(50, 100);
   return newDot;
-};
+}
 
 color createRandomColor(float saturationValue, float brightnessValue) {
-  //color newColor;
-
-  return color(random(50, 200));
-};
+  color newColor;
+  colorMode(HSB);
+  newColor = color(random(360), saturationValue, brightnessValue);
+  colorMode(RGB);
+  return newColor;
+}
 
 void processDotsAway(float effectiveRadius, float probability) {
   Dot eachDot;
@@ -757,25 +825,25 @@ void awayFromMouse(Dot dot, float effectiveRadius) {
   if (!(dot.getDistance(mouseX, mouseY) < effectiveRadius)) {
     return;
   }
-  dot.setTarget(random(width), random(height/2, height));
+  dot.setTarget(random(screenW*4), random(screenH/2, screenH));
 }
 
 void attractToMouse(Dot dot, float effectiveRadius) {
   float angle, distance, x, y;
   distance = random(1) * effectiveRadius;
   angle = random(1) * TWO_PI;
-  x = mouseX + distance * cos(angle);
+  x = map(mouseX, 0, width, 0, screenW*4) + distance * cos(angle);
   if (x < 0) {
     x = -x;
-  } else if (x > width) {
-    x = width - (x - width);
+  } else if (x > screenW*4) {
+    x = screenW*4 - (x - screenW*4);
   }
-  y = mouseY + distance * sin(angle);
-  if (y < height/2) {
+  y =  constrain(map(mouseY, height/2, height, 0, screenH), 0, screenH) + distance * sin(angle);
+  if (y < screenH/2) {
     //y = -y;
-    y = height/2 + (height/2 - y);
-  } else if (y > height) {
-    y = height - (y - height);
+    y = screenH/2 + (screenH/2 - y);
+  } else if (y > screenH) {
+    y = screenH - (y - screenH);
   }
   dot.setTarget(x, y);
 }
@@ -788,20 +856,31 @@ void initDots(int num) {
   effectiveRadius = 0.25 * width;
 }
 
-void displayDots() {
-  Dot eachDot;
-  blendMode(BLEND);
-  //background(0, 0, 40);
-  blendMode(SCREEN);
+void updateDots() {
   for (int i = 0; i < dotArray.length; i++) {
-    eachDot = dotArray[i];
-    eachDot.update();
-    eachDot.display();
+    dotArray[i].update();
   }
   if (awayDots) {
     processDotsAway(effectiveRadius, 1);
     processDotsAway(effectiveRadius, 0.001);
   } else {
     processDotsTo(effectiveRadius, 0.1);
+  }
+}
+
+void displayDots() {
+  updateDots();
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    Dot eachDot;
+    s.beginDraw();
+    s.blendMode(BLEND);
+    s.background(0, 0, 40);
+    s.blendMode(ADD);
+    for (int j = 0; j < dotArray.length; j++) {
+      eachDot = dotArray[j];
+      eachDot.display(s, i);
+    }
+    s.endDraw();
   }
 }

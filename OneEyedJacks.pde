@@ -70,7 +70,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(LOLLIES);
+  changeScene(RITE);
   frameRate(30);
 }
 
@@ -116,7 +116,7 @@ void playShow() {
 void keyPressed() {
 
   if (key == 'c') controlsON = !controlsON;
-  else if (key == 'p') changePlatform();
+  else if (key == 'p') togglePlatform();
   else if (key == 'e') mappingON =!mappingON;
   else if (key == 'f') if (fc!=null) fc.explodeFlocking();
   if (bracketDown) {
@@ -128,8 +128,8 @@ void keyPressed() {
     else if (key == 'w') changeScene(13);
   } else if (slashDown) {
     if (isPlaying) {
-      if (keyCode == RIGHT) songFile.skip(50);
-      else if (keyCode == LEFT) songFile.skip(-50);
+      if (keyCode == RIGHT) skipSong(150);
+      else if (keyCode == LEFT) skipSong(-150);
     }
   } else if (key == ' ') {
     if (!startShow) startShow = true;

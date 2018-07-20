@@ -129,6 +129,12 @@ class FlockingClass {
 
   void randomizeColors() {
     colorMode(HSB, 255);
+    
+    //color[] colors = {red, white, blue};
+    //int r = int(random(colors.length));
+    //int r2 = int(random(colors.length-1));
+    //agentC1 = colors[r];
+    //agentC2 = colors[(r+r2)%colors.length];
     agentC1 = color(random(255), 255, 255);
     agentC2 = color(random(255), 255, 255);
     currentBackgroundC = color(hue(agentC1), 255, 100);
