@@ -70,7 +70,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(DELTA);
+  changeScene(LOLLIES);
   frameRate(30);
 }
 
@@ -79,10 +79,11 @@ void draw() {
   background(0);
 
   if (mappingON) {
+    checkEditing();
     //drawSolidAll(color(205, 0, 0));
     drawSolidAllCubes(color(205, 0, 0));
     renderScreens();
-    checkEditing();
+    
     if (showMask) maskScreens(color(50));
   } else {
     playShow();
@@ -127,8 +128,8 @@ void keyPressed() {
     else if (key == 'w') changeScene(13);
   } else if (slashDown) {
     if (isPlaying) {
-      if (keyCode == RIGHT) songFile.skip(500);
-      else if (keyCode == LEFT) songFile.skip(-500);
+      if (keyCode == RIGHT) songFile.skip(50);
+      else if (keyCode == LEFT) songFile.skip(-50);
     }
   } else if (key == ' ') {
     if (!startShow) startShow = true;

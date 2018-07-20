@@ -201,6 +201,7 @@ void displaySong() {
   case 0:
     break;
   case 1:
+    maskGifSphere();
     movieSong();
     break;
   case 2:
@@ -351,8 +352,10 @@ void treeRun(int addonGif) {
 }
 
 void initCrush() {
-  initVid("scenes/crush/movies/crush.mp4", "scenes/crush/movies/crushpanels.mp4");
-
+  //initVid("scenes/crush/movies/crush.mp4", "scenes/crush/movies/crushpanels.mp4");
+  initVid("scenes/crush/movies/vid1.mov");
+  initSphereVid("scenes/crush/movies/crushpanels.mp4");
+  sphereImg = loadImage("images/sphere/grass.png");
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getBarLenSeconds()*2, 'm', 0, 0);
@@ -387,7 +390,7 @@ void initCrush() {
   //initTerrain();
   //initTesseract();
 
-  currentGifs.get(0).loop();
+  currentGifs.get(1).loop();
 }
 
 void deconstructCrush() {
@@ -404,13 +407,20 @@ void displayCrush() {
   //  //zCrush = getZCrushHand();
   //}
 
-  maskGifSphere();
+  //maskGifSphere();
+
 
   switch(currentCue) {
   case 0:
     break;
   case 1:
+    //movieCrush();
+    screens[0].drawImage(currentGifs.get(1), 0, 0);
+    screens[3].drawImage(currentGifs.get(1), 0, 0);
+    displaySphereMovie(0, 0, sphereW, sphereW);
     movieCrush();
+
+    sphereScreen.drawImage(sphereImg, 0, 0, sphereW, sphereW);
     break;
   case 2:
     break;
@@ -1099,6 +1109,7 @@ void deconstructMoon() {
 }
 
 void displayMoon() {
+  color moonC = color(255);
   int CONVERGE_CENTER = 0;
   int CONVERGE_VERT_LINE = 1;
   int DIAG_EXIT_VERT = 2;
@@ -1116,93 +1127,93 @@ void displayMoon() {
   case 0:    
     displayMoveSpaceAll(STATIC_STARS, 0.75);
 
-    pulsing(white, percentToNumBeats(8));
+    pulsing(moonC, percentToNumBeats(8));
     break;
   case 1: 
     displayMoveSpaceAll(STATIC_STARS, 0.86);
 
-    pulsing(white, percentToNumBeats(8));
+    pulsing(moonC, percentToNumBeats(8));
     break;
   case 2:
     displayMoveSpaceAll(DIVERGE_HORIZ_LINE, 0.86);
 
-    pulsing(white, percentToNumBeats(8));
+    pulsing(moonC, percentToNumBeats(8));
     break;
   case 3: 
     displayMoveSpaceAll(DIAG_EXIT_VERT, 0.66);
 
-    displayLines(white);
+    displayLines(moonC);
     break;
   case 4: 
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 5: 
     displayMoveSpaceAll(DIVERGE_VERT_LINE, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 6: 
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 7: 
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 8: 
     displayMoveSpaceAll(LIGHT_SPEED, 0.86);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 9:
     displayMoveSpaceAll(LIGHT_SPEED, 1);
 
-    displayRandomLines(color(255, 0, 0));
+    displayRandomLines(moonC);
     setLightning();
 
     break;
   case 10:
     displayMoveSpaceAll(DIVERGE_VERT_LINE, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
 
 
     break;
   case 11:
     displayMoveSpaceAll(CONVERGE_VERT_LINE, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 12:
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, 0.66);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
   case 13:
     displayMoveSpaceAll(LIGHT_SPEED, 0.86);
 
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     resetFade(); 
     break;
   case 14:
 
     displayMoveSpaceAll(LIGHT_SPEED, 1);
 
-    displayRandomLines(color(255, 0, 0));
+    displayRandomLines(moonC);
     setLightning();
     break;
   case 15:
     displayMoveSpaceAll(DIAG_EXIT_HORIZ, .9);
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     break;
 
   case 16: // fade out lines
     displayMoveSpaceAll(DIVERGE_VERT_LINE, .9);
-    displayLines(color(255, 0, 0));
+    displayLines(moonC);
     startFadeLine = false;
     resetFade(); 
     break;
@@ -1210,8 +1221,8 @@ void displayMoon() {
     displayMoveSpaceAll(CONVERGE_CENTER, 0.66);
     fadeOutAllScreens(cues[currentCue].startT, 8);
 
-    displayLines(color(255, 0, 0));
-    fadeOutAllLines(3, color(255, 0, 0));
+    displayLines(moonC);
+    fadeOutAllLines(3, moonC);
     break;
   case 18: // fade out end
     displayLines(color(0));
@@ -1294,7 +1305,7 @@ void initCycles() {
   currentGifs.get(0).loop();
   currentGifs.get(1).loop();
 
-
+  //sphereImg = loadImage("images/sphere/grass.png");
   initMaskGif();
 }
 
@@ -1305,12 +1316,13 @@ void displayCycles() {
 
 
   sphereScreen.drawImage(currentGifs.get(0), 0, 0, sphereScreen.s.width, sphereScreen.s.height);
-
+  //sphereScreen.drawImage(sphereImg, 0, 0, sphereW, sphereW);
 
 
   switch(currentCue) {
   case 1:
     centerVidCycles();
+    displayLinesCenterFocus(color(#021A00));
     break;
   default:
     displayLines(color(0));
@@ -1848,12 +1860,12 @@ void wizPinkVidConst() {
 
 void initMood() {
   initSphereVid("scenes/mood/movies/sphere.mp4");
-  initVid("scenes/mood/movies/vid1.mp4");
+  initVid("scenes/mood/movies/vid1orig.mov");
   currentGifs.get(0).loop();
 
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(3, 'm', 0.0, 0);
+  cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
   cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0.0, 0);
 }
 
@@ -1934,6 +1946,7 @@ void drawDave() {
 }
 
 void initEgrets() {
+  println(songFile.length()/1000.0);
   cues = new Cue[20];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(2, 'v', 0.0, 0); // sax

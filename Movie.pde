@@ -28,6 +28,7 @@ void initSphereVid(String path) {
 void displaySphereMovie(int x, int y, int w, int h) {
   if (sphereMovie != null) {
     sphereScreen.s.beginDraw();
+    sphereScreen.s.tint(255);
     sphereScreen.s.image(sphereMovie, x, y, w, h);
     sphereScreen.s.endDraw();
   }
@@ -172,21 +173,30 @@ void centerVidCycles() {
 
 void moodMovie() {
   //int x = (vid1.width - screenW*2)/2;
-  screens[0].drawImage(vid1, 0, 0, screenW, screenH);
-  screens[3].drawImageMirror(vid1, 0, 0, screenW, screenH);
+  //screens[0].drawImage(vid1, 0, 0, screenW, screenH);
+  //screens[3].drawImageMirror(vid1, 0, 0, screenW, screenH);
 
-  int y = -100;
-  int h = int(screenH*1.0*screenW/currentGifs.get(0).width);
-  screens[1].drawImage(currentGifs.get(0), 0 ,y , screenW, h);
-  screens[2].drawImageMirror(currentGifs.get(0), 0, y, screenW, h);
+  //int y = -100;
+  //int h = int(screenH*1.0*screenW/currentGifs.get(0).width);
+  //screens[1].drawImage(currentGifs.get(0), 0 ,y , screenW, h);
+  //screens[2].drawImageMirror(currentGifs.get(0), 0, y, screenW, h);
+  
+  int x = (vid1.width - screenW*2)/2;
+  int y = 0; //(vid1.height - screenH )/2;
+  screens[0].drawImage(vid1, -x, -y);
+  screens[1].drawImage(vid1, -screenW-x, -y);
+  
+  screens[2].drawImageMirror(vid1, -screenW-x, -y);
+  screens[3].drawImageMirror(vid1, -x, -y);
+
 }
 
 void movieSong() {
   screens[0].drawImage(vid1, 0, 0, screenW, screenH);
   screens[3].drawImage(vid1, 0, 0, screenW, screenH);
   
-  screens[1].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
-  screens[2].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
+  //screens[1].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
+  //screens[2].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
   
   //int x = (vid1.width - screenW*2)/2;
   //screens[1].drawImage(vid1, -x, 0);
@@ -196,11 +206,19 @@ void movieSong() {
 }
 
 void movieCrush() {
-  screens[0].drawImage(vid2, 0, 0);
-  screens[3].drawImage(vid2, 0, 0);
+  //screens[0].drawImage(vid2, 0, 0);
+  //screens[3].drawImage(vid2, 0, 0);
 
-  screens[1].drawImage(vid1, 0, 0);
-  screens[2].drawImageMirror(vid1, 0, 0);
+  //screens[1].drawImage(vid1, 0, 0);
+  //screens[2].drawImageMirror(vid1, 0, 0);
+  
+  int x = (vid1.width - screenW*2)/2;
+  int y = -120;
+  screens[0].drawImage(vid1, -x, y);
+  screens[1].drawImage(vid1, -screenW-x, y); // -x, 0);
+  screens[3].drawImageMirror(vid1,-x, y);
+  screens[2].drawImageMirror(vid1,-screenW-x, y);
+
 }
 
 void maskGifSphere() {

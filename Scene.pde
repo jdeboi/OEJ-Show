@@ -21,9 +21,9 @@ void initScenes() {
 
   scenes[0] = new Scene("Intro", "intro", 1, 60, 4, 0);
   scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80, 4, 2);
-  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 0);
+  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 2);
   //scenes[2] = new Scene("Fifty Fifty", "fifty", 3, 120, 4);
-  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 0);
+  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 2);
   scenes[4] = new Scene("Cycles", "cycles", 5, 81, 3, 1);  //6/8
   scenes[5] = new Scene("WizRock", "wizrock", 6, 151, 4, 2);
   scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4, 2);
@@ -32,7 +32,7 @@ void initScenes() {
   scenes[9] = new Scene("Song for M", "song", 10, 60, 4, 2);
   scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 1);
   scenes[11] = new Scene("Rite of Spring", "rite", 12, 61, 4, 2);
-  scenes[12] = new Scene("Lollies", "lollies", 13, 128, 135, 2);
+  scenes[12] = new Scene("Lollies", "lollies", 13, 135, 4, 2);
   scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4, 2);
   currentScene = scenes[0];
 }

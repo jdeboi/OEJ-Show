@@ -3,7 +3,7 @@ import ddf.minim.*;
 
 
 boolean backingTracks = true;
-int cueDelay = 0;
+int cueDelay = 230;
 //int cueDelay = 2300;
 
 Minim minim;
@@ -644,6 +644,7 @@ int getClickTrackLen() {
   int mspbars = mspb * currentScene.signature * currentScene.numClickBars;
   return mspbars;
 }
+
 
 float getBarLenSeconds() {
   float bpm = currentScene.tempo;

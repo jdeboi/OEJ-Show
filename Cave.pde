@@ -512,7 +512,7 @@ class OEJCave {
   }
 
   void setCastLightSideStroke(PGraphics s, Feature feat, int screenNum, int i) {
-    int brCol = constrain(int(map(mouseX, width/2 - 150, width/2 + 150, 0, width)), 0, width);
+    int brCol = getCaveHandSide();
     int spacing = 505;
     float x = feat.x;
     //if (screenNum == 1) {
@@ -539,7 +539,7 @@ class OEJCave {
   void lightGridTopBot(PGraphics s, int screenNum, int i, int cols) {
     int spacing = 15;
     if (screenNum == 1 || screenNum == 2) {
-      int brCol = int(map(mouseY, height, height/2, -spacing, cols+spacing));
+      int brCol = getCaveHandUpDown(spacing, cols);
       int br = 0;
       if (i <= brCol)  br = constrain(int(map(i, brCol - spacing, brCol, 0, 255)), 0, 255);
       else if (i > brCol) br = constrain(int(map(i, brCol, brCol+spacing, 255, 0)), 0, 255);
@@ -1059,7 +1059,8 @@ class OEJCave {
       if (lr > 1) lr = map(lr, 1, 2, 1, 0);
       float per = (map(z, -500, -3500, 0, 1) + lr);
       if (per > 1) per = map(per, 1, 2, 1, 0);
-      h = lerpColor(startHue, endHue, per);
+      h = map(per, 0, 1, 125, 180);
+      //h = lerpColor(startHue, endHue, per);
 
       float f;
       if (index > ySteps/2) f = 0;

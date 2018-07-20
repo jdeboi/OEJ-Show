@@ -166,9 +166,10 @@ void fadeOutAllLines(int seconds, color c) {
   } 
   float timePassed = (millis() - startFadeTime)/1000.0;
   int brig = constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
-  float h = hue(c);
   colorMode(HSB, 255);
-  color cr = color(h, 255, brig);
+  float h = hue(c);
+  float sat = saturation(c);
+  color cr = color(h, sat, brig);
   colorMode(RGB, 255);
   displayLines(cr);
 }

@@ -3092,15 +3092,18 @@ void moveConstellationLines(int speed) {
     constellationLines[i].move(speed);
   }
 }
-
+PImage tex;
 void rotateSphereBall() {
   //sphereConstellationDraw();
-  
+   
+  sphereBall.setTexture(tex);
   PGraphics s = sphereScreen.s;
   s.beginDraw();
   s.background(0);
+  //s.image(tex, 0, 0);
   s.translate(s.width/2, s.height/2);
   s.rotateY(millis()/4000.0);
+  s.fill(255, 0, 0);
   s.shape(sphereBall);
   s.endDraw();
  
@@ -3108,12 +3111,14 @@ void rotateSphereBall() {
 
 void initSphereBallRite() {
   sphereBall = createShape(SPHERE, sphereScreen.s.width*.43); 
-  sphereBall.setTexture(loadImage("images/sphere/constspheresm.png"));
+  tex = loadImage("images/sphere/constspheresm.png");
+  sphereBall.setTexture(tex);
 }
 
 void initSphereBallDelta() {
   sphereBall = createShape(SPHERE, sphereScreen.s.width*.43); 
-  sphereBall.setTexture(loadImage("images/sphere/plutomap.jpg"));
+  tex = loadImage("images/sphere/plutomap.jpg");
+  sphereBall.setTexture(tex);
 }
 
 class ConstellationLine {

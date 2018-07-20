@@ -8,6 +8,14 @@ void changePlatform() {
   sphereScreen.drawSolid(0);
 }
 
+int getCaveHandSide() {
+  return constrain(int(map(mouseX, width/2 - 150, width/2 + 150, 0, width)), 0, width);
+}
+
+int getCaveHandUpDown(int spacing, int cols) {
+  return int(map(mouseY, height, height/2, -spacing, cols+spacing));
+}
+
 float getFractalTreeAngle() {
   //(mouseX / (float) s.width) * 90f;
   return constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -PI/3, PI/3), -PI/3, PI/3);

@@ -553,6 +553,7 @@ class FlockingClass {
   void flockingSphere() {
     PGraphics s = sphereScreen.s;
     s.beginDraw();
+    s.noStroke();
     s.fill(currentBackgroundC, overlayAlpha);
     s.ellipse(s.width/2, s.height/2, s.width, s.width);
 
