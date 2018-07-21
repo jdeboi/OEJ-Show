@@ -472,7 +472,7 @@ float percentToNumBeats(int numBeats) {
   return percentToNumBeats(0, numBeats);
 }
 float percentToNumBeats(float startT, int numBeats) {
-  float timePassed =  - startT;
+  float timePassed =  getSongPositionSeconds()- startT;
   float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
   int cyclesSinceStartT = floor(timePassed / spb);

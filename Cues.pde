@@ -368,7 +368,7 @@ void initCrush() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(getTrackLenSeconds()/1000.0 -1, 'm', 0, 0);
+  cues[2] = new Cue(getTrackLenSeconds(), 'm', 0, 0);
   //cues[0] = new Cue(0, 'v', 0, 0);
   //cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
   //cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
