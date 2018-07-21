@@ -110,8 +110,8 @@ class Scene {
       //else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
       //else 
       //println(shortName);
-       if (shortName.equals("rite") || shortName.equals("lollies")) songFile = minim.loadFile("music/" + shortName + ".mp3");
-       else songFile = minim.loadFile("music/" + shortName + ".wav");
+      if (shortName.equals("rite") || shortName.equals("lollies")) songFile = minim.loadFile("music/" + shortName + ".mp3");
+      else songFile = minim.loadFile("music/" + shortName + ".wav");
     }
 
     //printMeasureBeatsCurrentScene();
@@ -207,20 +207,37 @@ class Scene {
 }
 
 
-  
+
 ArrayList<PImage> loadImages(String dir) {
   ArrayList<PImage> imgs = new ArrayList<PImage>();
-  java.io.File folder = new java.io.File(dataPath(dir));
-  String[] filenames = folder.list();
-  PImage p;
-  //if (filenames != null) {
+  if (mac) {
+    java.io.File folder = new java.io.File(dataPath(dir));
+    String[] filenames = folder.list();
+    PImage p;
+    //if (filenames != null) {
     for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
       if (!filenames[i].equals(".DS_Store")) {
         p = loadImage(dir + filenames[i]);
         imgs.add(p);
       }
     }
-  //}
+    //}
+  } else {
+    String dir2 = "C:\\Users\\User\\Desktop\\OneEyedJacks\\data\\scenes\\" + currentScene.shortName + "\\images";
+    java.io.File folder = new java.io.File(dir2); 
+    String[] filenames = folder.list();
+    PImage p;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length; i++) {
+
+        if (filenames[i].charAt(0) != '.') {
+          println(dir + "\\" + filenames[i]);
+          p = loadImage(dir + "\\" + filenames[i]);
+          imgs.add(g);
+        }
+      }
+    }
+  }
   return imgs;
 }
 
@@ -231,19 +248,34 @@ String[] getFileNames(String dir) {
 
 ArrayList<Gif> loadGifs(String dir) {
   ArrayList<Gif> gifs = new ArrayList<Gif>();
-  java.io.File folder = new java.io.File(dataPath(dir));
-  println(dir);
-  String[] filenames = folder.list();
-  println(folder.list().length);
-  Gif g;
-  //if (filenames != null) {
-    for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
-      if (!filenames[i].equals(".DS_Store")) {
-        g = new Gif(this, dir + filenames[i]);
-        gifs.add(g);
+  if (mac) {
+    java.io.File folder = new java.io.File(dataPath(dir));
+    String[] filenames = folder.list();
+    Gif g;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
+        if (!filenames[i].equals(".DS_Store")) {
+          g = new Gif(this, dir + filenames[i]);
+          gifs.add(g);
+        }
       }
     }
-  //}
+  } else {
+    String dir2 = "C:\\Users\\User\\Desktop\\OneEyedJacks\\data\\scenes\\" + currentScene.shortName + "\\gifs";
+    java.io.File folder = new java.io.File(dir2); 
+    String[] filenames = folder.list();
+    Gif g;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length; i++) {
+
+        if (filenames[i].charAt(0) != '.') {
+          println(dir + "\\" + filenames[i]);
+          g = new Gif(this, dir + "\\" + filenames[i]);
+          gifs.add(g);
+        }
+      }
+    }
+  }
   return gifs;
 }
 

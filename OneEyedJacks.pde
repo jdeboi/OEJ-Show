@@ -70,7 +70,7 @@ void setup() {
   initEye();
   sphereEdgeInit();
 
-  changeScene(LOLLIES);
+  changeScene(CRUSH);
   frameRate(30);
 }
 
