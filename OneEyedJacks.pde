@@ -63,27 +63,27 @@ void setup() {
   initMusic();
   initMask();
   initLines();
-
+  initSpotLights();
   if (!showTime) initControls();
 
   initColors();
   initEye();
   sphereEdgeInit();
 
-  changeScene(DIRTY);
+  changeScene(LOLLIES);
   frameRate(30);
 }
 
 void draw() {
   blendMode(BLEND);
-  background(255, 0, 0);
+  background(0);
 
   if (mappingON) {
     checkEditing();
-    //drawSolidAll(color(205, 0, 0));
+    //drawSolidAll(color(205, 0, 0)); 
     drawSolidAllCubes(color(205, 0, 0));
     renderScreens();
-    
+
     if (showMask) maskScreens(color(50));
   } else {
     playShow();
@@ -91,7 +91,8 @@ void draw() {
     if (showMask) maskScreens(0);
   }
   checkClickTrack();
-
+  displaySpotLights();
+  checkMidiStart();
   drawControls();
 
   //pushMatrix();
@@ -107,11 +108,9 @@ void playShow() {
   if (isPlaying) {
     currentScene.update();
     currentScene.display();
-    println("playing");
   } else {
-    println("not playing");
     blackoutScreens();
-    if (betweenSongs) checkMidiStart();
+    //if (betweenSongs) checkMidiStart();
   }
 }
 
@@ -196,6 +195,7 @@ void playScene() {
 }
 
 void startScene() {
+  pauseScene();
   midiStartTime = millis();
   //currentScene.startScene();
   clickTrackStarted = true;

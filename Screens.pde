@@ -302,7 +302,7 @@ void initScreens() {
   centerSurface = ks.createCornerPinSurface(screenW*2, screenH, 20);
   //centerScreen = new Screen(screenW*2, screenH, -2);
 
-  //loadKeystone(0);
+  loadKeystone(0);
 }
 
 void saveKeystone() {
