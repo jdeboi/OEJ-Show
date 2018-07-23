@@ -328,6 +328,77 @@ void drawWaveHands() {
   }
 }
 
+void drawHandTrail() {
+  //float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, 0), -PI/2, 0);
+  //float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, PI/2), -PI/2, PI/2);
+  int padding = 50;
+  int w = screenW;
+  int lr = constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
+  int num = (currentCycle/4)%4;
+  int h = int(hands[num].height*1.0*screenW/hands[num].width);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.blendMode(BLEND);
+    s.background(0);
+    //s.blendMode(ADD);
+    //for (int j = 0; j < 4; j++) {
+      //s.fill(0, 5);
+      //s.rect(0, 0, screenW, screenH);
+      s.pushMatrix();
+      //float newlr = lr*2;
+      //if (newlr > screenW*4) newlr = map(lr, screenW*4-w-padding, 2*(screenW*4-w-padding), screenW*4-w-padding, padding); 
+      //float x = newlr - screenW * i - j * screenW/3;
+      //int lr = int(constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
+      s.image( hands[num],lr, 0);
+      s.image(hands[num],screenW*4-lr, 0);
+      s.popMatrix();
+    //}
+    s.endDraw();
+  }
+}
+void beatTile(float rot) {
+  //updateSpectrum();
+  //beatCycle(300);
+  int k = 0;
+  for (Screen sc : screens) {
+    sc.s.beginDraw();
+    sc.s.background(0);
+    int numW = ((currentCycle-1)/4%4)+1;
+    int w = screenW/numW;
+    int h = hands[(currentCycle+k)%hands.length].height * w/hands[(currentCycle+k)%hands.length].width;
+    int numH = screenH/h;
+    for (int i = 0; i < numW; i++) {
+      for (int j = 0; j < numH+1; j++) {
+        sc.s.pushMatrix();
+        sc.s.translate(i*w, j*w);
+        sc.s.rotateZ(rot);
+        sc.s.image(hands[(currentCycle+k)%hands.length], -w/2, -h/2, w, h);
+        sc.s.popMatrix();
+      }
+    }
+    k++;
+    sc.s.endDraw();
+  }
+}
+void drawDoWaveHands() {
+  //float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, 0), -PI/2, 0);
+  float rot = constrain(map(mouseX, width/2 -mxW, width/2 + mxW, -PI/2, PI/2), -PI/2, PI/2);
+
+  int h = int(theremin[4].height*1.0*screenW/theremin[4].width);
+  for (int i = 0; i < 4; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    s.pushMatrix();
+    s.translate(screenW/2, screenH/2);
+    s.rotateZ(map(i, 0, 3, radians(0), radians(-90)) + rot);
+    s.image(theremin[4], -screenW/2, -h/2, screenW, h);
+    s.popMatrix();
+    s.endDraw();
+  }
+}
 void drawConstBright() {
   updateNodeConstellation(screens[0].s, screenH);
   for (int i = 0; i < screens.length; i++) {
@@ -378,6 +449,10 @@ void drawConstLeftRightSmoothImageHand(PGraphics s, int screenNum, int w) {
   drawImageMaxFit(s, constellations[currentCycle/4%4], lr - screenW * screenNum);
 }
 
+float getNodeHandLR() {
+  return  constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
+}
+
 void updateNodeConstellationMainHand() {
   float per = constrain(map(mouseX, width/2 - mxW, width/2 + mxW, -1, 1), -1, 1);
   int minY = maskPoints[keystoneNum][0].y;
@@ -385,6 +460,41 @@ void updateNodeConstellationMainHand() {
   for (int i=0; i<nodes.length; i++) {
     nodes[i].moveHand(minY, maxY, per);
   }
+}
+
+void drawHandUpHand(int num) {
+
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    if (i == num) drawImageCenteredMaxFitSole(s, theremin[7]);
+    else drawImageCenteredMaxFitSole(s, hands[4]);
+    s.endDraw();
+  }
+}
+
+void drawHandLeftRightSmoothImageHand(PGraphics s, int screenNum, int w) {
+  int padding = 50;
+  int lr = constrain(int((map(mouseX, width/2 - mxW, width/2 + mxW, padding, 4*screenW-w-padding))), padding, 4*screenW-w-padding);
+  drawImageMaxFit(s, theremin[7], lr - screenW * screenNum);
+}
+
+void drawCatchHand() {
+  updateNodeConstellation(screens[0].s, screenH);
+  for (int i = 0; i < screens.length; i++) {
+    PGraphics s = screens[i].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(BLEND);
+    drawHandLeftRightSmoothImageHand(s, i, screenW);
+    s.endDraw();
+  }
+}
+
+int getHandHand() {
+  int num = int(constrain(map(mouseX, width/2 - mxW, width/2 + mxW, 0, 4), 0, 3));
+  return num;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -464,7 +574,7 @@ void drawEye() {
     s.beginDraw();
     s.background(0);
     s.translate(s.width/2, s.height/2);
-    float rx = constrain(map(mouseY, height, height/2, -PI/5, PI/4), -PI/5, PI/4);
+    float rx = constrain(map(mouseY, height, height/2, -PI/5, PI/4), -PI/5, radians(10));
     float ry = constrain(map(mouseX, width/2 - 100, width/2 + 100, PI/3.5, PI/1.5), PI/3.5, PI/1.5);
     //println(rx, ry);
     s.rotateX(rx);
@@ -476,8 +586,8 @@ void drawEye() {
     s.beginDraw();
     s.background(0);
     s.translate(s.width/2, s.height/2);
-    s.rotateX(-0.17907077 + .02*cos(millis()/200.0));
-    s.rotateY(1.4002528 + .02*sin(millis()/200.0));
+    s.rotateX(-0.12 + .02*cos(millis()/200.0));
+    s.rotateY(1.5498 + .02*sin(millis()/200.0));
     s.shape(eyeball);
     s.endDraw();
   }

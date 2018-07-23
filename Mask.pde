@@ -80,6 +80,8 @@ void checkMaskClick() {
 
 
 void maskScreens(color c) {
+  pushMatrix();
+  translate(0, 0, -1);
   fill(c);
   noStroke();
   beginShape();
@@ -94,6 +96,7 @@ void maskScreens(color c) {
   vertex(0, 0);
   endShape();
   quad(0, maskPoints[keystoneNum][0].y, maskPoints[keystoneNum][0].x, maskPoints[keystoneNum][0].y, maskPoints[keystoneNum][9].x, maskPoints[keystoneNum][9].y, 0, maskPoints[keystoneNum][9].y);
+  popMatrix();
 }
 
 void snapMaskToOutline() {

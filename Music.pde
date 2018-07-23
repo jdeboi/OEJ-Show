@@ -7,9 +7,8 @@ int cueDelay = 230;
 //int cueDelay = 2300;
 
 Minim minim;
-AudioPlayer songFile2;
-NoAudioPlayer noAudioPlayer;
-boolean usingAudio = true;
+AudioPlayer songFile;
+//Song songFile;
 //BeatDetect beat;
 //BeatListener bl;
 int currentCycle = 0;
@@ -64,7 +63,7 @@ void initMusic() {
   //if (currentScene.song.equals("WizRock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
   //else if (!backingTracks) songFile = minim.loadFile("music/fullsong/intro.mp3");
   //else songFile = minim.loadFile("music/backing/intro.mp3");
-  songFile2 = minim.loadFile("music/intro.wav");
+  songFile = minim.loadFile("music/intro.wav");
 }
 
 //void initFFT() {
@@ -234,25 +233,7 @@ void cycleHandsFFT(float rotH) {
 }
 
 
-void beatTile() {
-  //updateSpectrum();
-  //beatCycle(300);
-  int k = 0;
-  for (Screen sc : screens) {
-    sc.s.beginDraw();
-    int numW = (currentCycle%4)+1;
-    int w = screenW/numW;
-    int h = hands[(currentCycle+k)%hands.length].height * w/hands[(currentCycle+k)%hands.length].width;
-    int numH = screenH/h;
-    for (int i = 0; i < numW; i++) {
-      for (int j = 0; j < numH+1; j++) {
-        sc.s.image(hands[(currentCycle+k)%hands.length], i * w, j * h, w, h);
-      }
-    }
-    k++;
-    sc.s.endDraw();
-  }
-}
+
 
 //void drawTriangleSpectrum() {
 //  int numBands = 10;
@@ -472,7 +453,7 @@ float percentToNumBeats(int numBeats) {
   return percentToNumBeats(0, numBeats);
 }
 float percentToNumBeats(float startT, int numBeats) {
-  float timePassed =  getSongPositionSeconds()- startT;
+  float timePassed = songFile.position()/1000.0 - startT;
   float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
   int cyclesSinceStartT = floor(timePassed / spb);
@@ -486,14 +467,14 @@ float percentToNumBeats(float startT, int numBeats) {
 }
 
 void setCurrentCycle(float startT) {
-  float timePassed = getSongPositionSeconds() - startT;
+  float timePassed = songFile.position()/1000.0 - startT;
   float bps = currentScene.tempo / 60.0;
   float spb = 1.0 / bps;
 
   currentCycle = int(timePassed/spb)+1;
 }
 void setCurrentCycleCueClick() {
-  float timePassedMinutes = (getSongPositionSeconds()/60); 
+  float timePassedMinutes = (songFile.position()/1000.0/60); 
   currentCycle = int(timePassedMinutes/currentScene.tempo) + 1;
 }
 
@@ -522,13 +503,13 @@ void checkBeatReady(float startT) {
 }
 
 
-class NoAudioPlayer {
+class Song {
   int duration, position;
   long startTime;
   boolean isPaused = true;
   ArrayList left, right;
 
-  NoAudioPlayer (int duration, float tempo) {
+  Song (int duration, float tempo) {
     left = new ArrayList<Integer>();
     right = new ArrayList<Integer>();
     this.duration = duration;
@@ -541,7 +522,6 @@ class NoAudioPlayer {
   void update() {
     if (!isPaused) {
       position += millis() - startTime;
-      
       startTime = millis();
       if (position > duration) position = duration;
     }
@@ -557,7 +537,7 @@ class NoAudioPlayer {
     startTime = millis();
   }
 
-  int position() {
+  float position() {
     return position;
   }
 
@@ -589,19 +569,23 @@ boolean editingBreaks = false;
 int currentBreak = 0;
 
 int xSpace = 50;
-int vW = 600;
+int vW = 800;
 int vH = 40;
-int ySpace = 150;
+int ySpace = 100;
 int infoX = 400;
 int infoY = 150;
 
 void drawPlayer() {
   stroke(255);
+  if (showTime) stroke(55);
   strokeWeight(2);
   noFill();
   //if (editingBreaks) fill(255);
   rect(xSpace, ySpace, vW, vH);
-  float position = map( getSongPositionSeconds(), 0, getTrackLenSeconds(), xSpace, xSpace+vW );
+  if (showTime) fill(55);
+  textSize(8);
+  text(currentScene.order, xSpace + vW + 20, ySpace);
+  float position = map( songFile.position(), 0, songFile.length(), xSpace, xSpace+vW );
   stroke(255);
   line( position, ySpace, position, ySpace+vH );
 
@@ -610,8 +594,8 @@ void drawPlayer() {
   //}
   stroke(255);
   strokeWeight(1);
-  textSize(12);
-  timeText.setText((nf(getSongPositionSeconds(), 3, 2)));
+  textSize(8);
+  timeText.setText((nf(songFile.position()/1000.0, 3, 2)));
   //text(nf(songFile.position()/1000.0, 3,2), xSpace, ySpace + vH);
 
   strokeWeight(1);
@@ -630,8 +614,8 @@ void mousePlayer() {
   int w = vW;
   int h = vH;
   if (mouseY > y && mouseY < y + h && mouseX > x && mouseX < x + w) {
-    int position = int( map( mouseX, x, x+w, 0, getTrackLenMillis() ) );
-    cueAudio(position);
+    int position = int( map( mouseX, x, x+w, 0, songFile.length() ) );
+    songFile.cue( position );
     setCurrentCue();
     setCurrentCycleCueClick();
     println("current cue: " + currentCue);
@@ -643,10 +627,10 @@ void mousePlayer() {
 
 
 void drawLines() {
-  //for (int i = 0; i < songFile.bufferSize() - 1; i++) {
+  for (int i = 0; i < songFile.bufferSize() - 1; i++) {
     //line(i, 50  + songFile.left.get(i)*50, i+1, 50  + songFile.left.get(i+1)*50);
     //line(i, 150 + songFile.right.get(i)*50, i+1, 150 + songFile.right.get(i+1)*50);
-  //}
+  }
 }
 
 int getClickTrackLen() {
@@ -673,8 +657,9 @@ float getClickTrackLenSeconds() {
 void checkClickTrack() {
   if (clickTrackStarted) {
     if (backingTracks) {
-      cueAudio(getClickTrackLen());
-      pauseSong();
+      songFile.cue(getClickTrackLen());
+      songFile.pause();
+      
     }
     fill(0, 255, 0);
     rect(width-5, height-5, 5, 5);
@@ -689,7 +674,7 @@ void printMeasureBeatsCurrentScene() {
   println("--------------------");
   println(currentScene.song, ": Bar Times");
   float bar = getBarLenSeconds();
-  for (float i = 0; i < getTrackLenSeconds(); i+= bar) {
+  for (float i = 0; i < songFile.length()/1000.0; i+= bar) {
     println(i);
   }
 }
@@ -709,46 +694,11 @@ void addClickTimes(float t) {
 void skipSong(int amt) {
   //songFile.pause();
   //songFile.skip(amt);
-  int position =  + amt;
-  cueAudio(position);
+  int position = songFile.position() + amt;
+  songFile.cue(position);
   setCurrentCue();
   setCurrentCycleCueClick();
   println("current cue: " + currentCue);
   if (currentCue != -1) cues[currentCue].initCue();
   
-}
-
-int getTrackLenMillis() {
-  if (usingAudio) return songFile2.length() - 500;
-  return int((currentScene.lengthSeconds-0.5)*1000);
-}
-
-float getTrackLenSeconds() {
-  if (usingAudio) return songFile2.length()/1000.0 -1;
-  return currentScene.lengthSeconds-0.5;
-}
-
-int getSongPositionMillis() {
-   if (usingAudio) return songFile2.position();
-  return noAudioPlayer.position();
-}
-
-float getSongPositionSeconds() {
-  if (usingAudio) return songFile2.position()/1000.0;
-  return noAudioPlayer.position()/1000.0;
-}
-
-void cueAudio(int position) {
-  if (usingAudio) songFile2.cue( position );
-  else noAudioPlayer.cue(position);
-}
-
-void pauseSong() {
-  if (usingAudio) songFile2.pause();
-  else noAudioPlayer.pause();
-}
-
-void playSong() {
-  if (usingAudio) songFile2.play();
-  else noAudioPlayer.play();
 }

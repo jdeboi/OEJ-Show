@@ -110,7 +110,7 @@ class FlockingClass {
 
     // Calculate a force to push particle away from repeller
     PVector attract(Boid b, int index) {
-      location.set(getBoidLocation());
+      //location.set(getBoidLocation());
       PVector spot = new PVector(location.x, location.y); //screelocation.y);
       PVector dir = PVector.sub(spot, b.location);  
       dir.normalize();                           // Normalize vector (distance doesn't matter here, we just want this vector for direction)

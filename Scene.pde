@@ -2,24 +2,39 @@ Scene[] scenes = new Scene[14];
 Scene currentScene;
 int currentSceneIndex = 0;
 boolean isPlaying = false;
+boolean mac = false;
 
 void initScenes() {
 
-  scenes[0] = new Scene("Intro", "intro", 1, 60, 4, 0, 261);
-  scenes[1] = new Scene("When the Moon Comes", "moon", 2, 80, 4, 2, 289);
-  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 2, 219);
+  //  When The Moon Comes = 80 4/4
+  //Subatomic = 87 4/4
+  //Crush Proof = 102 4/4
+  //Cycles = 81 3/4
+  //Papercuts = 151 4/4
+  //Cave Dwellers = 90 4/4
+  //Mood = 80 4/4
+  //Ellon = 112 4/4
+  //Deltawaves = 66.5 4/4
+  //Song For M = 60 4/4
+  //Rite Of Spring = 61 4/4
+  //Hypercube = 135 4/4
+  //Egrets = 122 4/4
+
+  scenes[0] = new Scene("Intro", "intro", 0, 60, 4, 0);
+  scenes[1] = new Scene("When the Moon Comes", "moon", 1, 80, 4, 2);
+  scenes[2] = new Scene("Dirty", "dirty", 2, 87, 4, 2);
   //scenes[2] = new Scene("Fifty Fifty", "fifty", 3, 120, 4);
-  scenes[3] = new Scene("Crush Proof", "crush", 4, 102, 4, 2, 210);
-  scenes[4] = new Scene("Cycles", "cycles", 5, 81, 3, 1, 192);  //6/8
-  scenes[5] = new Scene("WizRock", "wizrock", 6, 151, 4, 2, 229);
-  scenes[6] = new Scene("Violate Expectations", "violate", 7, 90, 4, 2, 218);
-  scenes[7] = new Scene("Mood #2", "mood", 8, 80, 4, 2, 276);
-  scenes[8] = new Scene("Delta Waves", "delta", 9, 132.8, 4, 1, 211);
-  scenes[9] = new Scene("Song for M", "song", 10, 60, 4, 2, 203);
-  scenes[10] = new Scene("Ellon", "ellon", 11, 112.12, 4, 1, 202);
-  scenes[11] = new Scene("Rite of Spring", "rite", 12, 61, 4, 2, 197);
-  scenes[12] = new Scene("Lollies", "lollies", 13, 135, 4, 2, 210);
-  scenes[13] = new Scene("Egrets", "egrets", 14, 122, 4, 2, 261);
+  scenes[3] = new Scene("Crush Proof", "crush", 3, 102, 4, 2);
+  scenes[4] = new Scene("Cycles", "cycles", 4, 81, 3, 2);  //6/8
+  scenes[5] = new Scene("WizRock", "wizrock", 5, 151, 4, 2);
+  scenes[6] = new Scene("Violate Expectations", "violate", 6, 90, 4, 2);
+  scenes[7] = new Scene("Mood #2", "mood", 7, 80, 4, 2);
+  scenes[8] = new Scene("Delta Waves", "delta", 8, 132.8, 4, 1);
+  scenes[9] = new Scene("Song for M", "song", 9, 60, 4, 2);
+  scenes[10] = new Scene("Ellon", "ellon", 10, 112.12, 4, 1);
+  scenes[11] = new Scene("Rite of Spring", "rite", 11, 61, 4, 2);
+  scenes[12] = new Scene("Lollies", "lollies", 12, 135, 4, 2);
+  scenes[13] = new Scene("Egrets", "egrets", 13, 122, 4, 2);
   currentScene = scenes[0];
 }
 
@@ -50,23 +65,21 @@ class Scene {
   float tempo;
   int signature;
   int numClickBars;
-  int lengthSeconds;
 
-  Scene(String s, String sn, int o, float t, int sig, int bars, int numSeconds) {
+  Scene(String s, String sn, int o, float t, int sig, int bars) {
     song = s;
     shortName = sn;
     order = o;
     tempo = t;
     signature = sig;
     numClickBars = bars;
-    lengthSeconds = numSeconds;
   }
 
   void playScene() {
     betweenSongs = false;
     isPlaying = true;
     //timeStarted = millis();
-    playSong();
+    songFile.play();
     println(song + " is playing");
 
     if (currentCue != -1) cues[currentCue].initCue();
@@ -74,7 +87,7 @@ class Scene {
 
   void pauseScene() {
     isPlaying = false;
-    pauseSong();
+    songFile.pause();
     println(song + " paused");
 
     if (currentCue != -1) cues[currentCue].pauseCue();
@@ -84,30 +97,28 @@ class Scene {
   }
 
   void init() {
-    currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
-    currentImages = loadImages("scenes/" + shortName + "/images/");
+    if (mac) currentGifs = loadGifs("scenes/" + shortName + "/gifs/");
+    else currentGifs = loadGifs("scenes\\" + shortName + "\\gifs\\");
+    if (mac) currentImages = loadImages("scenes/" + shortName + "/images/");
+    else currentImages = loadImages("scenes\\" + shortName + "\\images\\");
     currentCue = 0;
 
-    
-    if (!backingTracks) songFile2 = minim.loadFile("music/fullsong/" + shortName + ".mp3");
+    if (!backingTracks) songFile = minim.loadFile("musicold/fullsong/" + shortName + ".mp3");
 
     else {
-      songFile2 = minim.loadFile("music/" + shortName + ".wav");
-      if (songFile2.length() > 300 * 1000) {
-        usingAudio = false;
-        noAudioPlayer = new NoAudioPlayer(lengthSeconds * 1000, tempo);
-      }
-      else {
-        usingAudio = true;
-        noAudioPlayer = null;
-      }
+      //if (shortName.equals("ellon") || shortName.equals("intro")) songFile = minim.loadFile("music/backing/" + shortName + ".mp3");
+      //else if (shortName.equals("wizrock")) songFile = minim.loadFile("music/fullsong/wizrock.mp3");
+      //else 
+      //println(shortName);
+      //if (shortName.equals("rite") || shortName.equals("lollies") || shortName.equals("dirty")) songFile = minim.loadFile("music/" + shortName + ".mp3");
+      //else songFile = minim.loadFile("music/" + shortName + ".wav");
+      songFile = minim.loadFile("music/" + shortName + ".mp3");
     }
-    
 
     //printMeasureBeatsCurrentScene();
 
-    cueAudio(0);
-    pauseSong();
+    songFile.cue(0);
+    songFile.pause();
     //initBeat();
 
     resetFade();
@@ -136,7 +147,8 @@ class Scene {
 
   void display() {
     if (isPlaying) {
-      println("displaying");
+
+      //updateSpectrum();
       checkBeatReady(0);
 
       setCurrentCue();
@@ -157,7 +169,7 @@ class Scene {
       else if (song.equals("Intro")) displayIntro();
       previousCycle = currentCycle;
 
-      if (noAudioPlayer != null) noAudioPlayer.update();
+      //songFile.update();
 
       if (currentCue == cues.length-1) {
         println("next");
@@ -188,8 +200,8 @@ class Scene {
 
   void resetScene() {
     isPlaying = false;
-    pauseSong();
-    cueAudio(0);
+    songFile.pause();
+    songFile.cue(0);
     deconstruct();
     println(song + " has ended");
   }
@@ -199,15 +211,35 @@ class Scene {
 
 ArrayList<PImage> loadImages(String dir) {
   ArrayList<PImage> imgs = new ArrayList<PImage>();
-  java.io.File folder = new java.io.File(dataPath(dir));
-  String[] filenames = folder.list();
-  PImage p;
-  for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
-    if (!filenames[i].equals(".DS_Store")) {
-      p = loadImage(dir + filenames[i]);
-      imgs.add(p);
+  if (mac) {
+    java.io.File folder = new java.io.File(dataPath(dir));
+    String[] filenames = folder.list();
+    PImage p;
+    //if (filenames != null) {
+    for (int i = 0; i < filenames.length && i < MAX_IMG; i++) {
+      if (!filenames[i].equals(".DS_Store")) {
+        p = loadImage(dir + filenames[i]);
+        imgs.add(p);
+      }
+    }
+    //}
+  } else {
+    String dir2 = "C:\\Users\\User\\Desktop\\OneEyedJacks\\data\\scenes\\" + currentScene.shortName + "\\images";
+    java.io.File folder = new java.io.File(dir2); 
+    String[] filenames = folder.list();
+    PImage p;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length; i++) {
+
+        if (filenames[i].charAt(0) != '.') {
+          println(dir2 + "\\" + filenames[i]);
+          p = loadImage(dir + "\\" + filenames[i]);
+          imgs.add(p);
+        }
+      }
     }
   }
+  //println(imgs.size());
   return imgs;
 }
 
@@ -218,13 +250,32 @@ String[] getFileNames(String dir) {
 
 ArrayList<Gif> loadGifs(String dir) {
   ArrayList<Gif> gifs = new ArrayList<Gif>();
-  java.io.File folder = new java.io.File(dataPath(dir));
-  String[] filenames = folder.list();
-  Gif g;
-  for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
-    if (!filenames[i].equals(".DS_Store")) {
-      g = new Gif(this, dir + filenames[i]);
-      gifs.add(g);
+  if (mac) {
+    java.io.File folder = new java.io.File(dataPath(dir));
+    String[] filenames = folder.list();
+    Gif g;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length && i < MAX_GIF; i++) {
+        if (!filenames[i].equals(".DS_Store")) {
+          g = new Gif(this, dir + filenames[i]);
+          gifs.add(g);
+        }
+      }
+    }
+  } else {
+    String dir2 = "C:\\Users\\User\\Desktop\\OneEyedJacks\\data\\scenes\\" + currentScene.shortName + "\\gifs";
+    java.io.File folder = new java.io.File(dir2); 
+    String[] filenames = folder.list();
+    Gif g;
+    if (filenames != null) {
+      for (int i = 0; i < filenames.length; i++) {
+
+        if (filenames[i].charAt(0) != '.') {
+          println(dir + "\\" + filenames[i]);
+          g = new Gif(this, dir + "\\" + filenames[i]);
+          gifs.add(g);
+        }
+      }
     }
   }
   return gifs;

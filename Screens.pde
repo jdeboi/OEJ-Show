@@ -200,6 +200,7 @@ class Screen {
 }
 
 void blackoutScreens() {
+  displayLines(0);
   for (int i = 0; i < numScreens; i++) {
     screens[i].blackOut();
   }
@@ -302,7 +303,7 @@ void initScreens() {
   centerSurface = ks.createCornerPinSurface(screenW*2, screenH, 20);
   //centerScreen = new Screen(screenW*2, screenH, -2);
 
-  //loadKeystone(0);
+  loadKeystone(0);
 }
 
 void saveKeystone() {
@@ -345,7 +346,7 @@ void renderScreens() {
   //  topSurfaces[i].render(topScreens[i].s);
   //}
 
-  translate(0, 0, topScreens[0].zIndex);
+  //translate(0, 0, 0);
   sphereSurface.render(sphereScreen.s);
 
   popMatrix();

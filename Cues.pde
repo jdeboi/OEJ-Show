@@ -168,7 +168,7 @@ void initSong() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
+  cues[2] = new Cue(195, 'v', 0, 0);
 
 
   //cues[0] = new Cue(1.67, 'v', 0, 0);
@@ -197,6 +197,7 @@ void initSong() {
 
 
   currentGifs.get(0).loop();
+  currentGifs.get(1).loop();
 }
 
 void deconstructSong() {
@@ -208,12 +209,19 @@ void deconstructSong() {
 void displaySong() {
   switch(currentCue) {
   case 0:
+    drawSolidAll(0);
     break;
   case 1:
     maskGifSphere();
     movieSong();
+    fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
+    fadeInAllScreens(cues[currentCue].startT, 2);
     break;
   case 2:
+    break;
+  default:
+    drawSolidAll(0);
+    displayLines(0);
     break;
   }
 
@@ -368,7 +376,7 @@ void initCrush() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(getTrackLenSeconds(), 'm', 0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0 -1, 'm', 0, 0);
   //cues[0] = new Cue(0, 'v', 0, 0);
   //cues[1] = new Cue(10.7, 'v', 0.0, 0);  // X
   //cues[2] = new Cue(25.88, 'v', 0.0, 0);  // X
@@ -424,12 +432,14 @@ void displayCrush() {
     break;
   case 1:
     //movieCrush();
+
     screens[0].drawImage(currentGifs.get(1), 0, 0);
     screens[3].drawImage(currentGifs.get(1), 0, 0);
     displaySphereMovie(0, 0, sphereW, sphereW);
     movieCrush();
 
     sphereScreen.drawImage(sphereImg, 0, 0, sphereW, sphereW);
+    fadeInAllScreens(cues[currentCue].startT, 2);
     fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
     break;
   case 2:
@@ -680,14 +690,14 @@ void initDelta() {
   cues[0] = new Cue(3.89, 'v', 0, 0);
   cues[1] = new Cue(11.29, 'v', 0, 0);
   cues[2] = new Cue(25.39, 'v', 0, 0);
-  cues[3] = new Cue(32.39, 'v', 0, 0);
-  cues[4] = new Cue(47.39, 'v', 0, 0);
+  cues[3] = new Cue(32.39, 'v', 0, 0); // maybe rotating
+  cues[4] = new Cue(47.39, 'v', 0, 0); // control hand left to right?
   cues[5] = new Cue(68.59, 'v', 0, 0);
   cues[6] = new Cue(97.89, 'v', 0, 0);
   cues[7] = new Cue(111.39, 'v', 0, 0);
   cues[8] = new Cue(131.89, 'v', 0, 0);
-  cues[9] = new Cue(133.99, 'v', 0, 0);
-  cues[10] = new Cue(148.39, 'v', 0, 0);
+  cues[9] = new Cue(133.99, 'v', 0, 0); // interactive hands
+  cues[10] = new Cue(148.39, 'v', 0, 0); // particle symbols move
   cues[11] = new Cue(162.39, 'v', 0, 0);
   cues[12] = new Cue(177.39, 'v', 0, 0);
   cues[13] = new Cue(188.09, 'v', 0, 0);
@@ -699,8 +709,8 @@ void initDelta() {
   initSymbols();
   initNodesSym(2);
 
-  //sphereImg = loadImage("images/sphere/spiralblue.jpg");
-  initSphereBallDelta();
+  sphereImg = loadImage("images/sphere/spiralblue.jpg");
+  //initSphereBallDelta();
 }
 
 void deconstructDelta() {
@@ -721,11 +731,11 @@ void displayDelta() {
 
   if (!personOnPlatform) {
     rotHands = 0;
-    //displaySpiralSphere();
-    rotateSphereBall();
+    displaySpiralSphere();
+    //rotateSphereBall();
   } else {
     drawEye();
-    drawWaveHands();
+
     rotHands = getRotHandsDelta();
   }
 
@@ -744,16 +754,19 @@ void displayDelta() {
     chillSymbols(spiralColor);
     break;
   case 3:
+    if (currentCue > previousCue) platformOn(); 
     cycleHandsFFT(rotHands);
     displayLines(spiralColor);
     break;
   case 4:
+
     datDeltaBass(spiralColor, rotHands);
     break;
   case 5:
     crazyDelta(spiralColor, rotHands);
     break;
   case 6:
+    if (currentCue > previousCue) platformOff(); 
     chillSymbols(spiralColor);
     break;
   case 7:
@@ -763,9 +776,11 @@ void displayDelta() {
     crazySymbols(spiralColor);
     break;
   case 9:
+    if (currentCue > previousCue) platformOn(); 
     crazierDelta(spiralColor);
     break;
   case 10:
+
     crazyDelta(spiralColor, rotHands);
     break;
   case 11:
@@ -776,7 +791,7 @@ void displayDelta() {
     break;
   case 13:
     displaySymbolParticlesCenter();
-    fadeOutAllScreens(cues[currentCue].startT, 5);
+    fadeOutAllScreens(cues[currentCue+1].startT-4, 4);
     break;
   default:
     displayLines(color(0));
@@ -826,7 +841,24 @@ void drawRotateImageDelta(PGraphics s, PImage p, float rot) {
   s.endDraw();
 }
 
-void datDeltaBass(color c, float rotH) {
+void datDeltaBass(color c, float rH) {
+  int num = getHandHand();
+  drawHandUpHand(num);
+  for (int i = 0; i < 4; i++) {
+    if (i == num)  display4FaceLines(c, num);
+    else {
+      colorMode(HSB);
+      display4FaceLines(color(hue(c), saturation(c), brightness(c)-50), num);
+    }
+  }
+  //drawCatchHand();
+  // updateNodeSymbolsCatch();
+  //drawDoWaveHands();
+  //drawHandTrail();
+  //displayLines(c);
+  //beatTile(rH);
+}
+void datDeltaBassPrev(color c, float rotH) {
   drawSolidAllCubes(0);
   float[] deltaBeats2 = {1, 1, 1, -1, 1, .5, .5, -1, -1};
   currentBeatIndex = getMoveOnBeats(deltaBeats2, 8);
@@ -922,33 +954,44 @@ void rotateDelta() {
 
 void initRite() {
   cues = new Cue[10];
-  cues[0] = new Cue(3.85, 'v', 0, 0); // stars and constellations
-  cues[1] = new Cue(12.25, 'v', 0, 0);// Y whale
-  //cues[2] = new Cue(20.25, 'v', 0, 0); // Y whale
-  //cues[3] = new Cue(27.25, 'v', 0, 0);// X whale
-  //cues[4] = new Cue(36.15, 'v', 0, 0);// X whale
-  //cues[5] = new Cue(40, 'v', 0.0, 0); // Woooo - sarah pum
-  cues[2] = new Cue(43.85, 'v', 0, 0); // Z - sarah pumping wings
-  //cues[6] = new Cue(51.98, 'v', 0, 0); // Z
-  //cues[7] = new Cue(59.94, 'v', 0, 0); 
-  //cues[8] = new Cue(67.85, 'v', 0, 0); // Z
-  //cues[9] = new Cue(75.75, 'v', 0, 0); // Z
-  cues[3] = new Cue(83.45, 'v', 0, 0);// A
-  //cues[11] = new Cue(91.55, 'v', 0, 0);// A
-  cues[4] = new Cue(99.35, 'v', 0, 0);
-  //cues[13] = new Cue(107.45, 'v', 0, 0);/// BALLAD
-  //cues[14] = new Cue(115.35, 'v', 0, 0);/// BALLAD
-  //cues[15] = new Cue(123.35, 'v', 0, 0); /// BALLAD
+  //cues[0] = new Cue(3.94, 'v', 0, 0); // stars and constellations
+  //cues[1] = new Cue(11.8, 'v', 0, 0);// Y whale
+  ////cues[2] = new Cue(19.67, 'v', 0, 0); // Y whale
+  ////cues[3] = new Cue(27.25, 'v', 0, 0);// X whale
+  ////cues[4] = new Cue(36.15, 'v', 0, 0);// X whale
+  ////cues[5] = new Cue(40, 'v', 0.0, 0); // Woooo - sarah pum
+  //cues[2] = new Cue(43.85, 'v', 0, 0); // Z - sarah pumping wings
+  ////cues[6] = new Cue(51.98, 'v', 0, 0); // Z
+  ////cues[7] = new Cue(59.94, 'v', 0, 0); 
+  ////cues[8] = new Cue(67.85, 'v', 0, 0); // Z
+  ////cues[9] = new Cue(75.75, 'v', 0, 0); // Z
+  //cues[3] = new Cue(83.45, 'v', 0, 0);// A
+  ////cues[11] = new Cue(91.55, 'v', 0, 0);// A
+  //cues[4] = new Cue(99.35, 'v', 0, 0);
+  ////cues[13] = new Cue(107.45, 'v', 0, 0);/// BALLAD
+  ////cues[14] = new Cue(115.35, 'v', 0, 0);/// BALLAD
+  ////cues[15] = new Cue(123.35, 'v', 0, 0); /// BALLAD
+  //cues[5] = new Cue(131.2, 'v', 0, 0); // wooo
+  ////cues[17] = new Cue(139.25, 'v', 0, 0); // wooo
+  ////cues[18] = new Cue(147.15, 'v', 0, 0); // Z
+  ////cues[19] = new Cue(154.85, 'v', 0, 0); // Z
+  //cues[6] = new Cue(162.85, 'v', 0, 0); /// sax
+  ////cues[21] = new Cue(170.85, 'v', 0, 0);// sax
+  ////cues[22] = new Cue(178.35, 'v', 0, 0); 
+  //cues[7] = new Cue(183.85, 'v', 0, 0);
+  //cues[8] = new Cue(193.85, 'v', 0, 0); // fade
+  //cues[9] = new Cue(songFile.length()/1000.0 -.5, 'v', 0, 0);
+
+  cues[0] = new Cue(0, 'v', 0, 0); // stars and constellations
+  cues[1] = new Cue(7.87, 'v', 0, 0);// Y whale
+  cues[2] = new Cue(35.4, 'v', 0, 0); // Z - sarah pumping wings
+  cues[3] = new Cue(75.5, 'v', 0, 0);// A
+  cues[4] = new Cue(91.5, 'v', 0, 0);
   cues[5] = new Cue(131.2, 'v', 0, 0); // wooo
-  //cues[17] = new Cue(139.25, 'v', 0, 0); // wooo
-  //cues[18] = new Cue(147.15, 'v', 0, 0); // Z
-  //cues[19] = new Cue(154.85, 'v', 0, 0); // Z
   cues[6] = new Cue(162.85, 'v', 0, 0); /// sax
-  //cues[21] = new Cue(170.85, 'v', 0, 0);// sax
-  //cues[22] = new Cue(178.35, 'v', 0, 0); 
   cues[7] = new Cue(183.85, 'v', 0, 0);
   cues[8] = new Cue(193.85, 'v', 0, 0); // fade
-  cues[9] = new Cue(200.85, 'v', 0, 0);
+  cues[9] = new Cue(songFile.length()/1000.0 -.5, 'v', 0, 0);
 
   initConst();
   initMoth();
@@ -996,11 +1039,14 @@ void displayRite() {
       displayNodeConstellation(s);
       s.endDraw();
     }
+    nodesWhale();
     break;
   case 1:
     nodesWhale();
     break;
-
+    //case 2:
+    //  nodesWhale();
+    //  break;    
   case 2:
     displaySarahMothFlap();
     break;
@@ -1010,13 +1056,15 @@ void displayRite() {
     break;
 
   case 4:
-    displayHandEyeAcrossAll(percentToNumBeats(95.5, 64));
+    displayHandEyeAcrossAll(percentToNumBeats(91.5, 32));
     break;
 
   case 5: // push const
+  if (currentCue > previousCue) platformOn();
     drawConstellationLinesHand();
     break;
   case 6:
+  if (currentCue > previousCue) platformOff();
     cycleConst();
     break;
 
@@ -1025,7 +1073,7 @@ void displayRite() {
     break;
   case 8:
     displaySarahMothFlap();
-    fadeOutAllScreens(cues[currentCue].startT, 5);
+    fadeOutAllScreens(cues[currentCue+1].startT-4, 3);
     break;
   default:
     displayLines(color(0));
@@ -1054,7 +1102,7 @@ void nodesWhale() {
     //s.image(constellations[currentCycle/2%constellations.length], 0, 0);
     //drawImageCenteredMaxFit(screens[currentCycle/4%4].s, constellations[currentCycle/4%constellations.length]);
     displayNodeConstellation(s);
-    displaySwimWhale(s, i, percentToNumBeats(4, 64));
+    displaySwimWhale(s, i, percentToNumBeats(8, 32));
 
     s.endDraw();
   }
@@ -1084,7 +1132,7 @@ void initMoon() {
     cues[15] =  new Cue(256.8, 'v', 0.0, 0); 
     cues[16] =  new Cue(270, 'v', 0.0, 0); 
     cues[17] =  new Cue(280.9, 'v', 0.0, 0); 
-    cues[18] =  new Cue(getTrackLenSeconds(), 'v', 0.0, 0);// end
+    cues[18] =  new Cue(songFile.length()/1000.0-0.5, 'v', 0.0, 0);// end
   } else {
     cues = new Cue[18];
     //cues[0] = new Cue(0, 'v', 0, 0);
@@ -1109,8 +1157,10 @@ void initMoon() {
 
   initStarSpace();
   drawSolidAll(color(0));
-  currentImages.get(0).resize(sphereScreen.s.width, sphereScreen.s.height);
+  //currentImages.get(0).resize(sphereScreen.s.width, sphereScreen.s.height);
   cubesFront();
+
+  sphereImg = loadImage("scenes/moon/images/0.jpg");
 }
 
 void deconstructMoon() {
@@ -1130,9 +1180,10 @@ void displayMoon() {
   int DIVERGE_VERT_LINE = 7;
   int LIGHT_SPEED = 8;
 
-  if (!personOnPlatform) drawMoonSphere(currentImages.get(0));
-  else drawEye();
-
+  //if (!personOnPlatform) drawMoonSphere(currentImages.get(0));
+  //else drawEye();
+  drawMoonSphere(currentImages.get(0));
+  //sphereScreen.drawSolid(color(255, 0, 0)); // Image(currentImages.get(0), 0, 0);
   switch(currentCue) {
   case 0:    
     displayMoveSpaceAll(STATIC_STARS, 0.75);
@@ -1246,7 +1297,7 @@ void displayMoon() {
 }
 
 void initLollies() {
-  cues = new Cue[18];
+  cues = new Cue[15];
   cues[0] = new Cue(3.6, 'v', 0, 0);
   cues[1] = new Cue(10.67, 'v', 0, 0);
   cues[2] = new Cue(24.89, 'v', 0, 0);
@@ -1261,10 +1312,10 @@ void initLollies() {
   cues[11] = new Cue(152.89, 'v', 0, 0);
   cues[12] = new Cue(167.11, 'v', 0, 0);
   cues[13] = new Cue(181.33, 'v', 0, 0);
-  cues[14] = new Cue(195.56, 'v', 0, 0);
-  cues[15] = new Cue(209.78, 'v', 0, 0);
-  cues[16] = new Cue(216, 'v', 0, 0);
-  cues[17] = new Cue(218, 'v', 0, 0);
+  cues[14] = new Cue(songFile.length()/1000.0-1, 'v', 0, 0);
+  //cues[15] = new Cue(209.78, 'v', 0, 0);
+  //cues[16] = new Cue(216, 'v', 0, 0);
+  //cues[17] = new Cue(218, 'v', 0, 0);
   //addClickTimes();
 
   initSymbols();
@@ -1288,15 +1339,15 @@ void displayLollies() {
   //if (!personOnPlatform) displayLolliesSphere();
   //else drawEye();
 
-
+  displayLolliesSphere();
 
   if (currentCue == 0)  cycleCubeDelaunay(pink, pink);
-  else if (currentCue >= 0 && currentCue < 16) {
+  else if (currentCue >= 0 && currentCue < 13) {
     drawDelaunayTriAll();
     displayLines(pink);
-  } else if (currentCue == 16) {
+  } else if (currentCue == 13) {
     drawDelaunayTriAll();
-    fadeOutAllScreens(cues[currentCue].startT, 3);
+    fadeOutAllScreens(cues[currentCue+1].startT-4, 3);
     fadeOutAllLines(3, pink);
   } else {
     displayLines(color(0));
@@ -1311,7 +1362,7 @@ void initCycles() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(getTrackLenSeconds()-1, 'v', 0.0, 0);
+  cues[2] = new Cue(songFile.length()/1000 - 2, 'v', 0.0, 0);
 
   currentGifs.get(0).loop();
   currentGifs.get(1).loop();
@@ -1332,9 +1383,11 @@ void displayCycles() {
 
   switch(currentCue) {
   case 1:
+    //sphereScreen.drawImage(sphereImg, 0, 0, sphereW, sphereW);
     centerVidCycles();
     displayLinesCenterFocus(color(#021A00));
     fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
+    fadeInAllScreens(cues[currentCue].startT, 2);
     break;
   default:
     displayLines(color(0));
@@ -1365,7 +1418,7 @@ void initDirty() {
   cues[13] = new Cue(198.62, 'v', 0, 0);
   cues[14] = new Cue(209.66, 'v', 0, 0);
   cues[15] = new Cue(217.93, 'v', 0, 0);
-  cues[16] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
+  cues[16] = new Cue(songFile.length()/1000.0-0.5, 'v', 0, 0);
 
   centerScreen = new Screen(screenW*2, screenH, -2);
   temp = createGraphics(screenW, screenH, P3D);
@@ -1393,7 +1446,7 @@ void displayDirty() {
     drawEye();
     galaxyMove();
   }
-  println("dirty");
+
   colorMode(RGB, 255);
   switch(currentCue) { 
   case 0:
@@ -1694,16 +1747,16 @@ void initWiz() {
   //cues[11] = new Cue(213, 'v', 0, 0);  // fading outs
 
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(3.2, 'v', 0, 0);
-  cues[2] = new Cue(28.6, 'v', 0, 0);
-  cues[3] = new Cue(69.16, 'v', 0, 0);
+  cues[1] = new Cue(6.4, 'v', 0, 0);
+  cues[2] = new Cue(19.1, 'v', 0, 0);
+  cues[3] = new Cue(69.9, 'v', 0, 0);
 
-  cues[4] = new Cue(107.31, 'v', 0, 0);
-  cues[5] = new Cue(132.74, 'v', 0, 0);
-  cues[6] = new Cue(172.48, 'v', 0, 0);
-  cues[7] = new Cue(185.19, 'v', 0, 0);
-  cues[8] = new Cue(198.7, 'v', 0, 0);
-  cues[9] = new Cue(getTrackLenSeconds(), 'v', 0, 0);
+  cues[4] = new Cue(108.1, 'v', 0, 0);
+  cues[5] = new Cue(133.5, 'v', 0, 0);
+  cues[6] = new Cue(171.7, 'v', 0, 0);
+  cues[7] = new Cue(184.4, 'v', 0, 0);
+  cues[8] = new Cue(203.4, 'v', 0, 0);
+  cues[9] = new Cue(songFile.length()/1000.0 -1, 'v', 0, 0);
   //initDots(100);
   //initAllFlowyWaves();
   //initNodesMain();
@@ -1756,28 +1809,28 @@ void displayWiz() {
     //displaySquiggleParticlesAll();
     //displayDripParticlesAll();
     break;
+    //case 3:
+    //  bounceCircleFlocking(fc.NOISE_MODE);
+    //  break;
+    //case 4:
+    //  bounceCircleFlocking(fc.NOISE_MODE);
+    //  break;
   case 3:
-    bounceCircleFlocking(fc.NOISE_MODE);
+    bleed();
     break;
   case 4:
-    bounceCircleFlocking(fc.NOISE_MODE);
+    lineBoids();
     break;
   case 5:
     bleed();
     break;
   case 6:
-    lineBoids();
-    break;
-  case 7:
-    bleed();
-    break;
-  case 8:
     blackBoids();
     break;
-  case 9:
+  case 7:
     lineBoids();
     break;
-  case 10:
+  case 8:
     bounceCircleFlocking(fc.NOISE_MODE);
     fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
     break;
@@ -1804,17 +1857,29 @@ void blackBoids() {
 }
 
 void bleed() {
+  int lefts = screenW*2 - 130;
+  int rights = screenW*2 + 130;
+  int h = screenH/2;
+  attractMode = true; // after this point, explode
   fc.shapeMode = 0;
-  if (getSongPositionSeconds() < 72) attractMode = false;
-  else if (getSongPositionSeconds() < 81.3) attractMode = true;
-  else if (getSongPositionSeconds() < 86) attractMode = false;
-  else if (getSongPositionSeconds() < 88) attractMode = true;
-  else if (getSongPositionSeconds() < 94) attractMode = false;
-  else if (getSongPositionSeconds() < 100.3) attractMode = true;
-  else if (getSongPositionSeconds() < 140) attractMode = false;
-  else if (getSongPositionSeconds() < 146) attractMode = true;
-  else if (getSongPositionSeconds() < 150) attractMode = false;
-  else if (getSongPositionSeconds() < 153) attractMode = true;
+  if (songFile.position()/1000.0 < 69.9) attractMode = false;
+  else if (songFile.position()/1000.0 < 82.6) {
+    fc.attractor.location.set(lefts, h);
+    attractMode = true; // after this point, explode4
+  }
+  //else if (songFile.position()/1000.0 < 86) attractMode = false;
+  //else if (songFile.position()/1000.0 < 88) attractMode = true;
+  else if (songFile.position()/1000.0 < 89) attractMode = false;
+  else if (songFile.position()/1000.0 < 101.7) {
+    fc.attractor.location.set(rights, h);
+    attractMode = true; // after this point, explode
+  } else if (songFile.position()/1000.0 < 133.5) attractMode = false;
+  else if (songFile.position()/1000.0 < 146.2) {
+    fc.attractor.location.set(lefts, h);
+    attractMode = true;
+  }
+  //else if (songFile.position()/1000.0 < 150) attractMode = false;
+  //else if (songFile.position()/1000.0 < 153) attractMode = true;
   else attractMode = false;
   //else if (songFile.position()/1000.0 < 162) attractMode = false;
   //else if (songFile.position()/1000.0 < 140) attractMode = true;
@@ -1883,7 +1948,7 @@ void initMood() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
   cues[1] = new Cue(getClickTrackLenSeconds(), 'm', getClickTrackLenSeconds(), 0);
-  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0.0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0 -1, 'v', 0.0, 0);
 }
 
 void deconstructMood() {
@@ -1901,6 +1966,8 @@ void displayMood() {
     break;
   case 1:
     moodMovie();
+    fadeInAllScreens(cues[currentCue].startT, 2);
+    fadeOutAllScreens(cues[currentCue+1].startT-3, 3);
     break;
   default:
     displayLines(color(0));
@@ -1913,8 +1980,8 @@ void displayMood() {
 void initEllon() {
   cues = new Cue[3];
   cues[0] = new Cue(0, 'v', 0, 0);
-  cues[1] = new Cue(getTrackLenSeconds()-3, 'v', 0.0, 0);
-  cues[2] = new Cue(getTrackLenSeconds(), 'v', 0.0, 0);
+  cues[1] = new Cue(songFile.length()/1000.0-4, 'v', 0.0, 0);
+  cues[2] = new Cue(songFile.length()/1000.0-1, 'v', 0.0, 0);
 
   centerScreen = new Screen(screenW*2, screenH, -2);
 }
@@ -1984,7 +2051,7 @@ void initEgrets() {
   cues[16] = new Cue(238, 'v', 0.0, 0); // doodle shrink
   cues[17] = new Cue(254, 'v', 0.0, 0);
   cues[18] = new Cue(261, 'v', 0.0, 0); // done
-  cues[19] = new Cue(263.5, 'v', 0.0, 0); // done
+  cues[19] = new Cue(383.5, 'v', 0.0, 0); // done
 
   //initDots(100);
 }
@@ -2141,13 +2208,13 @@ class Cue {
     if (type == 'm') {
       pauseVids();
       if (vid1 != null) {
-        vid1.jump(getSongPositionSeconds() - startT + movieStartT);
+        vid1.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
       }
       if (vid2 != null) {
-        vid2.jump(getSongPositionSeconds() - startT + movieStartT);
+        vid2.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
       }
       if (sphereMovie != null) {
-        sphereMovie.jump(getSongPositionSeconds() - startT + movieStartT);
+        sphereMovie.jump(songFile.position()*1.0/1000.0 - startT + movieStartT);
       }
       playVids();
     }
@@ -2158,7 +2225,7 @@ void setCurrentCue() {
   int c = -1;
 
   for (Cue cue : cues) {
-    if (getSongPositionSeconds() >= cue.startT*1000) {
+    if (songFile.position() >= cue.startT*1000) {
       c++;
       if (c >= cues.length-1) {
         c = cues.length -1;
@@ -2192,6 +2259,7 @@ void initMidi() {
 
 void checkMidiStart() {
   if (midiPlayed) {
+
     midiPlayed = false;
     println("--------------");
     println("START");
@@ -2202,10 +2270,10 @@ void checkMidiStart() {
 void noteOn(int channel, int pitch, int velocity) {
   //printMidi("Note ON", channel, pitch, velocity);
   //lastMidi = millis();
-  if (betweenSongs) {
-    midiPlayed = true;
-    println("MIDI CUE");
-  }
+  //if (betweenSongs) {
+  midiPlayed = true;
+  println("MIDI CUE");
+  //}
   //println(">>>>>>>>>>>>>>>>>>");
 }
 
@@ -2231,16 +2299,35 @@ void controllerChange(int channel, int number, int value) {
 void displayCues() {
   int j = 0;
   for (Cue c : cues) {
-    strokeWeight(1);
-    noFill();
-    float position = map( c.startT, 0, getTrackLenSeconds(), xSpace, xSpace+vW );
-    float hue = map( c.startT, 0, getTrackLenSeconds(), 0, 255 );
-    colorMode(HSB, 255);
-    stroke(hue, 255, 255);
-    if (c.startT < getTrackLenSeconds()) {
-      line( position, ySpace, position, ySpace+vH );
-      text(j++, position, ySpace + vH/2);
+    if (!showTime) {
+      strokeWeight(1);
+      noFill();
+      float position = map( c.startT, 0, songFile.length()/1000.0, xSpace, xSpace+vW );
+      float hue = map( c.startT, 0, songFile.length()/1000.0, 0, 255 );
+      colorMode(HSB, 255);
+      stroke(hue, 255, 255);
+      textSize(12);
+
+      if (c.startT < songFile.length()/1000.0) {
+        line( position, ySpace, position, ySpace+vH );
+        stroke(255);
+        fill(255);
+        text(j++, position, ySpace + vH/2);
+      }
+      colorMode(RGB, 255);
+    } else {
+      strokeWeight(1);
+      noFill();
+      float position = map( c.startT, 0, songFile.length()/1000.0, xSpace, xSpace+vW );
+      //float hue = map( c.startT, 0, songFile.length()/1000.0, 0, 255 );
+      colorMode(HSB, 255);
+      stroke(55);
+      textSize(8);
+      if (c.startT < songFile.length()/1000.0) {
+        line( position, ySpace, position, ySpace+vH );
+        text(j++, position, ySpace + vH/2);
+      }
+      colorMode(RGB, 255);
     }
-    colorMode(RGB, 255);
   }
 }

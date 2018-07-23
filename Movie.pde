@@ -159,7 +159,7 @@ void centerVidCycles() {
   screens[2].drawImage(vid1, -screenW-x, 0);
 
   screens[0].drawImage(currentGifs.get(1), 0, 0, screenW, screenH);
-  screens[3].drawImage(currentGifs.get(1), 0, 0, screenW, screenH);
+  screens[3].drawImageMirror(currentGifs.get(1), 0, 0, screenW, screenH);
   //splitGifHorizontal(screens[0].s, currentGifs.get(1), -50);
   //splitGifHorizontal(screens[3].s, currentGifs.get(1));
 }
@@ -195,8 +195,8 @@ void movieSong() {
   screens[0].drawImage(vid1, 0, 0, screenW, screenH);
   screens[3].drawImage(vid1, 0, 0, screenW, screenH);
   
-  //screens[1].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
-  //screens[2].drawImage(currentGifs.get(0), 0, 0, screenW, screenH);
+  screens[1].drawImage(currentGifs.get(1), 0, 0, screenW, screenH);
+  screens[2].drawImageMirror(currentGifs.get(1), 0, 0, screenW, screenH);
   
   //int x = (vid1.width - screenW*2)/2;
   //screens[1].drawImage(vid1, -x, 0);

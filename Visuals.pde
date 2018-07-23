@@ -225,6 +225,21 @@ void updateNodeSymbols() {
     nodes[i].moveSym(2);
   }
 }
+void updateNodeSymbolsAll() {
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveSym(4);
+  }
+}
+void updateNodeSymbolsCatch() {
+  for (int i=0; i<nodes.length; i++) {
+    //nodes[i].moveCatch();
+  }
+}
+void updateNodeSymbolsHand() {
+  for (int i=0; i<nodes.length; i++) {
+    nodes[i].moveSymHand(getNodeHandLR());
+  }
+}
 
 void displayNodeConstellationMain() {
   int dis = 150;
@@ -295,6 +310,14 @@ class Node {
     if (this.pos.y > screenH) this.pos.y = 0;
     else if (this.pos.y < 0) this.pos.y = screenH;
   }
+   void moveSymCatch(int numScreens) {
+    this.pos.add(vel);
+    if (this.pos.x > screenW*numScreens) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = screenW*numScreens;
+
+    if (this.pos.y > screenH) this.pos.y = 0;
+    else if (this.pos.y < 0) this.pos.y = screenH;
+  }
   void move(PGraphics s, int maxY) {
     this.pos.add(vel);
     if (this.pos.x > s.width) this.pos.x = 0;
@@ -302,6 +325,14 @@ class Node {
 
     if (this.pos.y > maxY) this.pos.y = 0;
     else if (this.pos.y < 0) this.pos.y = maxY;
+  }
+  void moveSymHand(float per) {
+    this.pos.add(new PVector(per*8, vel.y));
+    if (this.pos.x > screenW*2) this.pos.x = 0;
+    else if (this.pos.x < 0) this.pos.x = screenW*2;
+
+    if (this.pos.y > screenH) this.pos.y = 0;
+    else if (this.pos.y < 0) this.pos.y = screenH;
   }
   void moveHand(float per) {
     this.pos.add(new PVector(per*8, vel.y));
@@ -340,7 +371,8 @@ class Node {
 }
 
 void displaySymbolParticlesCenter() {
-  updateNodeSymbols();
+  if (!personOnPlatform) updateNodeSymbols();
+  else updateNodeSymbolsHand();
   for (int j = 0; j < 2; j++) {
     PGraphics s = screens[j + 1].s;
     s.beginDraw();
@@ -353,6 +385,21 @@ void displaySymbolParticlesCenter() {
   }
 }
 
+void displaySymbolParticlesAll() {
+  pulsing(cyan, sin(millis()/3000.0));
+  updateNodeSymbolsAll();
+  for (int j = 0; j < 4; j++) {
+    PGraphics s = screens[j].s;
+    s.beginDraw();
+    s.background(0);
+    s.blendMode(LIGHTEST);
+    for (int i=0; i<nodes.length; i++) {
+      nodes[i].displaySym(s, j, 140);
+    }
+    s.blendMode(BLEND);
+    s.endDraw();
+  }
+}
 //////////////////////////////////////////////////////////////////////////////////
 // NERVOUS WAVES 2
 //////////////////////////////////////////////////////////////////////////////////
@@ -784,7 +831,7 @@ void startAudioAmp() {
 
 
 void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
-  float seconds = getSongPositionSeconds();
+  float seconds = songFile.position()/1000.0;
   // fade in audio amp 
   if (seconds < start + rampStart) audioLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
   // fade out audio amp
@@ -792,7 +839,7 @@ void fadeAudioLev(float start, float end, float rampStart, float rampEnd) {
 }
 
 void fadeAudioAmp(float start, float end, float rampStart, float rampEnd) {
-  float seconds = getSongPositionSeconds();
+  float seconds = songFile.position()/1000.0;
   // fade in audio amp 
   if (seconds < start + rampStart) audioAmpLev = constrain(map(seconds, start, start + rampStart, 0, 1), 0, 1);
   // fade out audio amp
@@ -857,7 +904,7 @@ void initZZoom() {
 }
 
 void zoomTerrain(float startT, float endT) {
-  float currentT = getSongPositionSeconds();
+  float currentT = songFile.position()/1000.0;
   zZoom = int(map(currentT, startT, endT, startingTerrain, endingTerrain));
   //zZoom += speed;
   zZoom = constrain(zZoom, startingTerrain, endingTerrain);
@@ -1533,6 +1580,8 @@ void displayRedPlanet(PGraphics s) {
   s.endDraw();
 }
 
+
+
 ArrayList<PVector>   complexifyPath(ArrayList<PVector> pathPoints) {
   //create a new path array from the old one by adding new points inbetween the old points
   ArrayList<PVector> newPath = new ArrayList<PVector>();
@@ -1614,7 +1663,7 @@ void displayMoonsAcross(int moonRadius) {
 
 void drawMoonSphere(PImage moon) {
   float shadow = 0.0;
-  PGraphics s = createGraphics(sphereScreen.s.width, sphereScreen.s.height);
+  PGraphics s = createGraphics(currentImages.get(0).width, currentImages.get(0).height); // sphereScreen.s.width, sphereScreen.s.height);
   s.beginDraw();
   s.background(0);
   s.noStroke(); 
@@ -1625,7 +1674,7 @@ void drawMoonSphere(PImage moon) {
   s.translate(s.width/2, s.height/2);
   color moonColor = color(255);//color(255, 0, 0, 40);
   color noColor = color(0, 0);
-  float t = getSongPositionSeconds()/(getTrackLenSeconds()*1.0);
+  float t = songFile.position()/(songFile.length()*1.0);
   if (t < 0.5) { 
     float tt = map(t, 0, 0.5, 0, 1); 
 
@@ -1716,11 +1765,12 @@ void drawMoonSphere(PImage moon) {
   s.endDraw();
 
   PImage m = moon.copy();
+
   m.mask(s);
   PGraphics sp = sphereScreen.s;
   sp.beginDraw();
   sp.background(0);
-  sp.image(m, 0, 0);
+  sp.image(m, 0, 0, sphereW, sphereW);
   sp.endDraw();
 }
 
@@ -1948,13 +1998,13 @@ void fadeInCenter(float startT, float  seconds) {
 }
 
 int getFadeOutAlpha(float startT, float seconds) {
-  float playSeconds = getSongPositionSeconds();
+  float playSeconds = songFile.position()/1000.0;
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 0, 255)), 0, 255);
 }
 
 int getFadeInAlpha(float startT, float  seconds) {
-  float playSeconds = getSongPositionSeconds();
+  float playSeconds = songFile.position()/1000.0;
   float timePassed = playSeconds - startT;
   return constrain(int(map(timePassed, 0, seconds, 255, 0)), 0, 255);
 }
@@ -2315,7 +2365,7 @@ class SpaceRect {
     int KINDA_TRIPPY = 1;
     int SORTA_TRIPPY = 2;
     int SEESAW = 3;
-    float timePassed = (getSongPositionSeconds() - cues[currentCue].startT);
+    float timePassed = (songFile.position()/1000.0 - cues[currentCue].startT);
     if (mode == NONE) rot.z = 0;
 
     else if (mode == SUPER_TRIPPY) rot.z = map(pos.z, endPSpaceRects, frontPSpaceRects, 0, timePassed);
@@ -3485,6 +3535,7 @@ void drawDelaunayTriCube(int index) {
   for (int j = index*2; j < (index+1)*2; j++) {
     PGraphics s = screens[j].s; 
     s.beginDraw(); 
+    s.blendMode(BLEND);
     if (dt != null)
       if (j % 2 == 0) {
         s.pushMatrix(); 
@@ -3503,6 +3554,7 @@ void drawDelaunayTriAll() {
   int j = 0; 
   for (Screen s : screens) {
     s.s.beginDraw(); 
+    s.s.blendMode(BLEND);
     if (dt != null)
       if (j == 1 || j == 3) {
         s.s.pushMatrix(); 

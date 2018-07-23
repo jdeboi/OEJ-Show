@@ -111,20 +111,20 @@ void initControls() {
     ;
 
 
-  String[] songNames = new String[scenes.length];
-  for (int i = 0; i < scenes.length; i++) {
-    songNames[i] = (i+1) + ". " + scenes[i].shortName;
-  }
-  List l = Arrays.asList(songNames);
-  /* add a ScrollableList, by default it behaves like a DropdownList */
-  cp5.addScrollableList("songs")
-    .setColorBackground(color(10, 155, 0))
-    .setPosition(0, ymen)
-    .setSize(150, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
+  //String[] songNames = new String[scenes.length];
+  //for (int i = 0; i < scenes.length; i++) {
+  //  songNames[i] = (i+1) + ". " + scenes[i].shortName;
+  //}
+  //List l = Arrays.asList(songNames);
+  ///* add a ScrollableList, by default it behaves like a DropdownList */
+  //cp5.addScrollableList("songs")
+  //  .setColorBackground(color(10, 155, 0))
+  //  .setPosition(0, ymen)
+  //  .setSize(150, 100)
+  //  .setBarHeight(20)
+  //  .setItemHeight(20)
+  //  .addItems(l)
+  //  ;
 
 //  l = Arrays.asList("GIF_ALL", "GIF_ACROSS", "IMG_ALL", "IMG_ACROSS", "FFT", "TILE_VID", "VID_ACROSS", "VID_MIRROR");
 //  cp5.addScrollableList("modeList")
@@ -136,15 +136,15 @@ void initControls() {
 //    .addItems(l)
 //    ;
 
-  l = Arrays.asList("0", "1");
-  cp5.addScrollableList("keystoneList")
-    .setPosition(750, ymen)
-    .setColorBackground(color(105, 110, 0))
-    .setSize(100, 100)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    ;
+//  l = Arrays.asList("0", "1");
+//  cp5.addScrollableList("keystoneList")
+//    .setPosition(750, ymen)
+//    .setColorBackground(color(105, 110, 0))
+//    .setSize(100, 100)
+//    .setBarHeight(20)
+//    .setItemHeight(20)
+//    .addItems(l)
+//    ;
 
   //l = Arrays.asList("moveXY", "moveZ", "rotateX", "rotateY", "rotateZ", "scale");
   //cp5.addScrollableList("cubeEdit")
@@ -167,13 +167,13 @@ public void controlEvent(ControlEvent theEvent) {
 //  mode = n + 1;
 //}
 
-void movieList(int n) {
-  initVid("_testing/movies/" + testingMovies[n]);
-}
+//void movieList(int n) {
+//  initVid("_testing/movies/" + testingMovies[n]);
+//}
 
-void imageList(int n) {
-  currentTestImg = loadImage("_testing/images/" + testingImages[n]);
-}
+//void imageList(int n) {
+//  currentTestImg = loadImage("_testing/images/" + testingImages[n]);
+//}
 
 //void cubeEdit(int n) {
 //  if (controlsON) {
@@ -182,18 +182,18 @@ void imageList(int n) {
 //  }
 //}
 
-void keystoneList(int n) {
-  loadKeystone(n);
-}
+//void keystoneList(int n) {
+//  loadKeystone(n);
+//}
 
-void gifs(int n) {
-  currentTestGif = new Gif(this, "_testing/gifs/" + testingGifs[n]);
-  currentTestGif.loop();
-}
+//void gifs(int n) {
+//  currentTestGif = new Gif(this, "_testing/gifs/" + testingGifs[n]);
+//  currentTestGif.loop();
+//}
 
-void songs(int n) {
-  changeScene(n);
-}
+//void songs(int n) {
+//  changeScene(n);
+//}
 
 public void saveMap(int theValue) {
   if (controlsON) {

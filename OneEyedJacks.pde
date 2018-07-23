@@ -1,4 +1,4 @@
-boolean showTime = false;
+boolean showTime = true;
 boolean mappingON = false;
 boolean useMusic = true;
 boolean useTestKeystone = true;
@@ -63,27 +63,28 @@ void setup() {
   initMusic();
   initMask();
   initLines();
-
-  if (!showTime) initControls();
+  initSpotLights();
+  initControls();
 
   initColors();
   initEye();
   sphereEdgeInit();
-
-  changeScene(DIRTY);
+  initNodesSym(4);
+  initSymbols();
+  changeScene(ELLON);
   frameRate(30);
 }
 
 void draw() {
   blendMode(BLEND);
-  background(255, 0, 0);
+  background(0);
 
   if (mappingON) {
     checkEditing();
-    //drawSolidAll(color(205, 0, 0));
+    //drawSolidAll(color(205, 0, 0)); 
     drawSolidAllCubes(color(205, 0, 0));
     renderScreens();
-    
+
     if (showMask) maskScreens(color(50));
   } else {
     playShow();
@@ -91,7 +92,8 @@ void draw() {
     if (showMask) maskScreens(0);
   }
   checkClickTrack();
-
+  //displaySpotLights();
+  checkMidiStart();
   drawControls();
 
   //pushMatrix();
@@ -103,15 +105,17 @@ void draw() {
   //popMatrix();
 }
 
+boolean inbetweenViz = false;
 void playShow() {
   if (isPlaying) {
+    inbetweenViz = false;
     currentScene.update();
     currentScene.display();
-    println("playing");
+  } else if(inbetweenViz) {
+    displaySymbolParticlesAll();
   } else {
-    println("not playing");
     blackoutScreens();
-    if (betweenSongs) checkMidiStart();
+    //if (betweenSongs) checkMidiStart();
   }
 }
 
@@ -120,10 +124,12 @@ void keyPressed() {
   if (key == 'c') controlsON = !controlsON;
   else if (key == 'p') togglePlatform();
   else if (key == 'e') mappingON =!mappingON;
+  else if (key == 'l') toggleSpotLights();
+  else if (key == 'b') inbetweenViz = true;
   else if (key == 'f') if (fc!=null) fc.explodeFlocking();
   if (bracketDown) {
     if (key == '0') changeScene(9);
-    else if (key >= '1' && key <='9') changeScene(parseInt(key) - '0' - 1);
+    else if (key >= '0' && key <='9') changeScene(parseInt(key) - '0');
     else if (key == '-') changeScene(10);
     else if (key == '=') changeScene(11);
     else if (key == 'q') changeScene(12);
@@ -166,28 +172,33 @@ void mouseReleased() {
 
 void drawControls() {
   if (controlsON && mouseY < 300) {
+    if (showTime) cursor(CROSS);
     textSize(18);
     stroke(255);
     noFill();
-    text("cue: " + currentCue, 50, 200);
+    if (!showTime) text("cue: " + currentCue, 50, 200);
     pushMatrix();
-    drawSongLabel();
     drawPlayer();
-    cp5.show();
+   
+    if (!showTime) drawSongLabel();
+    if (!showTime) cp5.show();
     popMatrix();
 
     // draw framerate
-    textSize(50);
-    noStroke();
-    fill(255);
-    pushMatrix();
-    translate(200, 0, 3);
-    text(frameRate, 50, 50);
-    popMatrix();
+    if (!showTime) {
+      textSize(50);
+      noStroke();
+      fill(255);
+      pushMatrix();
+      translate(200, 0, 3);
+      text(frameRate, 50, 50);
+      popMatrix();
+    }
   } else hideControls();
 }
 
 void hideControls() {
+  if (showTime) noCursor();
   cp5.hide();
 }
 
@@ -196,6 +207,9 @@ void playScene() {
 }
 
 void startScene() {
+  inbetweenViz = false;
+  blackoutScreens();
+  pauseScene();
   midiStartTime = millis();
   //currentScene.startScene();
   clickTrackStarted = true;
